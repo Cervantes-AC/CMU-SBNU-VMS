@@ -1,6 +1,6 @@
 # Settings & Preferences
 
-Eight settings sections for comprehensive user control:
+Seven settings sections for comprehensive user control:
 
 - **Theme** — Light (emerald), Dark (slate), NSRC Classic (crimson/gold) — 4-mode cycle
 - **Notifications** — Configure notification preferences per category

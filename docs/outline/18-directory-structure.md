@@ -35,8 +35,7 @@ D:\nsrc_vms\
 │   │   ├── database_management/  # Database browser
 │   │   ├── backup/               # Backup management UI
 │   │   ├── import_export/        # Import/export UI
-│   │   ├── reports/              # Report generation UI
-│   │   ├── report_generation/ # Report generation
+│   │   ├── report_generation/    # Report generation
 │   │   ├── landing/              # Public landing page
 │   │   ├── emergency_hotlines/   # Emergency contacts
 │   │   ├── user_guide/           # In-app help

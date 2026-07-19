@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "587410682952",
+    "project_id": "cmu-sbnu-vms",
+    "storage_bucket": "cmu-sbnu-vms.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587410682952:android:d7626add9e63de3c0e547d",
+        "android_client_info": {
+          "package_name": "com.example.cmu_sbnu_vms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmD-3PxlPWdsPSugK6yNS-TXQ37cBhT5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
