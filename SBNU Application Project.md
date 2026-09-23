@@ -8,6 +8,14 @@ A full-stack volunteer operations platform built with **Flutter** (mobile + web)
 > **Version:** `1.0.0+1`
 > **Firebase project:** `nsrc-vms`
 > **Android application ID:** `com.nsrc.nsrc_vms`
+> **Provenance:** this document describes the **earlier prototype** of the CMU SBNU VMS — the application built
+> at `D:\nsrc_vms` with package `cmu_nsrc_app`, Firebase project `nsrc-vms`, and application ID
+> `com.nsrc.nsrc_vms`. It is **design input** for this repository, which is the project of record
+> (`cmu_sbnu_vms` / `cmu-sbnu-vms` / `com.cmu.sbnu.vms.cmu_sbnu_vms`); see
+> [ADR-0001](docs/adr/0001-backend-platform-and-environment-ownership.md) and
+> [ADR-0009](docs/adr/0009-reuse-of-reference-implementation.md). Every path below is relative to `D:\nsrc_vms`,
+> and none of the code described here exists in this repository yet. Porting rules and stage order:
+> [docs/99-prototype-port-and-identity-migration-plan.md](docs/99-prototype-port-and-identity-migration-plan.md).
 
 ---
 
