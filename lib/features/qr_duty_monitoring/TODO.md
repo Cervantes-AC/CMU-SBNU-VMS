@@ -1,6 +1,6 @@
 # TODO: QR duty monitoring
 
-**Status:** Deferred planning scaffold. Do not implement or expose this feature until its approval gates are closed. This file is not evidence that QR flows exist. Follow the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** QR Duty models, repository, controllers (scanner + monitor), and screens implemented. QR session creation with opaque tokens, scan validation with replay protection and capacity checks, and officer monitoring with paginated scan feed are complete. Camera permission UX and offline queue remain deferred per D-19. Follow the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
