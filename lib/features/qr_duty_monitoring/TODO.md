@@ -1,44 +1,37 @@
-﻿# TODO: qr duty monitoring
+# TODO: QR duty monitoring
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Deferred planning scaffold. Do not implement or expose this feature until its approval gates are closed. This file is not evidence that QR flows exist. Follow the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
-This is the `features/qr_duty_monitoring/TODO.md` module. Its detailed file-by-file contract is in [the canonical specification](../../../docs/lib/features.md). The [implementation backlog](../../../docs/guides/implementation-backlog.md), [decision register](../../../docs/overview/decision-register.md), [data/access contract](../../../docs/architecture/data-and-access.md), and [backend contracts](../../../docs/architecture/backend-contracts.md) govern sequencing, approval, data and trusted operations. Resolve mismatches by updating the canonical contract and decision record before implementation; do not invent APIs silently.
+This feature would support event-bound duty/check-in QR flows. The canonical screen and file contract is in [Feature File Specifications](../../../docs/lib/features.md). QR policy is open under D-12; attendance and service-hour policy are open under D-10/D-25; offline behavior is open under D-19. Keep the feature disabled until owners approve token format, validation, expiry, replay handling, offline behavior, retention, and any attendance consequences.
 
-## Approval and safety gate
+## Required files and responsibilities
 
-Deferred pending attendance policy, permissions, trusted signing/validation, expiry, replay protection, and retention. Client cannot mint trusted scans.
+- [ ] `qr_duty_scanner_screen.dart`: request camera access only after an explanation; accept the documented opaque payload; show accepted, rejected, expired, unavailable/offline, and permission-denied outcomes; prevent duplicate camera callbacks.
+- [ ] `qr_code_generator_screen.dart`: request creation/closure of a time-bound event session through a trusted endpoint; render an opaque QR without PII or signing secrets. No client-side token signing.
+- [ ] `duty_monitoring_screen.dart`: display an authorized, paginated scan feed and distinguish a server-confirmed record from a pending local attempt.
+- [ ] `qr_duty_controller.dart`: coordinate UI state, camera lifecycle, duplicate callback suppression, and repository intents; it must not validate trust, determine actor identity, award hours, or trust device time.
+- [ ] `widgets/scan_permission_prompt.dart` only if a reusable, accessible permission explanation is required by the implementation.
 
-Identify each relevant requirement as approved, proposed, open, or deferred before coding. Open decisions permit local synthetic work only. Never use real personal data or production credentials in development. Client checks are not authorization; privileged behavior requires documented backend operations and server enforcement.
+## Prerequisites before implementation
 
-## Canonical file-level contract
+- [ ] Product/security owners approve D-12 threat model, opaque token/session format, lifetime, event binding, signature/validation authority, replay/idempotency behavior, and failure response.
+- [ ] Attendance owner closes D-10 and D-25 before QR results can affect attendance or official service hours.
+- [ ] Product/security owners close D-19 before any offline queue or local sensitive-data persistence is designed.
+- [ ] Trusted backend contract, rules, indexes, and emulator security tests are specified before client UI depends on them.
+- [ ] Camera permission UX and supported device matrix are approved; no background camera/location behavior.
 
-### `lib/features/qr_duty_monitoring/`
+## Security requirements
 
-**Files:** `qr_duty_scanner_screen.dart`, `qr_code_generator_screen.dart`, `duty_monitoring_screen.dart`, `qr_duty_controller.dart`, `widgets/scan_permission_prompt.dart` if needed.
+- [ ] QR contents contain no PII, static credentials, signing secrets, or reusable bearer authority.
+- [ ] Trusted backend validates session, event scope, current actor, expiry, status, duplicate/replay, and idempotency. Client clock and client assertions are never authoritative.
+- [ ] A failed or offline scan is not presented as a recorded check-in. Retry cannot create a second attendance/duty record.
+- [ ] Access to monitor/roster data is server-authorized and paginated; logs exclude QR payloads and personal details.
 
-Member scanner requests camera permission after explanation, accepts only the documented opaque payload, submits it to trusted validation, provides accepted/rejected/expired/offline states, and prevents duplicate scanner callbacks. Officer generator creates a time-bound event session through the trusted service and renders printable QR without PII. Monitor uses authorized paged scans and distinguishes server receipt from pending local intent. No client-side secret signing or trust in device clock.
+## Completion and verification
 
-**Tests:** malformed/expired/replayed/cross-event/duplicate scans, camera denied, no PII in encoded contents, duplicate camera callback, session close, network unavailable. Security tests must run against the emulator/function, not only mocked repository.
-
-## Implementation checklist
-
-- [ ] Confirm backlog stage and dependencies. If a prerequisite contract is missing, scope that work explicitly before building dependent UI.
-- [ ] Create the named files and only justified local helpers. Preserve specified public APIs, file responsibilities, route names, domain invariants, and view-state behavior.
-- [ ] Inject dependencies. Keep presentation, orchestration, domain policy, persistence, and SDK/platform adapters separated; avoid hidden global clients.
-- [ ] Handle validation, persisted-data parsing, bounded pagination, retries/idempotency, and relevant loading, empty, stale/offline, failure, permission-denied, and conflict states.
-- [ ] Enforce record and role scope in backend/rules as well as UI affordances. Derive actor identity and privileged values on the trusted side.
-- [ ] Redact personal/sensitive data from logs, errors, analytics labels, cache, exports, URLs, and serialized payloads. Clear user-scoped state at sign-out/revocation where applicable.
-- [ ] Update related data, route, backend, environment, operations, and backlog documentation when contracts or dependencies change. Record unresolved decisions.
-
-## Acceptance and handoff
-
-- [ ] All required files meet their specified responsibilities; no undeclared privileged behavior was added.
-- [ ] Routes and repositories use the intended access policy; backend denial remains authoritative.
-- [ ] Canonical boundary, retry, concurrency/idempotency, failure, and unauthorized-access scenarios are accounted for.
-- [ ] Handoff states changed files, actual verification performed, unverified acceptance cases, configuration/migration needs, open decisions, and limitations.
-
-**Verification rule:** Scenarios here and in canonical specifications describe future required evidence. They do not authorize adding or running tests. Follow [`AGENTS.md`](../../../AGENTS.md) and [testing/review guidance](../../../docs/ai-coding/testing-and-review.md).
-
-
+- [ ] All prerequisites are approved and recorded; feature route remains unavailable until then.
+- [ ] Canonical scenarios include malformed, expired, replayed, cross-event, duplicate, denied-camera, denied-access, session-closed, and network-failure cases.
+- [ ] Emulator/function security coverage proves the trusted authorization and replay behavior before release.
+- [ ] These scenarios describe required future evidence and do not authorize adding or running tests. Follow [`AGENTS.md`](../../../AGENTS.md) and update this TODO, feature spec, decision register, and backlog together when the gate changes.
