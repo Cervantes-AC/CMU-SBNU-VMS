@@ -2,3 +2,4 @@
 export 'models/user.dart';
 export 'models/event.dart';
 export 'models/announcement.dart';
+export 'models/attendance.dart';

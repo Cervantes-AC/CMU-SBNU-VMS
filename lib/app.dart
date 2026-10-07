@@ -11,13 +11,18 @@ import 'package:cmu_sbnu_vms/core/error/app_exception.dart';
 import 'package:cmu_sbnu_vms/core/theme/app_theme.dart';
 import 'package:cmu_sbnu_vms/core/theme/theme_provider.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/announcement_repository.dart';
+import 'package:cmu_sbnu_vms/data/interfaces/attendance_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/auth_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/event_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/user_repository.dart';
 import 'package:cmu_sbnu_vms/data/models/announcement.dart';
+import 'package:cmu_sbnu_vms/data/models/attendance.dart';
 import 'package:cmu_sbnu_vms/data/models/event.dart';
 import 'package:cmu_sbnu_vms/data/models/user.dart';
 import 'package:cmu_sbnu_vms/features/access_denied_screen.dart';
+import 'package:cmu_sbnu_vms/features/attendance/attendance_controller.dart';
+import 'package:cmu_sbnu_vms/features/attendance/event_attendance_screen.dart';
+import 'package:cmu_sbnu_vms/features/attendance/member_attendance_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_controller.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/password_reset_screen.dart';
@@ -344,6 +349,65 @@ class UnconfiguredAnnouncementRepository implements AnnouncementRepository {
       ));
 }
 
+/// Attendance repository used when Firebase was not initialized at bootstrap.
+/// Returns empty results for all operations.
+class UnconfiguredAttendanceRepository implements AttendanceRepository {
+  const UnconfiguredAttendanceRepository();
+
+  @override
+  Stream<({List<Attendance> items, String? nextCursor})> watchEventAttendance({
+    required String eventId,
+    int limit = 50,
+  }) =>
+      Stream.value((items: <Attendance>[], nextCursor: null));
+
+  @override
+  Future<Result<({List<Attendance> items, String? nextCursor})>> getEventAttendance({
+    required String eventId,
+    int limit = 50,
+    String? startAfter,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Attendance service is not available in this build.',
+      ));
+
+  @override
+  Stream<Attendance?> watchMyAttendance(String eventId) =>
+      Stream.value(null);
+
+  @override
+  Future<Result<Attendance?>> getMyAttendance(String eventId) async =>
+      const Failure(UnavailableException(
+        message: 'Attendance service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Attendance>> recordAttendance({
+    required String eventId,
+    required AttendanceStatus status,
+    required AttendanceSource source,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Attendance service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Attendance>> correctAttendance({
+    required String attendanceId,
+    required AttendanceStatus newStatus,
+    required int expectedRevision,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Attendance service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<AttendanceSummary>> getAttendanceSummary(String eventId) async =>
+      const Failure(UnavailableException(
+        message: 'Attendance service is not available in this build.',
+      ));
+}
+
 /// Application composition root.
 ///
 /// Accepts/injects root dependencies, establishes Provider scopes, applies
@@ -358,6 +422,7 @@ class NSRCApp extends StatefulWidget {
     this.userRepository,
     this.eventRepository,
     this.announcementRepository,
+    this.attendanceRepository,
     this.themeProvider,
     this.cacheService,
   });
@@ -375,6 +440,9 @@ class NSRCApp extends StatefulWidget {
   /// Null falls back to [UnconfiguredAnnouncementRepository] (announcements unavailable).
   final AnnouncementRepository? announcementRepository;
 
+  /// Null falls back to [UnconfiguredAttendanceRepository] (attendance unavailable).
+  final AttendanceRepository? attendanceRepository;
+
   final ThemeProvider? themeProvider;
   final CacheService? cacheService;
 
@@ -390,6 +458,8 @@ class _NSRCAppState extends State<NSRCApp> {
   late final ProfileController _profileController;
   late final EventsController _eventsController;
   late final AnnouncementsController _announcementsController;
+  late final MemberAttendanceController _memberAttendanceController;
+  late final OfficerAttendanceController _officerAttendanceController;
   late final SessionController _sessionController;
   late final GoRouter _router;
 
@@ -410,6 +480,12 @@ class _NSRCAppState extends State<NSRCApp> {
     _announcementsController = AnnouncementsController(
       announcementRepository: widget.announcementRepository ?? const UnconfiguredAnnouncementRepository(),
     );
+    _memberAttendanceController = MemberAttendanceController(
+      attendanceRepository: widget.attendanceRepository ?? const UnconfiguredAttendanceRepository(),
+    );
+    _officerAttendanceController = OfficerAttendanceController(
+      attendanceRepository: widget.attendanceRepository ?? const UnconfiguredAttendanceRepository(),
+    );
     _sessionController = SessionController(authRepository: _authRepository);
     _router = _createRouter();
   }
@@ -422,6 +498,8 @@ class _NSRCAppState extends State<NSRCApp> {
     _profileController.dispose();
     _eventsController.dispose();
     _announcementsController.dispose();
+    _memberAttendanceController.dispose();
+    _officerAttendanceController.dispose();
     super.dispose();
   }
 
@@ -550,6 +628,30 @@ class _NSRCAppState extends State<NSRCApp> {
                   ),
                 ),
               ),
+              GoRoute(
+                path: RouteNames.memberAttendance,
+                builder: (context, state) => ListenableBuilder(
+                  listenable: _sessionController,
+                  builder: (context, _) => MemberAttendanceScreen(
+                    controller: _memberAttendanceController,
+                    sessionController: _sessionController,
+                    authController: _authController,
+                    eventId: state.pathParameters['eventId']!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: RouteNames.eventAttendance,
+                builder: (context, state) => ListenableBuilder(
+                  listenable: _sessionController,
+                  builder: (context, _) => EventAttendanceScreen(
+                    controller: _officerAttendanceController,
+                    sessionController: _sessionController,
+                    authController: _authController,
+                    eventId: state.pathParameters['eventId']!,
+                  ),
+                ),
+              ),
             ],
           ),
           if (kDebugMode)
@@ -572,6 +674,8 @@ class _NSRCAppState extends State<NSRCApp> {
         ChangeNotifierProvider<ProfileController>.value(value: _profileController),
         ChangeNotifierProvider<EventsController>.value(value: _eventsController),
         ChangeNotifierProvider<AnnouncementsController>.value(value: _announcementsController),
+        ChangeNotifierProvider<MemberAttendanceController>.value(value: _memberAttendanceController),
+        ChangeNotifierProvider<OfficerAttendanceController>.value(value: _officerAttendanceController),
         ChangeNotifierProvider<SessionController>.value(
             value: _sessionController),
       ],

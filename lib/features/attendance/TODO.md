@@ -1,6 +1,6 @@
 ﻿# TODO: attendance
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Member attendance screen, Event attendance screen, MemberAttendanceController, OfficerAttendanceController, AttendanceRepository interface/impl, Attendance model implemented. Controllers handle loading, QR check-in, manual recording, corrections, and summary. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
