@@ -7,18 +7,18 @@ actions.
 
 ## Project status (2026-10-07)
 
-**This repository is an early development scaffold. The app currently opens a static landing concept preview with the CMU/SBNU logos for local development; no authenticated product workflow is implemented. Public branding/release approval remains open.**
+**This repository is an early frontend prototype. The app opens a responsive, member-facing workspace with synthetic sample content and local-only interactions. Authentication, Firebase, and live records are not connected. Public branding/release approval remains open.**
 
 | | State |
 |---|---|
-| Application code | `lib/main.dart` opens the static landing preview through `NSRCApp`; Firebase/auth routing is not implemented |
+| Application code | `lib/main.dart` opens the member workspace prototype through `NSRCApp`; Firebase/auth routing is not implemented |
 | Dependencies | `firebase_core` is declared and locked; `flutter pub get` succeeds |
 | Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
-| Tests | One landing-root smoke test was updated; it has not been run since the app-root change |
+| Tests | The root smoke test still describes the earlier landing preview and has not been updated or run for the workspace prototype |
 | Firebase | Target client identifiers exist. Local Auth/Firestore emulators and deny-all Firestore rules are configured; Flutter emulator wiring, feature rules, Functions, and backend code are not implemented |
 | Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
 | Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
-| Local development | `flutter run -d chrome` opens the local landing preview. It does not connect to Firebase; use synthetic data only |
+| Local development | `flutter run -d chrome` opens the frontend-only member workspace. It does not connect to Firebase; use synthetic data only |
 | Real data | **None may be used** until the decisions in the open-decisions register are closed |
 
 This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
@@ -42,8 +42,8 @@ Verify with `flutter doctor -v`.
 flutter --version                 # confirm 3.38.9 / Dart 3.10.8
 flutter pub get                   # install dependencies
 flutter analyze                   # passes with 0 errors as of 2026-10-07
-flutter test                      # landing-root smoke test (run when authorized)
-flutter run -d chrome             # opens the local landing preview; no Firebase client is initialized
+flutter test                      # existing smoke test still targets the previous landing preview
+flutter run -d chrome             # opens the local frontend prototype; no Firebase client is initialized
 ```
 
 For local Auth/Firestore emulator configuration (not yet connected to the Flutter app), run in a separate terminal:
@@ -77,8 +77,8 @@ Follow the reading order matching your role to get started:
 ## Repository layout
 
 ```text
-lib/                Application source (currently the starter only)
-test/               Tests (currently the starter widget test)
+lib/                Application source (member workspace frontend prototype)
+test/               Widget tests (not yet updated for the member workspace)
 docs/               Planning and architecture docs — see docs/index.md for the full map
   docs/overview/    Product scope, decision records, and prototype context
   docs/architecture/ Implementation guides, schema/data access, backend & UI contracts
