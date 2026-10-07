@@ -1,41 +1,25 @@
 # Landing Feature Status and TODO
 
-**Current status:** The static landing concept remains available as an isolated screen, but the app now starts in the member workspace prototype. The landing concept does not record brand/publication approval. Do not publish or release it as the final landing experience while its approval gates remain open.
+**Status:** The local app starts at the landing page (`/`). The page provides a direct path to member sign-in (`/sign-in`) and uses the CMU and SBNU logo files from `assets/images/`. Authentication is not connected; the sign-in page currently explains that limitation and disables submission.
 
-## Run the local preview
+## Implemented
 
-From the repository root:
+- Responsive landing content for narrow and wide layouts.
+- Accessible, contained display of the two configured logo assets.
+- Member sign-in actions in the header, access notice, and hero section; all navigate to `/sign-in`.
+- Product areas described without sample member identities, records, metrics, or fake service results.
+- Local-only disclosure that member services are not connected.
+- Root route `/` starts at this page; `/sign-in` and `/password-reset` remain separate routes.
 
-```powershell
-flutter run -d chrome
-```
+## Remaining work
 
-The page is presentation-only. It loads no Firebase, network, or member data and has no working sign-in, contact form, external link, or service action. The current app starts in the frontend-only member workspace prototype instead.
+- [ ] Product owner reviews the copy, navigation, and described service areas.
+- [ ] Record D-17 approval before public hosting or enabling an external public landing route.
+- [ ] Record D-18 brand approval before publishing CMU/SBNU names and logos.
+- [ ] Confirm platform and accessibility scope under D-21.
+- [ ] Replace the disabled sign-in service action only when the approved auth controller/repository are connected.
+- [ ] Update the widget smoke test, which still expects the previous landing preview content, when test changes are authorized.
 
-## Implemented files
+## Boundary
 
-- `lib/main.dart`: initializes Flutter bindings and starts `NSRCApp`.
-- `lib/app.dart`: temporarily composes the Material 3 theme and uses `MemberWorkspace` as the local prototype home. Firebase initialization and the approved auth/public router are not implemented.
-- `lib/features/prototype/member_workspace.dart`: synthetic-data member dashboard and local-only Events, My Attendance, Announcements, and Profile screens. No action writes data or authenticates a user.
-- `lib/features/landing/landing_page.dart`: responsive concept page with CMU/SBNU image assets in a contained logo row, a preview notice, static workspace illustration, planned capability cards, text scaling, and semantic image/headings.
-- `test/widget_test.dart`: smoke test for the earlier landing preview; it is stale against the current member workspace root and has not been run or updated.
-
-## Approval gates before public use
-
-- [ ] D-17: Approve whether a public landing route/site will exist, supported platforms, hosting/domain, and support ownership.
-- [ ] D-18: Approve institutional name, logo use, colors, program claims, and publication context. The logos are included for this requested local preview only; public use still needs the recorded approval.
-- [ ] D-21: Confirm supported browser/device matrix, accessibility expectations, and languages.
-- [ ] Product owner reviews final copy, capability descriptions, navigation, metadata, and release behavior.
-- [ ] Replace this temporary app root with the approved signed-out/auth route behavior. Do not expose a public landing route unless D-17 permits it.
-- [ ] Add a contact form only after its destination, data-use notice, validation, backend abuse controls/rate limits, retention, and failure behavior are approved.
-
-## Completion criteria for the local preview
-
-- [x] Landing preview is implemented as a standalone presentation screen.
-- [x] Layout adapts across narrow and wide widths; CMU and SBNU logos use `BoxFit.contain` and accessible labels.
-- [x] The page states that content is conceptual and sign-in/records are not connected.
-- [x] Capability cards are visibly marked planned; there are no unsupported service promises, private data, contact details, or unapproved external links.
-- [ ] Updated root-preview smoke test and approved-width/accessibility review are completed.
-- [ ] Owner review and D-17/D-18/D-21 decisions are recorded before public release.
-
-**Verification boundary:** The smoke test was updated but not run. Do not add or run further tests unless the user explicitly asks to test or verify implementation. Public routing, branding, and contact workflow remain gated by the decisions above.
+This landing page is the local application entry, not proof that member services or public hosting are ready. It loads no Firebase or member data, offers no registration/contact form, and must not be published while the required approval decisions remain open.

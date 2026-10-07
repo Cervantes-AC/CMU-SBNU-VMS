@@ -24,7 +24,7 @@ flutter test
 flutter run -d chrome
 ```
 
-Current state: `firebase_core` is declared and locked. `lib/main.dart` starts `NSRCApp`, which displays a static, unbranded landing preview. The app does not initialize Firebase or connect to either emulator. The counter test was replaced with a landing-root smoke test but has not been run since that change. Emulator-only SDK initialization, auth routing, and the rest of B-005 remain incomplete. Keep lockfile changes committed with dependency changes.
+Current state: `firebase_core` is declared and locked. `lib/main.dart` starts `NSRCApp` at the local landing page, which links to sign-in. The sign-in and password-reset forms are present, but their service handlers are not connected. The app does not initialize Firebase or connect to either emulator. The existing widget test still expects earlier preview-specific landing copy and is stale. Emulator-only SDK initialization, auth service wiring, session/profile routing, and the rest of B-005 remain incomplete. Keep lockfile changes committed with dependency changes.
 
 ## 3. Firebase local emulator
 

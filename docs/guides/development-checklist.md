@@ -11,7 +11,7 @@ This checklist records verified repository state at the development gates. It is
 - [x] **B-003 (local emulator config):** Auth and Firestore emulator ports, demo project instructions, empty index catalog, and deny-all Firestore rules are checked in. Startup must be verified on the contributor machine before relying on it.
 - [ ] **B-002 (product scope):** Product owner has accepted or amended the proposed P0/P1 scope. Until then, implement only foundation work that is safe under the documented synthetic-data defaults.
 - [ ] **B-004 (toolchain/CI):** CI host, runner image, and pinned Flutter/Dart/Node versions are configured and verified. The local Flutter version alone is insufficient.
-- [ ] **B-005 (application bootstrap):** The counter is removed from `main.dart`; `NSRCApp` currently displays a local static landing preview, and its smoke test has not been run. Complete safe bootstrap, the approved auth/public router, and explicit emulator-only Firebase initialization before any Firebase client is used.
+- [ ] **B-005 (application bootstrap):** `NSRCApp` starts at the local landing page with a route to sign-in. Sign-in/reset service handlers, safe bootstrap, session/profile routing, and explicit emulator-only Firebase initialization remain incomplete. Update the stale preview-copy smoke test as part of an authorized test task.
 - [ ] **B-006 (trusted backend):** Implement only owner-approved backend operations with validation, authorization, idempotency, audit, and emulator evidence.
 
 ## Gate 1 — secure application foundation
@@ -29,4 +29,4 @@ Do not use real volunteer data, deploy, or publish while required decisions rema
 
 ## Verification record
 
-`flutter pub get` succeeded and the pre-landing starter passed `flutter analyze` and its counter test on 2026-10-07. After connecting the landing preview to `NSRCApp`, `flutter analyze` has been rerun; the updated root smoke test has not been run. Markdown links were checked. Firebase emulator startup/rules behavior, CI, Firebase bootstrap, auth routing, other feature behavior, and production readiness remain unverified.
+`flutter pub get` succeeded and the pre-landing starter passed `flutter analyze` and its counter test on 2026-10-07. `flutter analyze` passed after adding the auth frontend; the existing widget test still expects earlier landing-preview copy and has not been run. Markdown links were checked. Firebase emulator startup/rules behavior, CI, Firebase bootstrap, auth service wiring, session routing, other feature behavior, and production readiness remain unverified.

@@ -1,6 +1,6 @@
 ﻿# TODO: auth
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Sign-in and password-reset frontend screens are implemented. Authentication repository, Firebase integration, session/profile routing, and service-backed flows remain pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
@@ -23,6 +23,14 @@ Identify each relevant requirement as approved, proposed, open, or deferred befo
 **Screen contract:** sign-in, reset, and registration only if institution-approved; clear explanation of pending approval; no self-service role selection. Must handle keyboard, autofill, text scaling, retry and disabled accounts. It delegates auth to `AuthRepository` and profile gating to app session state.
 
 **Tests:** valid/invalid input, duplicate submission, password reset generic response, pending-account routing, auth failure, no role choice, password not retained.
+
+## Current frontend implementation
+
+- [x] `auth_screen.dart`: responsive sign-in form, inline validation, password visibility, safe generic submission failure, pending/approval guidance, and no registration or role selector.
+- [x] `password_reset_screen.dart`: responsive email form, input validation, and account-enumeration-safe response copy.
+- [x] `app.dart`: local landing route at `/`, sign-in route at `/sign-in`, and password-reset route at `/password-reset`.
+- [ ] Implement `AuthController` and `AuthRepository` injection; keep submit/reset controls unavailable until those services are wired.
+- [ ] Connect authentication to the approved Firebase environment and add auth/profile status routing before protected screens exist.
 
 ## Implementation checklist
 
