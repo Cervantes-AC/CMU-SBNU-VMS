@@ -1,6 +1,6 @@
 # Test Plan and Continuous Integration Contract
 
-**Current state:** no CI workflow, Firebase rules/functions test harness, or feature test suite is documented in this target. The only current test is the Flutter counter starter test. This page defines what to add and what CI must prove.
+**Current state:** Flutter has one passing counter starter test; no CI workflow, Firebase rules/functions test harness, or feature test suite exists. The Auth/Firestore emulators are configured with a deny-all Firestore baseline, but emulator behavior has not yet been validated by a rules test. This page defines what to add and what CI must prove.
 
 ## 1. Local verification
 

@@ -8,9 +8,9 @@ This backlog replaces references to a missing sprint plan. Work is ordered by de
 |---|---|---|---|
 | B-001 | Reconcile target documentation and decision register | Root README links only existing target docs; D-01…D-27 owners/status and required evidence recorded | All work |
 | B-002 | Approve proposed P0/P1 product scope | Product owner records accepted requirements or edits `PRODUCT_REQUIREMENTS.md` | Feature scope |
-| B-003 | Confirm local/dev Firebase ownership/config | Emulator project/config and explicit dev identity documented; no prod access | Backend |
-| B-004 | Pin toolchain and CI runner | Flutter/Dart/Node versions match README, pubspec and CI | All builds |
-| B-005 | Add dependency baseline and replace starter bootstrap/test | Firebase deps intentionally selected; `main.dart` bootstraps safe app; counter removed; smoke test targets root app | P0 UI |
+| B-003 | Configure local emulator-only Firebase environment | Auth/Firestore emulator config uses explicit demo project ID; default Firestore rules deny all; no cloud alias or production access | Backend |
+| B-004 | Pin toolchain and CI runner | Flutter/Dart/Node versions match README, `pubspec.yaml`, lockfile, and a configured CI runner | All builds |
+| B-005 | Complete application bootstrap and dependency baseline | Firebase dependencies intentionally selected; `main.dart` bootstraps a safe root app; counter removed; emulator-only SDK wiring is explicit; smoke test targets root app | P0 UI |
 | B-006 | Implement the approved trusted backend contracts | Functions/rules implement only approved operations in `BACKEND_CONTRACTS.md`; authorization, validation, idempotency and audit tests pass | Any privileged write |
 
 ## Gate 1 — secure app foundation (P0)
@@ -19,7 +19,7 @@ This backlog replaces references to a missing sprint plan. Work is ordered by de
 |---|---|---|
 | B-010 | Define approved data dictionary and role matrix | DATA_AND_ACCESS approved for synthetic/development scope; field owners and denied cases stated |
 | B-011 | Implement core errors, result, logging, theme, route catalog | Contracts match `docs/lib/core.md` and `shared.md`; no raw exception/PII logs |
-| B-012 | Configure emulator and deny-all rules/index skeleton | `firebase.json`, rules and indexes checked in; emulator-only instructions work; default all denied |
+| B-012 | Configure emulator and deny-all rules/index skeleton | Auth/Firestore emulator config, rules, and indexes checked in; emulator starts under the demo project ID; rules deny every client operation until reviewed rules/tests replace the baseline |
 | B-013 | Implement auth/session/profile approval gate | Missing/pending/disabled fails closed; role/status cannot be client-set |
 | B-014 | Implement app shell and approved routes | Route table and role nav match UI_AND_ROUTES; unknown/deep links safe |
 | B-015 | Add auth, route-guard and rules tests | Anonymous/pending/member/officer/admin and cross-user cases cover all existing operations |

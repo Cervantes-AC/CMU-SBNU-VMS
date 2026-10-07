@@ -5,19 +5,20 @@ Unit (CMU SBNU)**. The product goal is a role-aware volunteer operations tool: v
 attendance, incident reporting, and unit communication, with least-privilege access and auditable
 actions.
 
-## Project status (2026-09-23)
+## Project status (2026-10-07)
 
 **This repository is a starter plus a planning set. No product feature is implemented yet.**
 
 | | State |
 |---|---|
 | Application code | `lib/main.dart` is still the Flutter counter starter |
-| Dependencies | `firebase_core` added (B-005); `flutter analyze` now passes with 0 errors |
+| Dependencies | `firebase_core` is declared and locked; `flutter pub get` succeeds |
 | Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
 | Tests | One starter widget test |
-| Firebase | Client configuration for project `cmu-sbnu-vms` exists; no rules, indexes, or backend code yet |
+| Firebase | Target client identifiers exist. Local Auth/Firestore emulators and deny-all Firestore rules are configured; Flutter emulator wiring, feature rules, Functions, and backend code are not implemented |
 | Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
 | Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
+| Local development | Flutter starter checks pass. The app is still the counter starter and does not connect to Firebase; use synthetic data only |
 | Real data | **None may be used** until the decisions in the open-decisions register are closed |
 
 This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
@@ -42,7 +43,13 @@ flutter --version                 # confirm 3.38.9 / Dart 3.10.8
 flutter pub get                   # install dependencies
 flutter analyze                   # passes with 0 errors as of 2026-10-07
 flutter test                      # runs the starter test
-flutter run -d chrome             # or: flutter run -d <android-device-id>
+flutter run -d chrome             # starter only; no Firebase client is initialized
+```
+
+For local Auth/Firestore emulator configuration (not yet connected to the Flutter app), run in a separate terminal:
+
+```powershell
+firebase emulators:start --project demo-cmu-sbnu-vms
 ```
 
 Full setup, troubleshooting, and the environment-file steps are in
@@ -110,8 +117,7 @@ workflow, Git, security, review and handoff procedures. [`docs/overview/about.md
    whose prerequisites are closed.
 2. Branch from the integration branch (`T-xx-short-purpose`), keep the change small, and follow the
    conventions in [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) §3.
-3. Before requesting review, run `dart format .`, `flutter analyze`, and `flutter test`, and paste the
-   results.
+3. Before requesting review, run the authorized format/analyzer/test checks and report exact results. AI-assisted changes must also follow the test authorization rule in [`AGENTS.md`](AGENTS.md).
 4. Meet the checklists in [`docs/guides/development-checklist.md`](docs/guides/development-checklist.md)
    and update docs/data contracts and (if a decision changed) the decision register.
 

@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Deny all client access until a reviewed least-privilege policy and
+    // corresponding security tests are added.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
