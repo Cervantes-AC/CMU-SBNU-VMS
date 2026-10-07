@@ -1,6 +1,6 @@
 ﻿# TODO: incidents
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Incident model, repository, controllers (IncidentsController + IncidentDetailController), and screens (IncidentsScreen + IncidentDetailScreen) implemented. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
