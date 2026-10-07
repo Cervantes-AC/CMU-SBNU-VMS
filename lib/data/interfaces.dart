@@ -3,3 +3,4 @@
 export 'interfaces/auth_repository.dart';
 export 'interfaces/user_repository.dart';
 export 'interfaces/event_repository.dart';
+export 'interfaces/announcement_repository.dart';

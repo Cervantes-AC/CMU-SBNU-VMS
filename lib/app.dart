@@ -10,15 +10,19 @@ import 'package:cmu_sbnu_vms/core/constants/route_names.dart';
 import 'package:cmu_sbnu_vms/core/error/app_exception.dart';
 import 'package:cmu_sbnu_vms/core/theme/app_theme.dart';
 import 'package:cmu_sbnu_vms/core/theme/theme_provider.dart';
+import 'package:cmu_sbnu_vms/data/interfaces/announcement_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/auth_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/event_repository.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/user_repository.dart';
+import 'package:cmu_sbnu_vms/data/models/announcement.dart';
 import 'package:cmu_sbnu_vms/data/models/event.dart';
 import 'package:cmu_sbnu_vms/data/models/user.dart';
 import 'package:cmu_sbnu_vms/features/access_denied_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_controller.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/password_reset_screen.dart';
+import 'package:cmu_sbnu_vms/features/announcements/announcements_controller.dart';
+import 'package:cmu_sbnu_vms/features/announcements/announcements_screen.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/admin_dashboard.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/dashboard_router.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/demo_admin_dashboard_screen.dart';
@@ -281,6 +285,65 @@ class UnconfiguredEventRepository implements EventRepository {
       ));
 }
 
+/// Announcement repository used when Firebase was not initialized at bootstrap.
+/// Returns empty results for all operations.
+class UnconfiguredAnnouncementRepository implements AnnouncementRepository {
+  const UnconfiguredAnnouncementRepository();
+
+  @override
+  Stream<({List<Announcement> items, String? nextCursor})> watchAnnouncements({
+    int limit = 20,
+  }) =>
+      Stream.value((items: <Announcement>[], nextCursor: null));
+
+  @override
+  Future<Result<({List<Announcement> items, String? nextCursor})>> getAnnouncements({
+    int limit = 20,
+    String? startAfter,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Announcement>> getAnnouncement(String id) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+
+  @override
+  Stream<Announcement?> watchAnnouncement(String id) =>
+      Stream.value(null);
+
+  @override
+  Future<Result<Announcement>> createAnnouncement(AnnouncementDraft draft) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Announcement>> updateAnnouncement({
+    required String id,
+    required AnnouncementDraft draft,
+    required int expectedRevision,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Announcement>> publishAnnouncement(String id, {required int expectedRevision}) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Announcement>> unpublishAnnouncement(String id, {required int expectedRevision}) async =>
+      const Failure(UnavailableException(
+        message: 'Announcements service is not available in this build.',
+      ));
+}
+
 /// Application composition root.
 ///
 /// Accepts/injects root dependencies, establishes Provider scopes, applies
@@ -294,6 +357,7 @@ class NSRCApp extends StatefulWidget {
     this.authRepository,
     this.userRepository,
     this.eventRepository,
+    this.announcementRepository,
     this.themeProvider,
     this.cacheService,
   });
@@ -307,6 +371,9 @@ class NSRCApp extends StatefulWidget {
 
   /// Null falls back to [UnconfiguredEventRepository] (events unavailable).
   final EventRepository? eventRepository;
+
+  /// Null falls back to [UnconfiguredAnnouncementRepository] (announcements unavailable).
+  final AnnouncementRepository? announcementRepository;
 
   final ThemeProvider? themeProvider;
   final CacheService? cacheService;
@@ -322,6 +389,7 @@ class _NSRCAppState extends State<NSRCApp> {
   late final AuthController _authController;
   late final ProfileController _profileController;
   late final EventsController _eventsController;
+  late final AnnouncementsController _announcementsController;
   late final SessionController _sessionController;
   late final GoRouter _router;
 
@@ -339,6 +407,9 @@ class _NSRCAppState extends State<NSRCApp> {
     _eventsController = EventsController(
       eventRepository: widget.eventRepository ?? const UnconfiguredEventRepository(),
     );
+    _announcementsController = AnnouncementsController(
+      announcementRepository: widget.announcementRepository ?? const UnconfiguredAnnouncementRepository(),
+    );
     _sessionController = SessionController(authRepository: _authRepository);
     _router = _createRouter();
   }
@@ -350,6 +421,7 @@ class _NSRCAppState extends State<NSRCApp> {
     _authController.dispose();
     _profileController.dispose();
     _eventsController.dispose();
+    _announcementsController.dispose();
     super.dispose();
   }
 
@@ -467,6 +539,17 @@ class _NSRCAppState extends State<NSRCApp> {
                   ),
                 ),
               ),
+              GoRoute(
+                path: RouteNames.announcements,
+                builder: (context, state) => ListenableBuilder(
+                  listenable: _sessionController,
+                  builder: (context, _) => AnnouncementsScreen(
+                    controller: _announcementsController,
+                    sessionController: _sessionController,
+                    authController: _authController,
+                  ),
+                ),
+              ),
             ],
           ),
           if (kDebugMode)
@@ -488,6 +571,7 @@ class _NSRCAppState extends State<NSRCApp> {
         ChangeNotifierProvider<AuthController>.value(value: _authController),
         ChangeNotifierProvider<ProfileController>.value(value: _profileController),
         ChangeNotifierProvider<EventsController>.value(value: _eventsController),
+        ChangeNotifierProvider<AnnouncementsController>.value(value: _announcementsController),
         ChangeNotifierProvider<SessionController>.value(
             value: _sessionController),
       ],

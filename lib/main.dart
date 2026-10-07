@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cmu_sbnu_vms/app.dart';
 import 'package:cmu_sbnu_vms/core/cache/cache_service.dart';
 import 'package:cmu_sbnu_vms/core/utils/logger.dart';
+import 'package:cmu_sbnu_vms/data/repositories/announcement_repository.dart';
 import 'package:cmu_sbnu_vms/data/repositories/auth_repository.dart';
 import 'package:cmu_sbnu_vms/data/repositories/event_repository.dart';
 import 'package:cmu_sbnu_vms/data/repositories/user_repository.dart';
@@ -60,6 +61,10 @@ Future<void> main() async {
       cacheService: cacheService,
     ),
     eventRepository: EventRepositoryImpl(
+      firestoreService: firestoreService,
+      currentUid: authService.currentUid,
+    ),
+    announcementRepository: AnnouncementRepositoryImpl(
       firestoreService: firestoreService,
       currentUid: authService.currentUid,
     ),
