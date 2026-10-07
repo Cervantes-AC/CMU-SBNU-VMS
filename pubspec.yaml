@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Firebase Core — required by lib/firebase_options.dart (FlutterFire-generated).
+  # Added as part of B-005: add approved dependency baseline.
+  firebase_core: ^3.13.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -12,22 +12,20 @@ actions.
 | | State |
 |---|---|
 | Application code | `lib/main.dart` is still the Flutter counter starter |
-| Dependencies | `cupertino_icons` only, plus `flutter_lints` for development |
-| Analyzer | **Fails with 11 errors** (`lib/firebase_options.dart` imports `package:firebase_core`, which is not a dependency) — first task: T-01 |
+| Dependencies | `firebase_core` added (B-005); `flutter analyze` now passes with 0 errors |
+| Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
 | Tests | One starter widget test |
-| Firebase | Client configuration for project `cmu-sbnu-vms` exists but is untracked; no rules, indexes, or backend code |
+| Firebase | Client configuration for project `cmu-sbnu-vms` exists; no rules, indexes, or backend code yet |
 | Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
-| Documentation | The `00`–`99` set: planning `00`–`91`, baselines and registers `92`–`98`, the prototype port plan `99`, nine ADRs, the design-reference folder, and the readiness gate |
+| Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
 | Real data | **None may be used** until the decisions in the open-decisions register are closed |
 
-This repository **is** the project of record. The larger application described in
-[`SBNU Application Project.md`](SBNU%20Application%20Project.md) and documented under
-[`docs/features/`](docs/features/README.md) is an **earlier prototype** (Dart package `cmu_nsrc_app`, Firebase
-project `nsrc-vms`) kept as design input: its code does not run in this repository, and no data, seed file, or
-credential comes from it ([ADR-0001](docs/adr/0001-backend-platform-and-environment-ownership.md),
-[ADR-0009](docs/adr/0009-reuse-of-reference-implementation.md)). How its modules are ported here — identity
-map, port order, per-module acceptance — is
-[`docs/99-prototype-port-and-identity-migration-plan.md`](docs/99-prototype-port-and-identity-migration-plan.md).
+This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
+project `nsrc-vms`) is kept as design input and described in [`docs/overview/about.md`](docs/overview/about.md): its code does
+not run in this repository, and no data, seed file, or credential comes from it (see
+[`docs/overview/decision-register.md`](docs/overview/decision-register.md) D-04, D-09). How its modules are ported here — identity
+map, port order, per-module acceptance — is planned in [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md)
+and [`docs/lib/features.md`](docs/lib/features.md).
 
 ## Requirements
 
@@ -42,55 +40,84 @@ Verify with `flutter doctor -v`.
 ```powershell
 flutter --version                 # confirm 3.38.9 / Dart 3.10.8
 flutter pub get                   # install dependencies
-flutter analyze                   # currently reports 11 known errors — see task T-01
+flutter analyze                   # passes with 0 errors as of 2026-10-07
 flutter test                      # runs the starter test
 flutter run -d chrome             # or: flutter run -d <android-device-id>
 ```
 
 Full setup, troubleshooting, and the environment-file steps are in
-[`docs/51-environment-setup.md`](docs/51-environment-setup.md). Backend work needs either the Firebase
-Emulator Suite or a `dev` project; see [`docs/adr/0001-backend-platform-and-environment-ownership.md`](docs/adr/0001-backend-platform-and-environment-ownership.md)
+[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md). Backend work needs either the Firebase
+Emulator Suite or a `dev` project; see [`docs/overview/decision-register.md`](docs/overview/decision-register.md)
 (D-04 is **Decided**: `cmu-sbnu-vms` is the project of record, and the prototype project `nsrc-vms` must never
 be used as a backend).
+
+## Developer Onboarding & Reading Guide
+
+Follow the reading order matching your role to get started:
+
+- 🛠️ **Developer Starting Feature Implementation:**
+  1. **[`README.md`](README.md)** — Project status, baseline versions, and quick start commands.
+  2. **[`docs/index.md`](docs/index.md)** — Central documentation map.
+  3. **[`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md)** — Core architecture, error contracts & state management rules.
+  4. **[`docs/lib/index.md`](docs/lib/index.md)** — File-by-file class contracts & implementation order for `lib/`.
+
+- 💻 **Machine & Environment Setup:**
+  - **[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md)** — Local Flutter, Android SDK & Firebase Emulator Suite setup.
+
+- 🤖 **AI Coding Assistant:**
+  - **[`AGENTS.md`](AGENTS.md)** ➔ **[`docs/ai-coding/index.md`](docs/ai-coding/index.md)** — Mandatory AI safety rules, workflow & task templates.
 
 ## Repository layout
 
 ```text
 lib/                Application source (currently the starter only)
 test/               Tests (currently the starter widget test)
-docs/               Planning set, ADRs, baselines/registers, port plan, reference material
+docs/               Planning and architecture docs — see docs/index.md for the full map
+  docs/overview/    Product scope, decision records, and prototype context
+  docs/architecture/ Implementation guides, schema/data access, backend & UI contracts
+  docs/guides/      Setup, backlog, checklists, operations & CI specs
+  docs/lib/         File-by-file source contracts for lib/
+  docs/ai-coding/   AI agent operating playbook
 android/ ios/ web/ linux/ macos/ windows/   Flutter platform hosts
-firebase.json       Flutter/Firebase platform configuration (untracked)
-cmu_logo.png, SBNU LOGO.png   Untracked brand assets — do not publish without permission (D-18)
+firebase.json       Firebase platform configuration
+cmu_logo.png, SBNU LOGO.png   Brand assets — do not publish without permission (D-18)
 ```
 
 ## Documentation: start here
 
+The target-specific, file-by-file build plan and production-readiness criteria are in
+[`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md). The source contract for every planned
+`lib/` module and file is indexed in [`docs/lib/index.md`](docs/lib/index.md). Use these alongside
+the approved requirements and decision records below. AI agents should start with
+[`AGENTS.md`](AGENTS.md) and follow the [AI Coding Playbook](docs/ai-coding/index.md), including its
+workflow, Git, security, review and handoff procedures. [`docs/overview/about.md`](docs/overview/about.md) describes the earlier
+`nsrc_vms` prototype and is reference material only.
+
 | If you are… | Read, in order |
 |---|---|
-| A developer about to write code | [`docs/README.md`](docs/README.md) → [`docs/92-implementation-baseline.md`](docs/92-implementation-baseline.md) → [`docs/98-sprint-0-plan.md`](docs/98-sprint-0-plan.md) → [`docs/96-definition-of-ready-and-done.md`](docs/96-definition-of-ready-and-done.md) |
-| Setting up a machine | [`docs/51-environment-setup.md`](docs/51-environment-setup.md) |
-| A product owner or sponsor | [`docs/00-project-overview.md`](docs/00-project-overview.md) → [`docs/04-project-scope.md`](docs/04-project-scope.md) → [`docs/94-open-decisions-register.md`](docs/94-open-decisions-register.md) |
-| Reviewing safety, privacy, or risk | [`docs/DEVELOPMENT-READINESS.md`](docs/DEVELOPMENT-READINESS.md) → [`docs/14-legal-and-policy-constraints.md`](docs/14-legal-and-policy-constraints.md) → [`docs/74-risk-register.md`](docs/74-risk-register.md) |
-| Trying to understand the target product | [`docs/00-project-overview.md`](docs/00-project-overview.md) → [`docs/04-project-scope.md`](docs/04-project-scope.md) → [`SBNU Application Project.md`](SBNU%20Application%20Project.md) (the prototype's own description) |
-| Porting a prototype module | [`docs/99-prototype-port-and-identity-migration-plan.md`](docs/99-prototype-port-and-identity-migration-plan.md) → [`docs/features/README.md`](docs/features/README.md) → [`docs/92-implementation-baseline.md`](docs/92-implementation-baseline.md) |
+| A developer about to write code | [`docs/index.md`](docs/index.md) → [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) → [`docs/guides/implementation-backlog.md`](docs/guides/implementation-backlog.md) → [`docs/guides/development-checklist.md`](docs/guides/development-checklist.md) |
+| Setting up a machine | [`docs/guides/environment-setup.md`](docs/guides/environment-setup.md) |
+| A product owner or sponsor | [`docs/overview/product-requirements.md`](docs/overview/product-requirements.md) → [`docs/overview/decision-register.md`](docs/overview/decision-register.md) |
+| Reviewing safety, privacy, or risk | [`docs/guides/operations-runbook.md`](docs/guides/operations-runbook.md) → [`docs/overview/decision-register.md`](docs/overview/decision-register.md) |
+| Trying to understand the target product | [`docs/overview/product-requirements.md`](docs/overview/product-requirements.md) → [`docs/overview/about.md`](docs/overview/about.md) (prototype reference) |
+| Porting a prototype module | [`docs/overview/about.md`](docs/overview/about.md) → [`docs/lib/features.md`](docs/lib/features.md) → [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) |
 
 ## Contributing
 
-1. Pick an unblocked task from [`docs/98-sprint-0-plan.md`](docs/98-sprint-0-plan.md) — or, later, an
-   approved feature package from [`docs/feature-planning-template.md`](docs/feature-planning-template.md), or a
-   staged port from [`docs/99-prototype-port-and-identity-migration-plan.md`](docs/99-prototype-port-and-identity-migration-plan.md)
+1. Pick an unblocked task from [`docs/guides/implementation-backlog.md`](docs/guides/implementation-backlog.md) — or, later, an
+   approved feature package from [`docs/ai-coding/task-template.md`](docs/ai-coding/task-template.md), or a
+   staged port from [`docs/overview/about.md`](docs/overview/about.md)
    whose prerequisites are closed.
 2. Branch from the integration branch (`T-xx-short-purpose`), keep the change small, and follow the
-   conventions in [`docs/92-implementation-baseline.md`](docs/92-implementation-baseline.md) §4.
+   conventions in [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) §3.
 3. Before requesting review, run `dart format .`, `flutter analyze`, and `flutter test`, and paste the
    results.
-4. Meet the checklists in [`docs/96-definition-of-ready-and-done.md`](docs/96-definition-of-ready-and-done.md)
-   and update the changelog, traceability matrix, and (if a decision changed) the ADR set.
+4. Meet the checklists in [`docs/guides/development-checklist.md`](docs/guides/development-checklist.md)
+   and update docs/data contracts and (if a decision changed) the decision register.
 
 **Never** commit credentials, service-account keys, or real volunteer data, and never point a build at the
 prototype project `nsrc-vms` — this repository's Firebase project is `cmu-sbnu-vms` (D-04). See
-[`docs/adr/0007-environment-configuration-and-secrets.md`](docs/adr/0007-environment-configuration-and-secrets.md).
+[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md).
 
 ## Ownership and licensing
 

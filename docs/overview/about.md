@@ -8,14 +8,14 @@ A full-stack volunteer operations platform built with **Flutter** (mobile + web)
 > **Version:** `1.0.0+1`
 > **Firebase project:** `nsrc-vms`
 > **Android application ID:** `com.nsrc.nsrc_vms`
-> **Provenance:** this document describes the **earlier prototype** of the CMU SBNU VMS — the application built
-> at `D:\nsrc_vms` with package `cmu_nsrc_app`, Firebase project `nsrc-vms`, and application ID
-> `com.nsrc.nsrc_vms`. It is **design input** for this repository, which is the project of record
-> (`cmu_sbnu_vms` / `cmu-sbnu-vms` / `com.cmu.sbnu.vms.cmu_sbnu_vms`); see
-> [ADR-0001](docs/adr/0001-backend-platform-and-environment-ownership.md) and
-> [ADR-0009](docs/adr/0009-reuse-of-reference-implementation.md). Every path below is relative to `D:\nsrc_vms`,
-> and none of the code described here exists in this repository yet. Porting rules and stage order:
-> [docs/99-prototype-port-and-identity-migration-plan.md](docs/99-prototype-port-and-identity-migration-plan.md).
+> **Provenance:** this document describes the earlier prototype at `D:\nsrc_vms` (package `cmu_nsrc_app`,
+> Firebase project `nsrc-vms`, Android application ID `com.nsrc.nsrc_vms`). It is reference material only.
+> This repository's target identity is `cmu_sbnu_vms` / `cmu-sbnu-vms` /
+> `com.cmu.sbnu.vms.cmu_sbnu_vms`. Do not copy prototype credentials, data, Firebase configuration or
+> access-control behavior. The target's current scope and decisions are in
+> [`product-requirements.md`](product-requirements.md), [`decision-register.md`](decision-register.md),
+> and [`implementation-guide.md`](../architecture/implementation-guide.md); the per-file target plan is in [`lib/index.md`](../lib/index.md).
+> Paths and package/backend statements in the sections below refer to the prototype, not this repository.
 
 ---
 
@@ -560,7 +560,7 @@ A responsive/overflow-safe redesign of the public landing page:
 ## 20. Known Notes & Caveats
 
 1. **Stubbed features** — `ai_admin_intelligence` and `pdf_generation` have documentation but no Dart implementation yet (PDF export currently lives in `data/services/import_export/pdf_export_service.dart`).
-2. **Missing doc file** — `README.md` references `docs/production-readiness.md`, but the file is not present in `docs/`.
+2. **Prototype documentation gap** — the prototype repository's `README.md` referenced `docs/production-readiness.md`, which was absent from the prototype docs tree at the time this reference was captured. This is historical context only; the target release gates are documented in `IMPLEMENTATION_GUIDE.md` and `OPERATIONS_RUNBOOK.md`.
 3. **Requirement traceability** — code comments reference requirement numbers (`Req 3`, `Req 4`, `Req 8–22`) sourced from `Project Outline.docx` (binary; not plain-text readable).
 4. **Groq API integration** — LLM report generation requires a Groq API key entered in Settings → AI Model. The app supports 6 selectable models.
 5. **Cloudinary** — profile photo uploads require Cloudinary configuration (`package.json` includes the `cloudinary` node dependency for signed requests).
@@ -568,5 +568,3 @@ A responsive/overflow-safe redesign of the public landing page:
 7. **Web audio** — SOS alarm playback requires try-catch handling on web (null assertion safety per `pubspec.yaml` comments).
 
 ---
-
-*Document generated for the NSRC VMS (SBNU Application) project. Paths are relative to the repository root `D:\nsrc_vms`.*
