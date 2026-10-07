@@ -26,6 +26,8 @@ For a module with non-trivial asynchronous behavior, create `<feature>_screen.da
 
 **Tests:** role-specific content, pending user denied, unavailable data/error, empty state, no cross-role leakage, responsive mobile/wide layouts.
 
+**Current code:** `demo_admin_dashboard_screen.dart` is a debug-only presentation preview. It displays synthetic sample values and has no repositories, auth session, privileged actions, or access to real data. It does not satisfy the production role-dashboard contract above.
+
 ### `lib/features/profile/`
 
 **Files:** `profile_screen.dart`, `profile_controller.dart`, `profile_edit_form.dart`, optional `profile_avatar.dart` (only if approved avatar upload is implemented).

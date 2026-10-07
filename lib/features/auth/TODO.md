@@ -1,6 +1,6 @@
 ﻿# TODO: auth
 
-**Status:** Sign-in and password-reset frontend screens are implemented. Authentication repository, Firebase integration, session/profile routing, and service-backed flows remain pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Sign-in and password-reset frontend screens are implemented. A debug-only synthetic demo path opens an admin dashboard preview. Authentication repository, Firebase integration, session/profile routing, and service-backed flows remain pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
@@ -27,9 +27,10 @@ Identify each relevant requirement as approved, proposed, open, or deferred befo
 ## Current frontend implementation
 
 - [x] `auth_screen.dart`: responsive sign-in form, inline validation, password visibility, safe generic submission failure, pending/approval guidance, and no registration or role selector.
+- [x] Debug builds accept `DemoAdminCredentials` to open the local synthetic admin dashboard preview. These fixture credentials are not Firebase authentication and must never grant production access.
 - [x] `password_reset_screen.dart`: responsive email form, input validation, and account-enumeration-safe response copy.
-- [x] `app.dart`: local landing route at `/`, sign-in route at `/sign-in`, and password-reset route at `/password-reset`.
-- [ ] Implement `AuthController` and `AuthRepository` injection; keep submit/reset controls unavailable until those services are wired.
+- [x] `app.dart`: local landing route at `/`, sign-in route at `/sign-in`, password-reset route at `/password-reset`, and debug-only preview route at `/demo-admin`.
+- [ ] Implement `AuthController` and `AuthRepository` injection; keep production sign-in unavailable until those services are wired (the debug fixture is preview-only).
 - [ ] Connect authentication to the approved Firebase environment and add auth/profile status routing before protected screens exist.
 
 ## Implementation checklist

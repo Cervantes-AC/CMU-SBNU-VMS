@@ -7,11 +7,11 @@ actions.
 
 ## Project status (2026-10-07)
 
-**This repository is in early frontend development. The app opens at a local landing page with a path to member sign-in and password reset. Authentication handlers, Firebase session routing, and protected feature screens are not connected. Public branding/release approval remains open.**
+**This repository is in early frontend development. The app opens at a local landing page with a path to member sign-in and password reset. Debug builds include a local synthetic admin dashboard preview with fixture credentials; it is not a real account or Firebase-authenticated session. Authentication handlers, Firebase session routing, and protected production feature screens are not connected. Public branding/release approval remains open.**
 
 | | State |
 |---|---|
-| Application code | `lib/main.dart` opens the landing page through `NSRCApp`; member sign-in and password-reset routes exist, but auth handlers and protected routes are not connected |
+| Application code | `lib/main.dart` opens the landing page through `NSRCApp`; sign-in and password reset are available, and debug builds have a local synthetic admin dashboard preview. Real auth handlers and protected production routes are not connected |
 | Dependencies | `firebase_core` is declared and locked; `flutter pub get` succeeds |
 | Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
 | Tests | The existing root smoke test still expects preview-specific landing copy; it has not been updated or run for the current landing/auth flow |
@@ -51,6 +51,11 @@ For local Auth/Firestore emulator configuration (not yet connected to the Flutte
 ```powershell
 firebase emulators:start --project demo-cmu-sbnu-vms
 ```
+
+In a debug build, the sign-in screen includes a local-only admin preview account:
+`admin@gmail.com` / `root@123`. The credentials are checked by the
+Flutter app, do not exist in Firebase Auth, and open only a synthetic dashboard
+preview. They are unavailable in profile and release builds.
 
 Full setup, troubleshooting, and the environment-file steps are in
 [`docs/guides/environment-setup.md`](docs/guides/environment-setup.md). Backend work needs either the Firebase

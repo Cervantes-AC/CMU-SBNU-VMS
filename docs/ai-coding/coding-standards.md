@@ -31,6 +31,7 @@
 - Use `snake_case.dart`; type names use `UpperCamelCase`; members use `lowerCamelCase`.
 - One file should have one cohesive responsibility. Split large screens when sections have independent state or behavior; do not create one-file-per-trivial-widget without reuse/clarity benefit.
 - Keep feature-specific components under `lib/features/<feature>/`; cross-feature widgets belong under `lib/shared/` only when genuinely shared.
+- Follow [`docs/lib/file-organization.md`](../lib/file-organization.md) for feature folder layout, split boundaries, dependency passing, and the landing/auth examples.
 - Avoid “utils”, “manager”, or “helper” files that become catch-alls. Use domain names.
 - Remove obsolete TODO comments when a task is complete; keep remaining TODOs actionable and link their decision/ticket when known.
 

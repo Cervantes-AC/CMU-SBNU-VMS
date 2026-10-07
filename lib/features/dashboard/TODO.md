@@ -1,6 +1,6 @@
 ﻿# TODO: dashboard
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** A debug-only administrator dashboard preview is implemented with synthetic display values. Production role dashboards and data connections remain unimplemented. This file is an implementation plan, not proof of approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
@@ -21,6 +21,13 @@ Identify each relevant requirement as approved, proposed, open, or deferred befo
 **Contract:** show only metrics/actions whose source repositories authorize the viewer. Member: own upcoming items/hours/announcements; officer: authorized event queue/attendance/incidents; admin: aggregate account and operations status. No dashboard may fetch an entire collection or expose sensitive incident text in a card. Each card has a destination gated by shared route metadata.
 
 **Tests:** role-specific content, pending user denied, unavailable data/error, empty state, no cross-role leakage, responsive mobile/wide layouts.
+
+## Current local demo
+
+- `demo_admin_dashboard_screen.dart` and its focused `widgets/` render a responsive visual preview inspired by the NSRC admin dashboard.
+- The app exposes this route only when `kDebugMode` is true. `DemoAdminCredentials` are local fixture strings checked by the app shell; they are not a Firebase Auth user and do not grant a `UserRole.admin` session.
+- Dashboard figures and queue entries are synthetic presentation samples. They do not come from Firestore or represent unit statistics. Do not add operational actions or real records to this preview.
+- Production dashboard implementation remains blocked on auth/session wiring, approved role and data contracts, and bounded authorized repository queries. Follow B-026 in the implementation backlog.
 
 ## Implementation checklist
 

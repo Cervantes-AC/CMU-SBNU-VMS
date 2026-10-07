@@ -41,6 +41,7 @@ The specifications below enumerate the initial production scope and expected sou
 
 ## Catalog
 
+- [Flutter source file organization](file-organization.md)
 - [Application shell and shared UI](shared.md)
 - [Core infrastructure](core.md)
 - [Data models, contracts, repositories and services](data.md)
