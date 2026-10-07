@@ -1,6 +1,6 @@
 ﻿# TODO: repositories
 
-**Status:** AuthRepositoryImpl (`lib/data/repositories/auth_repository.dart`) implemented. It coordinates AuthService+Firestore for session/profile loading, prevents stale profile leaks, and clears user-scoped cache on sign-out. Additional repositories are pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** AuthRepositoryImpl and UserRepositoryImpl implemented. AuthRepository coordinates AuthService+Firestore for session/profile, prevents stale profile leaks, clears user-scoped cache on sign-out. UserRepository enforces self-editable field allowlist, optimistic concurrency, and member directory search. Additional repositories (event, attendance, incident, announcement) are pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

@@ -11,6 +11,9 @@ import 'package:cmu_sbnu_vms/core/error/app_exception.dart';
 import 'package:cmu_sbnu_vms/core/theme/app_theme.dart';
 import 'package:cmu_sbnu_vms/core/theme/theme_provider.dart';
 import 'package:cmu_sbnu_vms/data/interfaces/auth_repository.dart';
+import 'package:cmu_sbnu_vms/data/interfaces/event_repository.dart';
+import 'package:cmu_sbnu_vms/data/interfaces/user_repository.dart';
+import 'package:cmu_sbnu_vms/data/models/event.dart';
 import 'package:cmu_sbnu_vms/data/models/user.dart';
 import 'package:cmu_sbnu_vms/features/access_denied_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_controller.dart';
@@ -21,7 +24,11 @@ import 'package:cmu_sbnu_vms/features/dashboard/dashboard_router.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/demo_admin_dashboard_screen.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/member_dashboard.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/officer_dashboard.dart';
+import 'package:cmu_sbnu_vms/features/events/events_controller.dart';
+import 'package:cmu_sbnu_vms/features/events/events_screen.dart';
 import 'package:cmu_sbnu_vms/features/landing/landing_page.dart';
+import 'package:cmu_sbnu_vms/features/profile/profile_controller.dart';
+import 'package:cmu_sbnu_vms/features/profile/profile_screen.dart';
 import 'package:cmu_sbnu_vms/shared/route_guard.dart';
 import 'package:cmu_sbnu_vms/shared/result.dart';
 import 'package:cmu_sbnu_vms/shared/app_shell.dart';
@@ -152,6 +159,128 @@ class UnconfiguredAuthRepository implements AuthRepository {
   String? get currentUid => null;
 }
 
+/// User repository used when Firebase was not initialized at bootstrap.
+/// Returns empty results for all operations.
+class UnconfiguredUserRepository implements UserRepository {
+  const UnconfiguredUserRepository();
+
+  @override
+  Stream<UserProfile?> watchProfile(String uid) => Stream<UserProfile?>.value(null);
+
+  @override
+  Future<Result<UserProfile>> getProfile(String uid) async =>
+      const Failure(UnavailableException(
+        message: 'Profile service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<UserProfile>> updateOwnProfile({
+    required String uid,
+    required Map<String, dynamic> fields,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Profile service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<UserProfile>> updateProfileAdmin({
+    required String uid,
+    required Map<String, dynamic> fields,
+    required int expectedRevision,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Profile service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<({List<UserProfile> items, String? nextCursor})>> searchMembers({
+    String? query,
+    int limit = 20,
+    String? startAfter,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Directory service is not available in this build.',
+      ));
+}
+
+/// Event repository used when Firebase was not initialized at bootstrap.
+/// Returns empty results for all operations.
+class UnconfiguredEventRepository implements EventRepository {
+  const UnconfiguredEventRepository();
+
+  @override
+  Stream<({List<Event> items, String? nextCursor})> watchEvents({
+    String? audienceFilter,
+    int limit = 20,
+  }) =>
+      Stream.value((items: <Event>[], nextCursor: null));
+
+  @override
+  Future<Result<({List<Event> items, String? nextCursor})>> getEvents({
+    String? audienceFilter,
+    int limit = 20,
+    String? startAfter,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Event>> getEvent(String eventId) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Stream<Event?> watchEvent(String eventId) =>
+      Stream.value(null);
+
+  @override
+  Future<Result<Event>> createEvent(EventDraft draft) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<Event>> updateEvent({
+    required String eventId,
+    required EventDraft draft,
+    required int expectedRevision,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<void>> cancelEvent(String eventId,
+      {required int expectedRevision}) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<void>> requestJoin(String eventId) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<void>> reviewJoinRequest({
+    required String eventId,
+    required String requesterUid,
+    required JoinRequestDecision decision,
+  }) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+
+  @override
+  Future<Result<JoinRequestStatus?>> getJoinRequestStatus(String eventId) async =>
+      const Failure(UnavailableException(
+        message: 'Events service is not available in this build.',
+      ));
+}
+
 /// Application composition root.
 ///
 /// Accepts/injects root dependencies, establishes Provider scopes, applies
@@ -163,6 +292,8 @@ class NSRCApp extends StatefulWidget {
   const NSRCApp({
     super.key,
     this.authRepository,
+    this.userRepository,
+    this.eventRepository,
     this.themeProvider,
     this.cacheService,
   });
@@ -170,6 +301,13 @@ class NSRCApp extends StatefulWidget {
   /// Null falls back to [UnconfiguredAuthRepository] (public pages only,
   /// sign-in disabled with an explicit message).
   final AuthRepository? authRepository;
+
+  /// Null falls back to [UnconfiguredUserRepository] (profile unavailable).
+  final UserRepository? userRepository;
+
+  /// Null falls back to [UnconfiguredEventRepository] (events unavailable).
+  final EventRepository? eventRepository;
+
   final ThemeProvider? themeProvider;
   final CacheService? cacheService;
 
@@ -180,7 +318,10 @@ class NSRCApp extends StatefulWidget {
 class _NSRCAppState extends State<NSRCApp> {
   late final ThemeProvider _themeProvider;
   late final AuthRepository _authRepository;
+  late final UserRepository _userRepository;
   late final AuthController _authController;
+  late final ProfileController _profileController;
+  late final EventsController _eventsController;
   late final SessionController _sessionController;
   late final GoRouter _router;
 
@@ -192,7 +333,12 @@ class _NSRCAppState extends State<NSRCApp> {
     _themeProvider.load();
     _authRepository =
         widget.authRepository ?? const UnconfiguredAuthRepository();
+    _userRepository = widget.userRepository ?? const UnconfiguredUserRepository();
     _authController = AuthController(authRepository: _authRepository);
+    _profileController = ProfileController(userRepository: _userRepository);
+    _eventsController = EventsController(
+      eventRepository: widget.eventRepository ?? const UnconfiguredEventRepository(),
+    );
     _sessionController = SessionController(authRepository: _authRepository);
     _router = _createRouter();
   }
@@ -202,6 +348,8 @@ class _NSRCAppState extends State<NSRCApp> {
     _router.dispose();
     _sessionController.dispose();
     _authController.dispose();
+    _profileController.dispose();
+    _eventsController.dispose();
     super.dispose();
   }
 
@@ -295,6 +443,30 @@ class _NSRCAppState extends State<NSRCApp> {
                   onSignOut: _signOut,
                 ),
               ),
+              GoRoute(
+                path: RouteNames.profile,
+                builder: (context, state) => ListenableBuilder(
+                  listenable: _sessionController,
+                  builder: (context, _) => ProfileScreen(
+                    controller: _profileController,
+                    profile: _sessionController.profile!,
+                    onSignOut: _signOut,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: RouteNames.events,
+                builder: (context, state) => ListenableBuilder(
+                  listenable: _sessionController,
+                  builder: (context, _) => EventsScreen(
+                    controller: _eventsController,
+                    sessionController: _sessionController,
+                    authController: _authController,
+                    onEventTap: (event) =>
+                        context.go('${RouteNames.eventDetail}/${event.eventId}'),
+                  ),
+                ),
+              ),
             ],
           ),
           if (kDebugMode)
@@ -314,6 +486,8 @@ class _NSRCAppState extends State<NSRCApp> {
       providers: [
         ChangeNotifierProvider<ThemeProvider>.value(value: _themeProvider),
         ChangeNotifierProvider<AuthController>.value(value: _authController),
+        ChangeNotifierProvider<ProfileController>.value(value: _profileController),
+        ChangeNotifierProvider<EventsController>.value(value: _eventsController),
         ChangeNotifierProvider<SessionController>.value(
             value: _sessionController),
       ],
@@ -358,7 +532,7 @@ class _PageUnavailableScreen extends StatelessWidget {
                   const Icon(Icons.construction_rounded, size: 34),
                   const SizedBox(height: 16),
                   Text(
-                    'This area isn’t available in this build yet.',
+                    'This area isn\'t available in this build yet.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,

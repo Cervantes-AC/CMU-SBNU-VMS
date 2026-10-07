@@ -1,6 +1,6 @@
 ﻿# TODO: interfaces
 
-**Status:** AuthRepository interface and barrel implemented (`lib/data/interfaces/auth_repository.dart`). The interface follows the documented convention (typed Results/Streams; no raw collection names). Additional repository interfaces (user, event, attendance, incident, announcement) remain to be defined. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** AuthRepository and UserRepository interfaces and barrel export implemented (`lib/data/interfaces/auth_repository.dart`, `lib/data/interfaces/user_repository.dart`). The interfaces follow the documented convention (typed Results/Streams; no raw collection names). Additional repository interfaces (event, attendance, incident, announcement) remain to be defined. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

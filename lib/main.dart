@@ -7,6 +7,8 @@ import 'package:cmu_sbnu_vms/app.dart';
 import 'package:cmu_sbnu_vms/core/cache/cache_service.dart';
 import 'package:cmu_sbnu_vms/core/utils/logger.dart';
 import 'package:cmu_sbnu_vms/data/repositories/auth_repository.dart';
+import 'package:cmu_sbnu_vms/data/repositories/event_repository.dart';
+import 'package:cmu_sbnu_vms/data/repositories/user_repository.dart';
 import 'package:cmu_sbnu_vms/data/services/auth_service.dart';
 import 'package:cmu_sbnu_vms/data/services/firestore_service.dart';
 import 'package:cmu_sbnu_vms/firebase_options.dart';
@@ -52,6 +54,14 @@ Future<void> main() async {
       authService: authService,
       firestoreService: firestoreService,
       cacheService: cacheService,
+    ),
+    userRepository: UserRepositoryImpl(
+      firestoreService: firestoreService,
+      cacheService: cacheService,
+    ),
+    eventRepository: EventRepositoryImpl(
+      firestoreService: firestoreService,
+      currentUid: authService.currentUid,
     ),
     cacheService: cacheService,
   ));

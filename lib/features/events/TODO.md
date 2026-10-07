@@ -1,6 +1,6 @@
 ﻿# TODO: events
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Events screen, EventsController, EventRepository interface/impl, Event model implemented. EventsController handles paged loading with filters, join requests, and optimistic concurrency. EventRepository provides typed CRUD + join request operations with deterministic request IDs. EventFilterBar, EventCard, and EventsScreen with pagination and pull-to-refresh are complete. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

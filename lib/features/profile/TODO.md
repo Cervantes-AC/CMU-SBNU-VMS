@@ -1,6 +1,6 @@
 ﻿# TODO: profile
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Profile screen, ProfileController, UserRepository interface/impl implemented. ProfileController coordinates loading/updating against UserRepository; enforces self-editable field allowlist and optimistic concurrency. UserRepository provides watchProfile, getProfile, updateOwnProfile, updateProfileAdmin, and searchMembers. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
