@@ -24,7 +24,7 @@ flutter test
 flutter run -d chrome
 ```
 
-Current state: `firebase_core` is declared and locked, and the starter repository passes `flutter pub get`, `flutter analyze`, and its one counter test. `lib/main.dart` is still the counter starter; the app does not initialize Firebase or connect to either emulator. These commands verify only the Flutter starter. Replacing the counter, adding the root app, and wiring emulator-only SDK initialization remain B-005 work. Keep lockfile changes committed with dependency changes.
+Current state: `firebase_core` is declared and locked. `lib/main.dart` starts `NSRCApp`, which displays a static, unbranded landing preview. The app does not initialize Firebase or connect to either emulator. The counter test was replaced with a landing-root smoke test but has not been run since that change. Emulator-only SDK initialization, auth routing, and the rest of B-005 remain incomplete. Keep lockfile changes committed with dependency changes.
 
 ## 3. Firebase local emulator
 
@@ -67,4 +67,3 @@ Rules tests use synthetic fixtures, seeded through test setup (not a checked-in 
 | Dev cloud | OPEN (D-05/D-06) | Synthetic only | Named dev IAM group | Not provisioned/verified in target docs |
 | Staging | OPEN (D-05/D-06) | Synthetic | Restricted release group | Not provisioned/verified |
 | Production | `cmu-sbnu-vms` app identity only; production project/ownership not confirmed | No data until D-03/D-05/D-22 close | Owner-appointed deployer | **Blocked; no deploy** |
-

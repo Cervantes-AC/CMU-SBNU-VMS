@@ -176,6 +176,8 @@ Reusable presentation behavior only: sortable/filterable columns from an allowli
 
 Public-safe content only. Institutional name, logos, program claims, contact details and links require owner approval. Contact form includes data-use notice, validation, abuse/rate limit at backend and no public list access. Do not link directly into protected record IDs. Ensure responsive layouts, text scaling, keyboard navigation and search/metadata if web is deployed.
 
+The current implementation is limited to a static concept preview shown as the local app home through `NSRCApp`. At the user's request, it displays the repository CMU and SBNU logo assets locally using contained image rendering and accessible labels. It does not access Firebase or personal data and has no sign-in, contact, or external-link actions. This local preview does not approve public content or logo publication: replace the temporary root behavior with the approved signed-out/auth flow, and keep public routing/publication gated on D-17/D-18. Confirm supported device/browser and accessibility scope under D-21.
+
 **Tests:** no private data in public tree, form validation, failed submit, responsive widths and external link handling.
 
 ### `lib/features/user_guide/`
@@ -211,4 +213,3 @@ Provide explicit, accessible confirmation for destructive actions, describing th
 PDF generation is a reusable output adapter, not a second source of report policy. Accept a typed authorized report view model rather than raw database data. Bound page/row count, escape untrusted text, handle long text/page breaks, include generation timestamp and approved branding only, and return a file/share result with cancellation/error states. Keep platform printing/sharing behind an adapter. Do not embed secrets or unsupported fonts/assets.
 
 **Tests:** text escaping, long content pagination, empty report, cancellation and data projection contains only authorized fields.
-

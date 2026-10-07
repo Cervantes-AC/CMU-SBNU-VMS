@@ -1,6 +1,6 @@
 # Test Plan and Continuous Integration Contract
 
-**Current state:** Flutter has one passing counter starter test; no CI workflow, Firebase rules/functions test harness, or feature test suite exists. The Auth/Firestore emulators are configured with a deny-all Firestore baseline, but emulator behavior has not yet been validated by a rules test. This page defines what to add and what CI must prove.
+**Current state:** The counter test has been replaced with a landing-root smoke test, which has not yet been run. No CI workflow, Firebase rules/functions test harness, or feature test suite exists. The Auth/Firestore emulators are configured with a deny-all Firestore baseline, but emulator behavior has not been validated by a rules test. This page defines what to add and what CI must prove.
 
 ## 1. Local verification
 
@@ -71,4 +71,3 @@ functions/test/{unit,authorization,integration}/
 ## 5. Production verification evidence
 
 Before release: all CI jobs green on exact commit; rules/indexes/functions emulator tests pass; release build uses explicit environment; staging smoke for each supported platform; privacy and accessibility reviews complete; dependency findings triaged; restore/rollback evidence exists; exact artifact SHA, project ID and approvals recorded. CI green alone is not production approval.
-

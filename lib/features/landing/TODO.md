@@ -1,44 +1,40 @@
-﻿# TODO: landing
+# Landing Feature Status and TODO
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Current status:** A static landing concept preview using the repository's CMU and SBNU logo assets is now the local app startup screen through `NSRCApp`, at the user's request. This local preview does not record brand/publication approval. Do not publish or release it as the final landing experience while its approval gates remain open.
 
-## Scope and authority
+## Run the local preview
 
-This is the `features/landing/TODO.md` module. Its detailed file-by-file contract is in [the canonical specification](../../../docs/lib/features.md). The [implementation backlog](../../../docs/guides/implementation-backlog.md), [decision register](../../../docs/overview/decision-register.md), [data/access contract](../../../docs/architecture/data-and-access.md), and [backend contracts](../../../docs/architecture/backend-contracts.md) govern sequencing, approval, data and trusted operations. Resolve mismatches by updating the canonical contract and decision record before implementation; do not invent APIs silently.
+From the repository root:
 
-## Approval and safety gate
+```powershell
+flutter run -d chrome
+```
 
-Deferred until public deployment, branding, claims, links, contacts, and form handling are approved. Public routes cannot expose protected data.
+The page is presentation-only. It loads no Firebase, network, or member data and has no working sign-in, contact form, external link, or service action.
 
-Identify each relevant requirement as approved, proposed, open, or deferred before coding. Open decisions permit local synthetic work only. Never use real personal data or production credentials in development. Client checks are not authorization; privileged behavior requires documented backend operations and server enforcement.
+## Implemented files
 
-## Canonical file-level contract
+- `lib/main.dart`: initializes Flutter bindings and starts `NSRCApp`.
+- `lib/app.dart`: temporarily composes the Material 3 theme and uses `LandingPage` as the local preview home. Firebase initialization and the approved auth/public router are not implemented.
+- `lib/features/landing/landing_page.dart`: responsive concept page with CMU/SBNU image assets in a contained logo row, a preview notice, static workspace illustration, planned capability cards, text scaling, and semantic image/headings.
+- `test/widget_test.dart`: starter counter test replaced with a smoke test for the app's landing preview. It has not been run since this change.
 
-### `lib/features/landing/`
+## Approval gates before public use
 
-**Files:** `landing_page.dart`, optional `parts/landing_hero.dart`, `parts/landing_about.dart`, `parts/landing_programs.dart`, `parts/landing_contact_form.dart`, `parts/landing_footer.dart` when approved brand/content is supplied.
+- [ ] D-17: Approve whether a public landing route/site will exist, supported platforms, hosting/domain, and support ownership.
+- [ ] D-18: Approve institutional name, logo use, colors, program claims, and publication context. The logos are included for this requested local preview only; public use still needs the recorded approval.
+- [ ] D-21: Confirm supported browser/device matrix, accessibility expectations, and languages.
+- [ ] Product owner reviews final copy, capability descriptions, navigation, metadata, and release behavior.
+- [ ] Replace this temporary app root with the approved signed-out/auth route behavior. Do not expose a public landing route unless D-17 permits it.
+- [ ] Add a contact form only after its destination, data-use notice, validation, backend abuse controls/rate limits, retention, and failure behavior are approved.
 
-Public-safe content only. Institutional name, logos, program claims, contact details and links require owner approval. Contact form includes data-use notice, validation, abuse/rate limit at backend and no public list access. Do not link directly into protected record IDs. Ensure responsive layouts, text scaling, keyboard navigation and search/metadata if web is deployed.
+## Completion criteria for the local preview
 
-**Tests:** no private data in public tree, form validation, failed submit, responsive widths and external link handling.
+- [x] Landing preview is connected to the default local app startup.
+- [x] Layout adapts across narrow and wide widths; CMU and SBNU logos use `BoxFit.contain` and accessible labels.
+- [x] The page states that content is conceptual and sign-in/records are not connected.
+- [x] Capability cards are visibly marked planned; there are no unsupported service promises, private data, contact details, or unapproved external links.
+- [ ] Updated root-preview smoke test and approved-width/accessibility review are completed.
+- [ ] Owner review and D-17/D-18/D-21 decisions are recorded before public release.
 
-## Implementation checklist
-
-- [ ] Confirm backlog stage and dependencies. If a prerequisite contract is missing, scope that work explicitly before building dependent UI.
-- [ ] Create the named files and only justified local helpers. Preserve specified public APIs, file responsibilities, route names, domain invariants, and view-state behavior.
-- [ ] Inject dependencies. Keep presentation, orchestration, domain policy, persistence, and SDK/platform adapters separated; avoid hidden global clients.
-- [ ] Handle validation, persisted-data parsing, bounded pagination, retries/idempotency, and relevant loading, empty, stale/offline, failure, permission-denied, and conflict states.
-- [ ] Enforce record and role scope in backend/rules as well as UI affordances. Derive actor identity and privileged values on the trusted side.
-- [ ] Redact personal/sensitive data from logs, errors, analytics labels, cache, exports, URLs, and serialized payloads. Clear user-scoped state at sign-out/revocation where applicable.
-- [ ] Update related data, route, backend, environment, operations, and backlog documentation when contracts or dependencies change. Record unresolved decisions.
-
-## Acceptance and handoff
-
-- [ ] All required files meet their specified responsibilities; no undeclared privileged behavior was added.
-- [ ] Routes and repositories use the intended access policy; backend denial remains authoritative.
-- [ ] Canonical boundary, retry, concurrency/idempotency, failure, and unauthorized-access scenarios are accounted for.
-- [ ] Handoff states changed files, actual verification performed, unverified acceptance cases, configuration/migration needs, open decisions, and limitations.
-
-**Verification rule:** Scenarios here and in canonical specifications describe future required evidence. They do not authorize adding or running tests. Follow [`AGENTS.md`](../../../AGENTS.md) and [testing/review guidance](../../../docs/ai-coding/testing-and-review.md).
-
-
+**Verification boundary:** The smoke test was updated but not run. Do not add or run further tests unless the user explicitly asks to test or verify implementation. Public routing, branding, and contact workflow remain gated by the decisions above.

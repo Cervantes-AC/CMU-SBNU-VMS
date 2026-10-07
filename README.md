@@ -7,18 +7,18 @@ actions.
 
 ## Project status (2026-10-07)
 
-**This repository is a starter plus a planning set. No product feature is implemented yet.**
+**This repository is an early development scaffold. The app currently opens a static landing concept preview with the CMU/SBNU logos for local development; no authenticated product workflow is implemented. Public branding/release approval remains open.**
 
 | | State |
 |---|---|
-| Application code | `lib/main.dart` is still the Flutter counter starter |
+| Application code | `lib/main.dart` opens the static landing preview through `NSRCApp`; Firebase/auth routing is not implemented |
 | Dependencies | `firebase_core` is declared and locked; `flutter pub get` succeeds |
 | Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
-| Tests | One starter widget test |
+| Tests | One landing-root smoke test was updated; it has not been run since the app-root change |
 | Firebase | Target client identifiers exist. Local Auth/Firestore emulators and deny-all Firestore rules are configured; Flutter emulator wiring, feature rules, Functions, and backend code are not implemented |
 | Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
 | Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
-| Local development | Flutter starter checks pass. The app is still the counter starter and does not connect to Firebase; use synthetic data only |
+| Local development | `flutter run -d chrome` opens the local landing preview. It does not connect to Firebase; use synthetic data only |
 | Real data | **None may be used** until the decisions in the open-decisions register are closed |
 
 This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
@@ -42,8 +42,8 @@ Verify with `flutter doctor -v`.
 flutter --version                 # confirm 3.38.9 / Dart 3.10.8
 flutter pub get                   # install dependencies
 flutter analyze                   # passes with 0 errors as of 2026-10-07
-flutter test                      # runs the starter test
-flutter run -d chrome             # starter only; no Firebase client is initialized
+flutter test                      # landing-root smoke test (run when authorized)
+flutter run -d chrome             # opens the local landing preview; no Firebase client is initialized
 ```
 
 For local Auth/Firestore emulator configuration (not yet connected to the Flutter app), run in a separate terminal:
@@ -87,7 +87,7 @@ docs/               Planning and architecture docs — see docs/index.md for the
   docs/ai-coding/   AI agent operating playbook
 android/ ios/ web/ linux/ macos/ windows/   Flutter platform hosts
 firebase.json       Firebase platform configuration
-cmu_logo.png, SBNU LOGO.png   Brand assets — do not publish without permission (D-18)
+assets/images/cmu_logo.png, assets/images/SBNU LOGO.png   Brand assets — do not publish without permission (D-18)
 ```
 
 ## Documentation: start here

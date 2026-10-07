@@ -7,11 +7,11 @@ This checklist records verified repository state at the development gates. It is
 - [x] **B-001 (documentation map):** README and docs relative links resolve. Verified 2026-10-07.
 - [x] **Local Flutter toolchain:** Flutter 3.38.9 / Dart 3.10.8 observed on the review machine 2026-10-07. This does not complete B-004's CI runner requirement.
 - [x] **Flutter dependency/analyzer baseline:** `flutter pub get` and `flutter analyze` succeed on the starter repository (2026-10-07).
-- [x] **Starter test baseline:** `flutter test` passes the counter starter test (2026-10-07). This is not feature or security coverage.
+- [ ] **Root app smoke test:** counter test replaced with a landing-root smoke test; it has not been run after the change.
 - [x] **B-003 (local emulator config):** Auth and Firestore emulator ports, demo project instructions, empty index catalog, and deny-all Firestore rules are checked in. Startup must be verified on the contributor machine before relying on it.
 - [ ] **B-002 (product scope):** Product owner has accepted or amended the proposed P0/P1 scope. Until then, implement only foundation work that is safe under the documented synthetic-data defaults.
 - [ ] **B-004 (toolchain/CI):** CI host, runner image, and pinned Flutter/Dart/Node versions are configured and verified. The local Flutter version alone is insufficient.
-- [ ] **B-005 (application bootstrap):** Replace counter `main.dart` and counter test with safe bootstrap/root-app smoke coverage; wire explicit emulator-only Firebase initialization before any Firebase client is used.
+- [ ] **B-005 (application bootstrap):** The counter is removed from `main.dart`; `NSRCApp` currently displays a local static landing preview, and its smoke test has not been run. Complete safe bootstrap, the approved auth/public router, and explicit emulator-only Firebase initialization before any Firebase client is used.
 - [ ] **B-006 (trusted backend):** Implement only owner-approved backend operations with validation, authorization, idempotency, audit, and emulator evidence.
 
 ## Gate 1 — secure application foundation
@@ -29,4 +29,4 @@ Do not use real volunteer data, deploy, or publish while required decisions rema
 
 ## Verification record
 
-The commands above were run on 2026-10-07: `flutter pub get` succeeded, `flutter analyze` reported no issues, and `flutter test` passed one counter test. Markdown links were checked. Firebase emulator startup/rules behavior, CI, application bootstrap, feature behavior, and production readiness are not verified by those Flutter commands.
+`flutter pub get` succeeded and the pre-landing starter passed `flutter analyze` and its counter test on 2026-10-07. After connecting the landing preview to `NSRCApp`, `flutter analyze` has been rerun; the updated root smoke test has not been run. Markdown links were checked. Firebase emulator startup/rules behavior, CI, Firebase bootstrap, auth routing, other feature behavior, and production readiness remain unverified.
