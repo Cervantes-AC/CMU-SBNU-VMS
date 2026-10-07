@@ -1,6 +1,6 @@
 ﻿# TODO: constants
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Core constants implemented (app_constants, route_names, firestore_paths). Constants barrel and imports follow relative paths. No credentials or mutable state. Some policy values remain subject to confirmation (unit timezone/limits as documented). This module continues to evolve with no security-impacting changes. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

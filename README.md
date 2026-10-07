@@ -7,18 +7,18 @@ actions.
 
 ## Project status (2026-10-07)
 
-**This repository is in early frontend development. The app opens at a local landing page with a path to member sign-in and password reset. Debug builds include a local synthetic admin dashboard preview with fixture credentials; it is not a real account or Firebase-authenticated session. Authentication handlers, Firebase session routing, and protected production feature screens are not connected. Public branding/release approval remains open.**
+**This repository is in early frontend development. The app opens at a local landing page with a path to member sign-in and password reset. The landing page, sign-in/password-reset flows and session routing use go_router with Provider state; auth state is coordinated against Firebase Auth when configured. Debug builds include a local synthetic admin dashboard preview with fixture credentials. Authentication repository, emulator wiring (opt-in), and many production feature screens are still being connected. Public branding/release approval remains open.**
 
 | | State |
 |---|---|
-| Application code | `lib/main.dart` opens the landing page through `NSRCApp`; sign-in and password reset are available, and debug builds have a local synthetic admin dashboard preview. Real auth handlers and protected production routes are not connected |
-| Dependencies | `firebase_core` is declared and locked; `flutter pub get` succeeds |
-| Analyzer | **Passes** — `firebase_core` dependency resolved 2026-10-07 |
+| Application code | `lib/main.dart` initializes Firebase, configures opt-in local emulators, and runs `NSRCApp` with go_router + Provider. Sign-in and password-reset flows are wired to an `AuthRepository` and fail-closed guard. Minimal role dashboards exist and route by approved `UserRole`. Debug builds still include the local synthetic admin dashboard preview. |
+| Dependencies | `firebase_core`, `firebase_auth`, `cloud_firestore`, `go_router`, `provider`, `shared_preferences`, `connectivity_plus`, `intl`, `crypto` are declared and locked; `flutter pub get` succeeds |
+| Analyzer | **Passes** — `flutter analyze --no-pub` returns 0 issues |
 | Tests | The existing root smoke test still expects preview-specific landing copy; it has not been updated or run for the current landing/auth flow |
-| Firebase | Target client identifiers exist. Local Auth/Firestore emulators and deny-all Firestore rules are configured; Flutter emulator wiring, feature rules, Functions, and backend code are not implemented |
+| Firebase | Target client identifiers exist; Firebase initializes against `cmu-sbnu-vms` (validated at startup). Local Auth/Firestore emulators may be enabled with `USE_FIREBASE_EMULATORS=true` (default `localhost`); deny-all Firestore rules are configured. Feature rules/Functions/backend code are not fully implemented |
 | Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
 | Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
-| Local development | `flutter run -d chrome` opens the landing page; authentication and Firebase are not connected |
+| Local development | `flutter run -d chrome` initializes Firebase (or shows a safe startup error), loads the landing page, and routes via go_router. Use `flutter run --dart-define=USE_FIREBASE_EMULATORS=true` to connect to local emulators (Auth 9099, Firestore 8080) |
 | Real data | **None may be used** until the decisions in the open-decisions register are closed |
 
 This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
@@ -41,15 +41,21 @@ Verify with `flutter doctor -v`.
 ```powershell
 flutter --version                 # confirm 3.38.9 / Dart 3.10.8
 flutter pub get                   # install dependencies
-flutter analyze                   # passes with 0 errors as of 2026-10-07
+flutter analyze --no-pub          # 0 issues as of 2026-10-07
 flutter test                      # existing smoke test still expects previous landing-preview copy
-flutter run -d chrome             # opens the local landing page; no Firebase client is initialized
+flutter run -d chrome             # initializes Firebase and routes via go_router; use --dart-define=USE_FIREBASE_EMULATORS=true to connect to local emulators
 ```
 
-For local Auth/Firestore emulator configuration (not yet connected to the Flutter app), run in a separate terminal:
+For local Auth/Firestore emulator configuration, run in a separate terminal:
 
 ```powershell
 firebase emulators:start --project demo-cmu-sbnu-vms
+```
+
+Then run the Flutter app with emulators enabled:
+
+```powershell
+flutter run --dart-define=USE_FIREBASE_EMULATORS=true
 ```
 
 In a debug build, the sign-in screen includes a local-only admin preview account:
@@ -82,7 +88,7 @@ Follow the reading order matching your role to get started:
 ## Repository layout
 
 ```text
-lib/                Application source (landing, sign-in and password-reset frontend)
+lib/                Application source (landing, auth with session routing, minimal role dashboards)
 test/               Widget tests (not yet updated for the current landing/auth flow)
 docs/               Planning and architecture docs — see docs/index.md for the full map
   docs/overview/    Product scope, decision records, and prototype context

@@ -1,6 +1,6 @@
 ﻿# TODO: services
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** AuthService (`lib/data/services/auth_service.dart`) and FirestoreService (`lib/data/services/firestore_service.dart`) implemented as dependency-injected adapters. Error translation to typed app errors lives at the repository boundary. Additional data services remain to be added. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

@@ -13,7 +13,6 @@ class LandingHero extends StatelessWidget {
   final VoidCallback onSignIn;
 
   static const _green = Color(0xFF245B4B);
-  static const _gold = Color(0xFFD4AF37);
 
   @override
   Widget build(BuildContext context) => Container(

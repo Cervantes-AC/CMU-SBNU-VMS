@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:cmu_sbnu_vms/core/constants/route_names.dart';
 
 import 'parts/landing_content.dart';
 import 'parts/landing_header.dart';
@@ -11,7 +14,7 @@ class LandingPage extends StatelessWidget {
   static const background = Color(0xFFF7F7F2);
 
   void _openSignIn(BuildContext context) =>
-      Navigator.of(context).pushNamed('/sign-in');
+      GoRouter.of(context).push(RouteNames.signIn);
 
   @override
   Widget build(BuildContext context) {

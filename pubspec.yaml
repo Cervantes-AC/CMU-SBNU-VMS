@@ -38,6 +38,24 @@ dependencies:
   # Firebase Core — required by lib/firebase_options.dart (FlutterFire-generated).
   # Added as part of B-005: add approved dependency baseline.
   firebase_core: ^3.13.1
+  firebase_auth: ^5.5.3
+  cloud_firestore: ^5.6.7
+
+  # Routing
+  go_router: ^14.8.1
+
+  # State management
+  provider: ^6.1.2
+
+  # Local storage for cache/theme persistence
+  shared_preferences: ^2.3.3
+
+  # Connectivity
+  connectivity_plus: ^6.1.0
+
+  # Utilities
+  intl: ^0.19.0
+  crypto: ^3.0.6
 
 dev_dependencies:
   flutter_test:

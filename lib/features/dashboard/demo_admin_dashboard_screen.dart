@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:cmu_sbnu_vms/core/constants/route_names.dart';
 
 import 'widgets/demo_activity_panel.dart';
 import 'widgets/demo_metric_card.dart';
@@ -70,8 +73,7 @@ class DemoAdminDashboardScreen extends StatelessWidget {
         ),
       ),
       TextButton.icon(
-        onPressed: () =>
-            Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false),
+        onPressed: () => GoRouter.of(context).go(RouteNames.landing),
         icon: const Icon(Icons.logout_rounded, size: 18),
         label: const Text('Exit demo'),
         style: TextButton.styleFrom(foregroundColor: _green),

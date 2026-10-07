@@ -1,6 +1,6 @@
 ﻿# TODO: auth
 
-**Status:** Sign-in and password-reset frontend screens are implemented. A debug-only synthetic demo path opens an admin dashboard preview. Authentication repository, Firebase integration, session/profile routing, and service-backed flows remain pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Sign-in and password-reset frontend screens are implemented. AuthController, AuthRepository (interface + implementation), AuthService, FirestoreService, session/profile routing (SessionController + RouteGuard with profileReady), go_router-based app wiring, and Firebase bootstrap (with opt-in emulators) are implemented. A debug-only synthetic demo path opens a local synthetic admin dashboard preview. Minimal role dashboards exist; many production feature screens remain to be connected. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

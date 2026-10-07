@@ -1,6 +1,6 @@
 ﻿# TODO: widgets
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Shared contracts/widgets implemented (Result, AppFeedback, StatusBadge, EmptyState, RouteGuard, AppShell). The authenticated application shell provides adaptive navigation with role-based destination filtering. Additional shared widgets may be added as patterns emerge; contracts remain stable. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

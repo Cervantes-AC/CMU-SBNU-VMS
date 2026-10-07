@@ -1,6 +1,6 @@
 ﻿# TODO: dashboard
 
-**Status:** A debug-only administrator dashboard preview is implemented with synthetic display values. Production role dashboards and data connections remain unimplemented. This file is an implementation plan, not proof of approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** A debug-only administrator dashboard preview is implemented with synthetic display values. Minimal production role dashboards (member/officer/admin) are now implemented as guarded post-sign-in destinations using the shared dashboard scaffold; they show role-aware greetings and sign-out but no live data connections. This file is an implementation plan for remaining data-connection work. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

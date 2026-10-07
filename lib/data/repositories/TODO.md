@@ -1,6 +1,6 @@
 ﻿# TODO: repositories
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** AuthRepositoryImpl (`lib/data/repositories/auth_repository.dart`) implemented. It coordinates AuthService+Firestore for session/profile loading, prevents stale profile leaks, and clears user-scoped cache on sign-out. Additional repositories are pending. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
