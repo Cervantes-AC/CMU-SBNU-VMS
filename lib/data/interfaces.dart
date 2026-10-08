@@ -9,3 +9,4 @@ export 'interfaces/qr_duty_repository.dart';
 export 'interfaces/incident_repository.dart';
 export 'interfaces/report_repository.dart';
 export 'interfaces/analytics_repository.dart';
+export 'interfaces/user_management_repository.dart';
