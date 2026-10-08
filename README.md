@@ -6,7 +6,7 @@ This repository is the project of record. The older `nsrc_vms` prototype is sepa
 
 ## Current state
 
-The application is at a clean restart point. `lib/main.dart` launches `NSRCApp` from `lib/app.dart`, which currently displays a simple CMU SBNU VMS screen. Most feature source files are not currently present in `lib/`; the planned ownership map is in [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md). The declared Flutter dependencies include Firebase, routing, state management, local preferences, connectivity, QR scanning, and utility packages, but the current starter screen does not yet connect those services.
+The application is at a clean restart point. `lib/main.dart` launches `NSRCApp` from `lib/app.dart`, which currently displays a simple CMU SBNU VMS screen. Most feature source files are not currently present in `lib/`; the planned ownership map is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The declared Flutter dependencies include Firebase, routing, state management, local preferences, connectivity, QR scanning, and utility packages, but the current starter screen does not yet connect those services.
 
 Product requirements and module plans below describe the intended direction. They do not mean that a feature is implemented, institutionally approved, or ready for real data. Some product and operating decisions remain open. Use synthetic data and local development only until the relevant owner approvals and backend protections are in place.
 
@@ -45,17 +45,15 @@ Incident handling, QR monitoring, public content/branding, export and restore, a
 
 ## Architecture
 
-The source layout follows a feature-first Flutter structure. See [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md) for the folder map.
+The proposed source layout is feature-first; the current app is still a starter screen. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the practical folder guide.
 
 - **`main.dart`** is the application entry point. As the app grows, it should coordinate environment validation and safe initialization without owning feature behavior.
 - **`app.dart`** is the composition root for shared dependencies, theme, application providers, and the single router.
-- **`core/`** holds cross-cutting foundations such as typed errors, configuration, theme, cache, connectivity, and pure utilities.
-- **`data/models/`** holds immutable domain types and serialization boundaries.
-- **`data/interfaces/`** defines typed repository contracts; **`data/repositories/`** implements those contracts; **`data/services/`** wraps specific SDKs and platform APIs.
-- **`features/<feature>/`** owns a feature's screens, state/controller logic, and feature-specific widgets.
-- **`shared/`** is for presentation components and route/result behavior reused across unrelated features.
+- **`core/`** is for small cross-feature foundations such as configuration, errors, and theme.
+- **`features/<feature>/`** owns a feature's presentation and data code; add a domain layer only when its logic needs one.
+- **`shared/`** is for code genuinely reused across unrelated features.
 
-Screens should render state and forward user intent. Controllers coordinate view state and repository calls. Repositories map typed operations to data sources. Firebase and other SDK details stay behind service/repository boundaries. Keep one source of truth for route policy and enforce all data authorization again in backend rules or trusted functions.
+Screens should render state and forward user intent. View models or controllers coordinate UI state; repositories own data access; services wrap SDKs. Keep Firebase details behind feature data boundaries. Client route guards are not a security boundary; enforce data authorization in backend rules or trusted functions.
 
 ## Data, privacy, and security principles
 
@@ -114,12 +112,12 @@ The Firebase client configuration file, if regenerated, must be generated for ap
 ## Repository layout
 
 ```text
-lib/                  Flutter app source and architecture map
+lib/                  Flutter app source
   main.dart           Entry point
   app.dart            Root application widget
-  ARCHITECTURE.md     Planned source folder ownership and implementation order
-  core/ data/ shared/ Planned shared application layers
-  features/           Planned product feature modules
+  firebase_options.dart Generated Firebase client options
+  core/ data/ shared/ Empty planned layers; add files when needed
+  features/           Empty planned feature folders; add files as approved
 assets/images/        Local image assets configured by pubspec.yaml
 android/ ios/ web/    Flutter platform hosts (other host folders may also exist)
 test/                 Flutter tests; current widget smoke test expects prior landing-page copy
@@ -137,8 +135,12 @@ firestore.indexes.json Firestore index configuration source file
 - Do not stage, commit, push, merge, publish, or deploy unless the task explicitly authorizes that action.
 - Do not claim a command or review ran if it did not. Test and analyzer commands are listed for developers but were not run as part of writing this README.
 
+For branch, staging, commit, and safe recovery practices, see the [Git version control guide](docs/git-version-control.md).
+
+For the staged roadmap and phase readiness criteria, see the [development plan](docs/Development/README.md).
+
 ## Project decisions and readiness
 
 The project identity is distinct from the earlier prototype. The target identifier `cmu-sbnu-vms` is the approved identity for this repository; production hosting/billing/IAM/region ownership and permission to store unit data must be resolved before production use. Product requirements remain a working baseline where approval is explicitly marked as proposed. Branding/public release, real-data field inventory, incident/privacy/retention policy, attendance-hour policy, QR anti-replay design, notifications, and backup/export decisions each require their owners' approval before the dependent feature is used.
 
-Use this README for the project overview and [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md) for source organization. Keep detailed product, decision, backend, data-access, and implementation records in the repository's documentation set as those records are maintained.
+Use this README for the project overview, [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for source organization, and [`docs/Development/README.md`](docs/Development/README.md) for the staged development plan.
