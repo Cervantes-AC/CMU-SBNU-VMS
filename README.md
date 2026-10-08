@@ -1,143 +1,144 @@
-# CMU SBNU VMS — School-Based NSRC Units Application
+# CMU SBNU Volunteer Management System
 
-Flutter application for the **Central Mindanao University School-Based National Service Reserve Corps
-Unit (CMU SBNU)**. The product goal is a role-aware volunteer operations tool: volunteer records, events,
-attendance, incident reporting, and unit communication, with least-privilege access and auditable
-actions.
+`cmu_sbnu_vms` is a Flutter application project for the Central Mindanao University School-Based National Service Reserve Corps Unit (CMU SBNU). Its planned purpose is to give volunteers and authorized unit officers a role-aware place to coordinate approved activities while protecting member information and recording privileged actions.
 
-## Project status (2026-10-07)
+This repository is the project of record. The older `nsrc_vms` prototype is separate design reference material; its Firebase project, credentials, data, and configuration must not be used here.
 
-**This repository is in early frontend development. The app opens at a local landing page with a path to member sign-in and password reset. The landing page, sign-in/password-reset flows and session routing use go_router with Provider state; auth state is coordinated against Firebase Auth when configured. Debug builds include a local synthetic admin dashboard preview with fixture credentials. Authentication repository, emulator wiring (opt-in), and many production feature screens are still being connected. Public branding/release approval remains open.**
+## Current state
 
-| | State |
+The application is at a clean restart point. `lib/main.dart` launches `NSRCApp` from `lib/app.dart`, which currently displays a simple CMU SBNU VMS screen. Most feature source files are not currently present in `lib/`; the planned ownership map is in [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md). The declared Flutter dependencies include Firebase, routing, state management, local preferences, connectivity, QR scanning, and utility packages, but the current starter screen does not yet connect those services.
+
+Product requirements and module plans below describe the intended direction. They do not mean that a feature is implemented, institutionally approved, or ready for real data. Some product and operating decisions remain open. Use synthetic data and local development only until the relevant owner approvals and backend protections are in place.
+
+## What the system is intended to do
+
+### Product goals
+
+- Give members access to approved announcements and events, their own profile, attendance history, and service summary.
+- Help authorized officers coordinate events and record attendance with traceable corrections.
+- Give administrators a controlled workflow for account review and access management.
+- Keep access role-aware, auditable, privacy-conscious, and suitable for Android-first use. Responsive web support may be retained as scope is confirmed.
+
+### Roles and access model
+
+The planned application roles are:
+
+| Role | Intended access |
 |---|---|
-| Application code | `lib/main.dart` initializes Firebase, configures opt-in local emulators, and runs `NSRCApp` with go_router + Provider. Sign-in and password-reset flows are wired to an `AuthRepository` and fail-closed guard. Minimal role dashboards exist and route by approved `UserRole`. Debug builds still include the local synthetic admin dashboard preview. |
-| Dependencies | `firebase_core`, `firebase_auth`, `cloud_firestore`, `go_router`, `provider`, `shared_preferences`, `connectivity_plus`, `intl`, `crypto` are declared and locked; `flutter pub get` succeeds |
-| Analyzer | **Passes** — `flutter analyze --no-pub` returns 0 issues |
-| Tests | The existing root smoke test still expects preview-specific landing copy; it has not been updated or run for the current landing/auth flow |
-| Firebase | Target client identifiers exist; Firebase initializes against `cmu-sbnu-vms` (validated at startup). Local Auth/Firestore emulators may be enabled with `USE_FIREBASE_EMULATORS=true` (default `localhost`); deny-all Firestore rules are configured. Feature rules/Functions/backend code are not fully implemented |
-| Backend identity | `cmu-sbnu-vms` — **Decided 2026-09-23** (D-04); the `nsrc-vms` prototype is not this app's backend. The production project, billing/IAM/region owner, and permission to store unit data are still open (D-22) |
-| Documentation | Consolidated descriptive-name docs under `docs/`; see [`docs/index.md`](docs/index.md) for the full map |
-| Local development | `flutter run -d chrome` initializes Firebase (or shows a safe startup error), loads the landing page, and routes via go_router. Use `flutter run --dart-define=USE_FIREBASE_EMULATORS=true` to connect to local emulators (Auth 9099, Firestore 8080) |
-| Real data | **None may be used** until the decisions in the open-decisions register are closed |
+| `member` | Read and update allowlisted fields on their own profile; view published events and announcements; view their own attendance and service summary; request event participation where enabled. |
+| `officer` | Member access plus authorized event coordination, attendance recording and correction, and approved incident response work. |
+| `admin` | Officer access plus controlled account approval, role/status management, announcement publishing, and permitted aggregate or audit views. |
+| `organization` | Deferred. This role requires an owner-defined identity process, purpose, and field-level access policy before implementation. |
 
-This repository **is** the project of record. The earlier prototype (Dart package `cmu_nsrc_app`, Firebase
-project `nsrc-vms`) is kept as design input and described in [`docs/overview/about.md`](docs/overview/about.md): its code does
-not run in this repository, and no data, seed file, or credential comes from it (see
-[`docs/overview/decision-register.md`](docs/overview/decision-register.md) D-04, D-09). How its modules are ported here — identity
-map, port order, per-module acceptance — is planned in [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md)
-and [`docs/lib/features.md`](docs/lib/features.md).
+The planned approval gate treats missing, malformed, pending, denied, blocked, suspended, or deactivated accounts as unapproved for protected application data. Role assignment and account approval must be enforced by trusted backend operations. A hidden button or client-side route guard is not a security boundary.
 
-## Requirements
+### Planned feature scope
 
-- Flutter **3.38.9** stable with Dart **3.10.8** (matches `pubspec.yaml`'s `sdk: ^3.10.8`)
-- Git, an editor with the Dart/Flutter plugins, and Android SDK tooling for Android builds
-- For rules and backend work: Node.js and the Firebase CLI
+The order below is a product roadmap, not a claim of implementation:
 
-Verify with `flutter doctor -v`.
+1. **Foundation and identity:** application startup, sign-in, password reset, session handling, approval gate, sign-out, access-denied and pending states.
+2. **Member operations:** own-profile view/edit, role-aware app navigation, events, announcements, attendance, and service summary.
+3. **Oversight:** audited privileged actions, controlled account management, and approved aggregate reporting.
+4. **Separately gated capabilities:** incident reporting, QR duty monitoring, notifications/SOS, analytics, exports, backup/restore, public landing/contact, PDF generation, and administrative data tools.
 
-## Quick start
+Incident handling, QR monitoring, public content/branding, export and restore, and arbitrary database/query tools require additional policy and threat-model decisions. Initial product scope excludes background location tracking, public incident maps, client-held privileged keys, user impersonation, arbitrary database access, unrestricted personal-data export, and replacing emergency services.
+
+## Architecture
+
+The source layout follows a feature-first Flutter structure. See [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md) for the folder map.
+
+- **`main.dart`** is the application entry point. As the app grows, it should coordinate environment validation and safe initialization without owning feature behavior.
+- **`app.dart`** is the composition root for shared dependencies, theme, application providers, and the single router.
+- **`core/`** holds cross-cutting foundations such as typed errors, configuration, theme, cache, connectivity, and pure utilities.
+- **`data/models/`** holds immutable domain types and serialization boundaries.
+- **`data/interfaces/`** defines typed repository contracts; **`data/repositories/`** implements those contracts; **`data/services/`** wraps specific SDKs and platform APIs.
+- **`features/<feature>/`** owns a feature's screens, state/controller logic, and feature-specific widgets.
+- **`shared/`** is for presentation components and route/result behavior reused across unrelated features.
+
+Screens should render state and forward user intent. Controllers coordinate view state and repository calls. Repositories map typed operations to data sources. Firebase and other SDK details stay behind service/repository boundaries. Keep one source of truth for route policy and enforce all data authorization again in backend rules or trusted functions.
+
+## Data, privacy, and security principles
+
+- Use only the target identity and configuration belonging to this repository. The approved target Firebase project identifier is `cmu-sbnu-vms`; never fall back to the prototype project `nsrc-vms`.
+- Do not access production data or deploy to a cloud environment unless a task explicitly authorizes it. Use synthetic fixtures and Firebase emulators for development once emulator configuration is available.
+- Do not add credentials, service-account keys, tokens, real volunteer records, or personal incident information to source control.
+- Collect only approved fields. A member cannot set their own role, account approval, actor identity, audit time, attendance total, or other privileged values.
+- Store timestamps as UTC/server timestamps and make unit-local date rules explicit.
+- Clear user-scoped in-memory state and caches when signing out or when access is revoked.
+- Keep incident narratives, contact details, locations, credentials, and raw backend payloads out of logs, URLs, analytics labels, and public views.
+- Prefer bounded, typed, purpose-specific repository operations. No generic client API for arbitrary Firestore collection reads or writes.
+- Record privileged mutations through trusted backend operations and an append-only audit mechanism when that feature is implemented.
+
+The project does not yet have a complete production backend, reviewed feature rules/functions, or approval to use real member data. A working screen or successful local build alone does not establish production readiness.
+
+## Technology
+
+- **Client:** Flutter and Dart. The repository's declared SDK constraint is Dart `^3.10.8`; the documented baseline is Flutter 3.38.9 stable with Dart 3.10.8.
+- **Backend direction:** Firebase Authentication and Cloud Firestore, with Firebase Emulator Suite for local backend development.
+- **Application structure dependencies declared in `pubspec.yaml`:** `go_router`, `provider`, `shared_preferences`, `connectivity_plus`, `mobile_scanner`, `intl`, and `crypto`, alongside Firebase packages and Flutter.
+- **Platforms:** Flutter host directories are present for Android, iOS, web, Linux, macOS, and Windows. Android is the intended first platform; support and release readiness for other platforms are not implied by their directories.
+
+## Getting started
+
+### Prerequisites
+
+- Flutter 3.38.9 stable and Dart 3.10.8 (or versions compatible with the SDK constraint in `pubspec.yaml`)
+- Git and a Flutter-enabled editor
+- Android SDK tooling for Android runs/builds
+- Node.js and Firebase CLI only when working on Firebase emulator/backend configuration
+
+Check the local toolchain with:
 
 ```powershell
-flutter --version                 # confirm 3.38.9 / Dart 3.10.8
-flutter pub get                   # install dependencies
-flutter analyze --no-pub          # 0 issues as of 2026-10-07
-flutter test                      # existing smoke test still expects previous landing-preview copy
-flutter run -d chrome             # initializes Firebase and routes via go_router; use --dart-define=USE_FIREBASE_EMULATORS=true to connect to local emulators
+flutter doctor -v
+flutter --version
 ```
 
-For local Auth/Firestore emulator configuration, run in a separate terminal:
+### Install dependencies and run the starter app
+
+From the repository root:
 
 ```powershell
-firebase emulators:start --project demo-cmu-sbnu-vms
+flutter pub get
+flutter run
 ```
 
-Then run the Flutter app with emulators enabled:
+Select a device with `flutter devices`, then pass its ID, for example `flutter run -d chrome` for a configured Chrome target. The current root widget is a local starter screen and does not require Firebase initialization.
 
-```powershell
-flutter run --dart-define=USE_FIREBASE_EMULATORS=true
-```
+### Firebase development
 
-In a debug build, the sign-in screen includes a local-only admin preview account:
-`admin@gmail.com` / `root@123`. The credentials are checked by the
-Flutter app, do not exist in Firebase Auth, and open only a synthetic dashboard
-preview. They are unavailable in profile and release builds.
+Firebase work is not fully wired into the current starter app. Before adding it, confirm the generated options and every emulator/configuration file point only to `cmu-sbnu-vms` or an explicitly named local demo emulator project. Emulator setup must use an explicit demo project ID and deny-by-default Firestore rules until reviewed rules and security tests exist. Do not run a Firebase deploy command as a substitute for local testing.
 
-Full setup, troubleshooting, and the environment-file steps are in
-[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md). Backend work needs either the Firebase
-Emulator Suite or a `dev` project; see [`docs/overview/decision-register.md`](docs/overview/decision-register.md)
-(D-04 is **Decided**: `cmu-sbnu-vms` is the project of record, and the prototype project `nsrc-vms` must never
-be used as a backend).
-
-## Developer Onboarding & Reading Guide
-
-Follow the reading order matching your role to get started:
-
-- 🛠️ **Developer Starting Feature Implementation:**
-  1. **[`README.md`](README.md)** — Project status, baseline versions, and quick start commands.
-  2. **[`docs/index.md`](docs/index.md)** — Central documentation map.
-  3. **[`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md)** — Core architecture, error contracts & state management rules.
-  4. **[`docs/lib/index.md`](docs/lib/index.md)** — File-by-file class contracts & implementation order for `lib/`.
-
-- 💻 **Machine & Environment Setup:**
-  - **[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md)** — Local Flutter, Android SDK & Firebase Emulator Suite setup.
-
-- 🤖 **AI Coding Assistant:**
-  - **[`AGENTS.md`](AGENTS.md)** ➔ **[`docs/ai-coding/index.md`](docs/ai-coding/index.md)** — Mandatory AI safety rules, workflow & task templates.
+The Firebase client configuration file, if regenerated, must be generated for approved target app registrations. Do not copy options or credentials from `D:\nsrc_vms`. Never put service-account keys in the Flutter client.
 
 ## Repository layout
 
 ```text
-lib/                Application source (landing, auth with session routing, minimal role dashboards)
-test/               Widget tests (not yet updated for the current landing/auth flow)
-docs/               Planning and architecture docs — see docs/index.md for the full map
-  docs/overview/    Product scope, decision records, and prototype context
-  docs/architecture/ Implementation guides, schema/data access, backend & UI contracts
-  docs/guides/      Setup, backlog, checklists, operations & CI specs
-  docs/lib/         File-by-file source contracts for lib/
-  docs/ai-coding/   AI agent operating playbook
-android/ ios/ web/ linux/ macos/ windows/   Flutter platform hosts
-firebase.json       Firebase platform configuration
-assets/images/      CMU and SBNU logo assets; use remains subject to D-18 approval
+lib/                  Flutter app source and architecture map
+  main.dart           Entry point
+  app.dart            Root application widget
+  ARCHITECTURE.md     Planned source folder ownership and implementation order
+  core/ data/ shared/ Planned shared application layers
+  features/           Planned product feature modules
+assets/images/        Local image assets configured by pubspec.yaml
+android/ ios/ web/    Flutter platform hosts (other host folders may also exist)
+test/                 Flutter tests; current widget smoke test expects prior landing-page copy
+firestore.rules       Current Firestore rules source file
+firestore.indexes.json Firestore index configuration source file
 ```
 
-## Documentation: start here
+## Development workflow
 
-The target-specific, file-by-file build plan and production-readiness criteria are in
-[`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md). The source contract for every planned
-`lib/` module and file is indexed in [`docs/lib/index.md`](docs/lib/index.md). Use these alongside
-the approved requirements and decision records below. AI agents should start with
-[`AGENTS.md`](AGENTS.md) and follow the [AI Coding Playbook](docs/ai-coding/index.md), including its
-workflow, Git, security, review and handoff procedures. [`docs/overview/about.md`](docs/overview/about.md) describes the earlier
-`nsrc_vms` prototype and is reference material only.
+- Inspect `git status` and the relevant diff before editing. Preserve unrelated local changes.
+- Read the module's architecture and product policy before adding a feature. Build one complete, reviewable slice at a time.
+- Prefer injected dependencies and typed contracts. Do not add empty source files just to populate the tree.
+- Update this README or the architecture map when project status or source organization materially changes.
+- Do not use real personal data during development.
+- Do not stage, commit, push, merge, publish, or deploy unless the task explicitly authorizes that action.
+- Do not claim a command or review ran if it did not. Test and analyzer commands are listed for developers but were not run as part of writing this README.
 
-| If you are… | Read, in order |
-|---|---|
-| A developer about to write code | [`docs/index.md`](docs/index.md) → [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) → [`docs/guides/implementation-backlog.md`](docs/guides/implementation-backlog.md) → [`docs/guides/development-checklist.md`](docs/guides/development-checklist.md) |
-| Setting up a machine | [`docs/guides/environment-setup.md`](docs/guides/environment-setup.md) |
-| A product owner or sponsor | [`docs/overview/product-requirements.md`](docs/overview/product-requirements.md) → [`docs/overview/decision-register.md`](docs/overview/decision-register.md) |
-| Reviewing safety, privacy, or risk | [`docs/guides/operations-runbook.md`](docs/guides/operations-runbook.md) → [`docs/overview/decision-register.md`](docs/overview/decision-register.md) |
-| Trying to understand the target product | [`docs/overview/product-requirements.md`](docs/overview/product-requirements.md) → [`docs/overview/about.md`](docs/overview/about.md) (prototype reference) |
-| Porting a prototype module | [`docs/overview/about.md`](docs/overview/about.md) → [`docs/lib/features.md`](docs/lib/features.md) → [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) |
+## Project decisions and readiness
 
-## Contributing
+The project identity is distinct from the earlier prototype. The target identifier `cmu-sbnu-vms` is the approved identity for this repository; production hosting/billing/IAM/region ownership and permission to store unit data must be resolved before production use. Product requirements remain a working baseline where approval is explicitly marked as proposed. Branding/public release, real-data field inventory, incident/privacy/retention policy, attendance-hour policy, QR anti-replay design, notifications, and backup/export decisions each require their owners' approval before the dependent feature is used.
 
-1. Pick an unblocked task from [`docs/guides/implementation-backlog.md`](docs/guides/implementation-backlog.md) — or, later, an
-   approved feature package from [`docs/ai-coding/task-template.md`](docs/ai-coding/task-template.md), or a
-   staged port from [`docs/overview/about.md`](docs/overview/about.md)
-   whose prerequisites are closed.
-2. Branch from the integration branch (`T-xx-short-purpose`), keep the change small, and follow the
-   conventions in [`docs/architecture/implementation-guide.md`](docs/architecture/implementation-guide.md) §3.
-3. Before requesting review, run the authorized format/analyzer/test checks and report exact results. AI-assisted changes must also follow the test authorization rule in [`AGENTS.md`](AGENTS.md).
-4. Meet the checklists in [`docs/guides/development-checklist.md`](docs/guides/development-checklist.md)
-   and update docs/data contracts and (if a decision changed) the decision register.
-
-**Never** commit credentials, service-account keys, or real volunteer data, and never point a build at the
-prototype project `nsrc-vms` — this repository's Firebase project is `cmu-sbnu-vms` (D-04). See
-[`docs/guides/environment-setup.md`](docs/guides/environment-setup.md).
-
-## Ownership and licensing
-
-No license file is present, and no institutional approval is recorded in this repository. Treat the code
-and documentation as internal until the sponsor and repository owner confirm distribution terms
-(D-01, D-18).
+Use this README for the project overview and [`lib/ARCHITECTURE.md`](lib/ARCHITECTURE.md) for source organization. Keep detailed product, decision, backend, data-access, and implementation records in the repository's documentation set as those records are maintained.
