@@ -104,6 +104,9 @@ class RouteNames {
   /// Access denied screen.
   static const String accessDenied = '/access-denied';
 
+  /// Pending access screen (authenticated but not approved).
+  static const String pendingAccess = '/access/pending';
+
   /// Import/Export (admin).
   static const String importExport = '/admin/import-export';
 

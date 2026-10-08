@@ -20,6 +20,7 @@ import 'package:cmu_sbnu_vms/data/models/attendance.dart';
 import 'package:cmu_sbnu_vms/data/models/event.dart';
 import 'package:cmu_sbnu_vms/data/models/user.dart';
 import 'package:cmu_sbnu_vms/features/access_denied_screen.dart';
+import 'package:cmu_sbnu_vms/features/pending_access_screen.dart';
 import 'package:cmu_sbnu_vms/features/attendance/attendance_controller.dart';
 import 'package:cmu_sbnu_vms/features/attendance/event_attendance_screen.dart';
 import 'package:cmu_sbnu_vms/features/attendance/member_attendance_screen.dart';
@@ -590,6 +591,13 @@ class _NSRCAppState extends State<NSRCApp> {
       GoRoute(
         path: RouteNames.accessDenied,
         builder: (context, state) => AccessDeniedScreen(
+          onSignOut: _signOut,
+          onRetry: _sessionController.retry,
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.pendingAccess,
+        builder: (context, state) => PendingAccessScreen(
           onSignOut: _signOut,
           onRetry: _sessionController.retry,
         ),

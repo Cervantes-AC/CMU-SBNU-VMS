@@ -5,38 +5,51 @@ import '../../core/error/error_mapper.dart';
 import '../../data/interfaces/event_repository.dart';
 import '../../data/models/event.dart';
 import '../../shared/app_feedback.dart';
+import '../../shared/result.dart';
 
 /// Immutable events view state.
 class EventsViewState {
   const EventsViewState({
     this.loading = false,
+    this.loadingDetail = false,
     this.items = const [],
     this.nextCursor,
     this.errorMessage,
     this.failureCategory,
     this.hasMore = true,
     this.selectedFilter = 'all',
+    this.detail,
+    this.joinRequestStatus,
   });
 
   final bool loading;
+  final bool loadingDetail;
   final List<Event> items;
   final String? nextCursor;
   final String? errorMessage;
   final ErrorCategory? failureCategory;
   final bool hasMore;
   final String selectedFilter;
+  final Event? detail;
+  final JoinRequestStatus? joinRequestStatus;
 
   EventsViewState copyWith({
     bool? loading,
+    bool? loadingDetail,
     List<Event>? items,
     String? nextCursor,
     String? errorMessage,
     ErrorCategory? failureCategory,
     bool? hasMore,
     String? selectedFilter,
+    Event? detail,
+    JoinRequestStatus? joinRequestStatus,
+    bool clearDetail = false,
+    bool clearJoinStatus = false,
     bool clearError = false,
   }) => EventsViewState(
         loading: loading ?? this.loading,
+        loadingDetail: loadingDetail ?? this.loadingDetail,
         items: items ?? this.items,
         nextCursor: nextCursor ?? this.nextCursor,
         errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
@@ -44,6 +57,9 @@ class EventsViewState {
             clearError ? null : failureCategory ?? this.failureCategory,
         hasMore: hasMore ?? this.hasMore,
         selectedFilter: selectedFilter ?? this.selectedFilter,
+        detail: clearDetail ? null : detail ?? this.detail,
+        joinRequestStatus:
+            clearJoinStatus ? null : joinRequestStatus ?? this.joinRequestStatus,
       );
 
   @override
@@ -185,5 +201,108 @@ class EventsController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     super.dispose();
+  }
+
+  /// Loads a single event by ID for the detail screen.
+  Future<void> loadDetail(String eventId) async {
+    if (_state.loadingDetail) return;
+    _update(_state.copyWith(loadingDetail: true, clearDetail: true, clearError: true));
+    try {
+      final result = await _eventRepository.getEvent(eventId);
+      if (_disposed) return;
+      result.when(
+        success: (event) {
+          _update(_state.copyWith(loadingDetail: false, detail: event, clearError: true));
+          // Also fetch join request status if user is authenticated
+          _fetchJoinStatus(eventId);
+        },
+        failure: (error) => _update(_state.copyWith(
+              loadingDetail: false,
+              errorMessage: AppFeedback.messageFor(error),
+              failureCategory: error.category,
+            )),
+      );
+    } catch (error, st) {
+      if (_disposed) return;
+      final mapped = mapToAppException(error, st);
+      _update(_state.copyWith(
+        loadingDetail: false,
+        errorMessage: AppFeedback.messageFor(mapped ?? const UnexpectedException()),
+        failureCategory: mapped?.category,
+      ));
+    }
+  }
+
+  Future<void> _fetchJoinStatus(String eventId) async {
+    try {
+      final result = await _eventRepository.getJoinRequestStatus(eventId);
+      if (_disposed) return;
+      result.when(
+        success: (status) => _update(_state.copyWith(joinRequestStatus: status)),
+        failure: (_) => _update(_state.copyWith(joinRequestStatus: JoinRequestStatus.none)),
+      );
+    } catch (_) {
+      if (!_disposed) _update(_state.copyWith(joinRequestStatus: JoinRequestStatus.none));
+    }
+  }
+
+  /// Creates a new event (officer/admin).
+  Future<Result<Event>> createEvent(EventDraft draft) async {
+    try {
+      final result = await _eventRepository.createEvent(draft);
+      return result;
+    } catch (error, st) {
+      final mapped = mapToAppException(error, st);
+      return Failure(mapped ?? const UnexpectedException());
+    }
+  }
+
+  /// Updates an existing event (officer/admin).
+  Future<Result<Event>> updateEvent({
+    required String eventId,
+    required EventDraft draft,
+    required int expectedRevision,
+  }) async {
+    try {
+      final result = await _eventRepository.updateEvent(
+        eventId: eventId,
+        draft: draft,
+        expectedRevision: expectedRevision,
+      );
+      return result;
+    } catch (error, st) {
+      final mapped = mapToAppException(error, st);
+      return Failure(mapped ?? const UnexpectedException());
+    }
+  }
+
+  /// Cancels an event (officer/admin).
+  Future<Result<void>> cancelEvent(String eventId, {required int expectedRevision}) async {
+    try {
+      final result = await _eventRepository.cancelEvent(
+        eventId,
+        expectedRevision: expectedRevision,
+      );
+      return result;
+    } catch (error, st) {
+      final mapped = mapToAppException(error, st);
+      return Failure(mapped ?? const UnexpectedException());
+    }
+  }
+
+  /// Deletes an event (officer/admin).
+  Future<Result<void>> deleteEvent(String eventId) async {
+    // This would require a deleteEvent method in the repository
+    // For now, we'll use cancelEvent as a placeholder
+    try {
+      final result = await _eventRepository.cancelEvent(
+        eventId,
+        expectedRevision: 0,
+      );
+      return result;
+    } catch (error, st) {
+      final mapped = mapToAppException(error, st);
+      return Failure(mapped ?? const UnexpectedException());
+    }
   }
 }

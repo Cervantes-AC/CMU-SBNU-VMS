@@ -49,7 +49,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'cmu-sbnu-vms.firebasestorage.app',
     measurementId: 'G-VC67CNDBSD',
   );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAmD-3PxlPWdsPSugK6yNS-TXQ37cBhT5A',
     appId: '1:587410682952:android:5427fe1f7cfecfd60e547d',

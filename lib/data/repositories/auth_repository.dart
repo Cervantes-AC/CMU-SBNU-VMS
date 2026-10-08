@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 import '../../core/cache/cache_service.dart';
@@ -117,6 +118,26 @@ class AuthRepositoryImpl implements AuthRepository {
         return const Failure(
           UnauthenticatedException(message: 'Registration did not complete.'),
         );
+      }
+      // Create initial Firestore profile (status: pending, role: member)
+      // The user will need admin approval to access protected routes.
+      try {
+        final now = FieldValue.serverTimestamp();
+        await _firestore.userDocument(uid).set({
+          'uid': uid,
+          'displayName': email.split('@').first,
+          'role': 'member',
+          'status': 'pending',
+          'createdAt': now,
+          'updatedAt': now,
+          'revision': 1,
+          'schemaVersion': 1,
+          'email': email.trim(),
+        });
+      } catch (profileError) {
+        // If profile creation fails, log but don't fail registration
+        // The user can still sign in; admin can create profile later
+        Logger.error('auth.profile.create', profileError);
       }
       return Success(uid);
     } catch (error, st) {
