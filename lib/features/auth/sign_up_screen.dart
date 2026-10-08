@@ -5,32 +5,35 @@ import 'package:cmu_sbnu_vms/core/constants/route_names.dart';
 
 import 'auth_controller.dart';
 import 'widgets/auth_identity_header.dart';
-import 'widgets/sign_in_form_card.dart';
+import 'widgets/sign_up_form_card.dart';
 
-/// Sign-in screen for the CMU SBNU VMS application.
+/// Registration screen for the CMU SBNU VMS application.
 ///
-/// Delegates real authentication to [AuthController] (which owns submitting
-/// and safe failure state).
-class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, required this.controller});
+/// Delegates real registration to [AuthController]. Institution-approved
+/// registration must be enabled; otherwise the screen shows an info message.
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key, required this.controller});
 
   final AuthController controller;
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   String? _localErrorMessage;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -42,22 +45,50 @@ class _AuthScreenState extends State<AuthScreen> {
 
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
     setState(() => _localErrorMessage = null);
 
+    if (password != confirmPassword) {
+      setState(() => _localErrorMessage = 'Passwords do not match.');
+      return;
+    }
+
     try {
-      // Real sign-in: controller owns submitting/failure state. The session
-      // watcher drives navigation once the profile is approved.
-      await widget.controller.signIn(email, password);
+      await widget.controller.signUp(email, password);
     } catch (_) {
       if (mounted) {
         setState(
           () => _localErrorMessage =
-              'We couldn’t sign you in. Check your details and try again.',
+              'We couldn\'t create your account. Check your details and try again.',
         );
       }
     } finally {
       _passwordController.clear();
+      _confirmPasswordController.clear();
     }
+  }
+
+  String? _validateEmail(String? value) {
+    final email = value?.trim() ?? '';
+    if (email.isEmpty) return 'Enter your email address.';
+    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
+      return 'Enter a valid email address.';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    final password = value ?? '';
+    if (password.isEmpty) return 'Enter a password.';
+    if (password.length < 8) return 'Password must be at least 8 characters.';
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    final confirm = value ?? '';
+    if (confirm.isEmpty) return 'Confirm your password.';
+    if (confirm != _passwordController.text) return 'Passwords do not match.';
+    return null;
   }
 
   @override
@@ -96,49 +127,32 @@ class _AuthScreenState extends State<AuthScreen> {
                       children: [
                         const AuthIdentityHeader(),
                         const SizedBox(height: 28),
-                        SignInFormCard(
+                        SignUpFormCard(
                           formKey: _formKey,
                           emailController: _emailController,
                           passwordController: _passwordController,
+                          confirmPasswordController: _confirmPasswordController,
                           isSubmitting: _submitting,
                           isEnabled: true,
                           infoMessage: null,
                           obscurePassword: _obscurePassword,
+                          obscureConfirmPassword: _obscureConfirmPassword,
                           errorMessage: errorMessage,
                           onSubmit: _submit,
                           onTogglePassword: () => setState(
                             () => _obscurePassword = !_obscurePassword,
                           ),
-                          onPasswordReset: () => GoRouter.of(
-                            context,
-                          ).push(RouteNames.passwordReset),
+                          onToggleConfirmPassword: () => setState(
+                            () => _obscureConfirmPassword =
+                                !_obscureConfirmPassword,
+                          ),
+                          onSignIn: () =>
+                              GoRouter.of(context).push(RouteNames.signIn),
                           validateEmail: _validateEmail,
+                          validatePassword: _validatePassword,
+                          validateConfirmPassword: _validateConfirmPassword,
                         ),
                         const SizedBox(height: 18),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Need an account? ',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () =>
-                                  GoRouter.of(context).push(RouteNames.signUp),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: const Text('Create one'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
                         const Text(
                           'For authorized CMU SBNU unit members',
                           textAlign: TextAlign.center,
@@ -154,14 +168,5 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       },
     );
-  }
-
-  String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-    if (email.isEmpty) return 'Enter your email address.';
-    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
-      return 'Enter a valid email address.';
-    }
-    return null;
   }
 }

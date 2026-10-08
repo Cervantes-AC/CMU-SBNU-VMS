@@ -26,6 +26,7 @@ import 'package:cmu_sbnu_vms/features/attendance/member_attendance_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_controller.dart';
 import 'package:cmu_sbnu_vms/features/auth/auth_screen.dart';
 import 'package:cmu_sbnu_vms/features/auth/password_reset_screen.dart';
+import 'package:cmu_sbnu_vms/features/auth/sign_up_screen.dart';
 import 'package:cmu_sbnu_vms/features/announcements/announcements_controller.dart';
 import 'package:cmu_sbnu_vms/features/announcements/announcements_screen.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/admin_dashboard.dart';
@@ -153,6 +154,10 @@ class UnconfiguredAuthRepository implements AuthRepository {
 
   @override
   Future<Result<String>> signIn(String email, String password) async =>
+      const Failure(_notConnected);
+
+  @override
+  Future<Result<String>> signUp(String email, String password) async =>
       const Failure(_notConnected);
 
   @override
@@ -577,6 +582,10 @@ class _NSRCAppState extends State<NSRCApp> {
         path: RouteNames.passwordReset,
         builder: (context, state) =>
             PasswordResetScreen(onSubmit: _authController.sendPasswordReset),
+      ),
+      GoRoute(
+        path: RouteNames.signUp,
+        builder: (context, state) => SignUpScreen(controller: _authController),
       ),
       GoRoute(
         path: RouteNames.accessDenied,

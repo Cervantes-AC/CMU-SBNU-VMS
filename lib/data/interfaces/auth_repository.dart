@@ -23,6 +23,12 @@ abstract interface class AuthRepository {
   /// (Firebase Auth handles duplicate sign-in). Errors are typed and safe.
   Future<Result<String>> signIn(String email, String password);
 
+  /// Registers a new user with email and password.
+  ///
+  /// Returns the UID on success. Only enabled if institution-approved
+  /// registration is configured. Errors are typed and safe.
+  Future<Result<String>> signUp(String email, String password);
+
   /// Sends a password-reset request. The result is intentionally identical
   /// for existing and non-existing accounts (no account enumeration).
   Future<Result<void>> sendPasswordReset(String email);

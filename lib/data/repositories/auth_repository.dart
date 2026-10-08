@@ -22,9 +22,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required AuthService authService,
     required FirestoreService firestoreService,
     CacheService? cacheService,
-  })  : _auth = authService,
-        _firestore = firestoreService,
-        _cache = cacheService;
+  }) : _auth = authService,
+       _firestore = firestoreService,
+       _cache = cacheService;
 
   final AuthService _auth;
   final FirestoreService _firestore;
@@ -62,24 +62,31 @@ class AuthRepositoryImpl implements AuthRepository {
     // longer signed in are suppressed and mapped to null.
     return _auth.authStateChanges().asyncExpand((currentUid) {
       if (currentUid != uid) return Stream<UserProfile?>.value(null);
-      return _firestore.userDocument(uid).snapshots().map((doc) {
-        try {
-          if (!doc.exists) return null;
-          return UserProfile.fromFirestore(doc);
-        } on FormatException {
-          // Malformed profile: fail closed, log safe details only.
-          Logger.warn('profile.parse', code: 'FORMAT',
-              fields: {'exists': doc.exists});
-          return null;
-        }
-      }).handleError((Object error, StackTrace st) {
-        // Permission denial / offline must surface as typed errors to the
-        // repository caller, not as a silent empty profile. Re-throw as
-        // AppException; the app layer maps it to a safe state.
-        final mapped = mapToAppException(error, st);
-        if (mapped != null) throw mapped;
-        throw UnexpectedException();
-      });
+      return _firestore
+          .userDocument(uid)
+          .snapshots()
+          .map((doc) {
+            try {
+              if (!doc.exists) return null;
+              return UserProfile.fromFirestore(doc);
+            } on FormatException {
+              // Malformed profile: fail closed, log safe details only.
+              Logger.warn(
+                'profile.parse',
+                code: 'FORMAT',
+                fields: {'exists': doc.exists},
+              );
+              return null;
+            }
+          })
+          .handleError((Object error, StackTrace st) {
+            // Permission denial / offline must surface as typed errors to the
+            // repository caller, not as a silent empty profile. Re-throw as
+            // AppException; the app layer maps it to a safe state.
+            final mapped = mapToAppException(error, st);
+            if (mapped != null) throw mapped;
+            throw UnexpectedException();
+          });
     });
   }
 
@@ -91,7 +98,25 @@ class AuthRepositoryImpl implements AuthRepository {
       final uid = _auth.currentUid;
       if (uid == null) {
         return const Failure(
-            UnauthenticatedException(message: 'Sign-in did not complete.'));
+          UnauthenticatedException(message: 'Sign-in did not complete.'),
+        );
+      }
+      return Success(uid);
+    } catch (error, st) {
+      final mapped = mapToAppException(error, st);
+      return Failure(mapped ?? const UnexpectedException());
+    }
+  }
+
+  @override
+  Future<Result<String>> signUp(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(email.trim(), password);
+      final uid = _auth.currentUid;
+      if (uid == null) {
+        return const Failure(
+          UnauthenticatedException(message: 'Registration did not complete.'),
+        );
       }
       return Success(uid);
     } catch (error, st) {

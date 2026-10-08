@@ -11,6 +11,9 @@ class RouteNames {
   /// Sign-in screen.
   static const String signIn = '/sign-in';
 
+  /// Registration screen (if institution-approved).
+  static const String signUp = '/sign-up';
+
   /// Password reset request screen.
   static const String passwordReset = '/password-reset';
 

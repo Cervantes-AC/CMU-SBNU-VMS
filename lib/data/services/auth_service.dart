@@ -38,6 +38,16 @@ class AuthService {
     await _auth.signOut();
   }
 
+  Future<UserCredential> createUserWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    return _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
   /// Connects Firebase Auth to the local emulator. Development only —
   /// gated in main.dart by USE_FIREBASE_EMULATORS.
   void configureEmulator({String host = 'localhost', int port = 9099}) {
@@ -52,8 +62,7 @@ class AuthService {
   /// Maps any SDK error from this service into a typed [AppException] with
   /// safe copy. Kept here so the repository never sees raw SDK errors.
   static Object mapError(Object error, StackTrace stackTrace) =>
-      mapToAppException(error, stackTrace) ??
-      error;
+      mapToAppException(error, stackTrace) ?? error;
 
   /// Debug-only: confirms no password persistence is requested (Firebase
   /// Auth persists sessions by platform; we never call

@@ -38,15 +38,15 @@ class AuthViewState {
     bool? resetSent,
     bool clearError = false,
     bool clearInfo = false,
-  }) =>
-      AuthViewState(
-        submitting: submitting ?? this.submitting,
-        errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
-        failureCategory:
-            clearError ? null : failureCategory ?? this.failureCategory,
-        infoMessage: clearInfo ? null : infoMessage ?? this.infoMessage,
-        resetSent: resetSent ?? this.resetSent,
-      );
+  }) => AuthViewState(
+    submitting: submitting ?? this.submitting,
+    errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
+    failureCategory: clearError
+        ? null
+        : failureCategory ?? this.failureCategory,
+    infoMessage: clearInfo ? null : infoMessage ?? this.infoMessage,
+    resetSent: resetSent ?? this.resetSent,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -58,8 +58,13 @@ class AuthViewState {
       other.resetSent == resetSent;
 
   @override
-  int get hashCode =>
-      Object.hash(submitting, errorMessage, failureCategory, infoMessage, resetSent);
+  int get hashCode => Object.hash(
+    submitting,
+    errorMessage,
+    failureCategory,
+    infoMessage,
+    resetSent,
+  );
 }
 
 /// Coordinates sign-in and password-reset user intent against
@@ -69,7 +74,7 @@ class AuthViewState {
 /// immutable; screens render it and dispatch intent methods.
 class AuthController extends ChangeNotifier {
   AuthController({required AuthRepository authRepository})
-      : _authRepository = authRepository;
+    : _authRepository = authRepository;
 
   final AuthRepository _authRepository;
 
@@ -88,8 +93,9 @@ class AuthController extends ChangeNotifier {
   /// message and returns false. The password is never stored.
   Future<bool> signIn(String email, String password) async {
     if (_state.submitting) return false;
-    _update(_state.copyWith(
-        submitting: true, clearError: true, clearInfo: true));
+    _update(
+      _state.copyWith(submitting: true, clearError: true, clearInfo: true),
+    );
     try {
       final result = await _authRepository.signIn(email, password);
       return result.when(
@@ -98,11 +104,13 @@ class AuthController extends ChangeNotifier {
           return true;
         },
         failure: (error) {
-          _update(_state.copyWith(
-            submitting: false,
-            errorMessage: AppFeedback.messageFor(error),
-            failureCategory: error.category,
-          ));
+          _update(
+            _state.copyWith(
+              submitting: false,
+              errorMessage: AppFeedback.messageFor(error),
+              failureCategory: error.category,
+            ),
+          );
           return false;
         },
       );
@@ -118,8 +126,9 @@ class AuthController extends ChangeNotifier {
   /// copy for valid-looking addresses; real failures show safe retry copy.
   Future<void> sendPasswordReset(String email) async {
     if (_state.submitting) return;
-    _update(_state.copyWith(
-        submitting: true, clearError: true, clearInfo: true));
+    _update(
+      _state.copyWith(submitting: true, clearError: true, clearInfo: true),
+    );
     final result = await _authRepository.sendPasswordReset(email);
     if (_disposed) return;
     result.when(
@@ -127,13 +136,46 @@ class AuthController extends ChangeNotifier {
         _update(_state.copyWith(submitting: false, resetSent: true));
       },
       failure: (error) {
-        _update(_state.copyWith(
-          submitting: false,
-          errorMessage: AppFeedback.messageFor(error),
-          failureCategory: error.category,
-        ));
+        _update(
+          _state.copyWith(
+            submitting: false,
+            errorMessage: AppFeedback.messageFor(error),
+            failureCategory: error.category,
+          ),
+        );
       },
     );
+  }
+
+  /// Registers a new user. Returns true on success.
+  Future<bool> signUp(String email, String password) async {
+    if (_state.submitting) return false;
+    _update(
+      _state.copyWith(submitting: true, clearError: true, clearInfo: true),
+    );
+    try {
+      final result = await _authRepository.signUp(email, password);
+      return result.when(
+        success: (_) {
+          _update(_state.copyWith(submitting: false, clearError: true));
+          return true;
+        },
+        failure: (error) {
+          _update(
+            _state.copyWith(
+              submitting: false,
+              errorMessage: AppFeedback.messageFor(error),
+              failureCategory: error.category,
+            ),
+          );
+          return false;
+        },
+      );
+    } finally {
+      if (!_disposed && _state.submitting) {
+        _update(_state.copyWith(submitting: false));
+      }
+    }
   }
 
   /// Clears error/info messages without touching the submitting state.
@@ -151,10 +193,12 @@ class AuthController extends ChangeNotifier {
     result.when(
       success: (_) {},
       failure: (error) {
-        _update(_state.copyWith(
-          errorMessage: AppFeedback.messageFor(error),
-          failureCategory: error.category,
-        ));
+        _update(
+          _state.copyWith(
+            errorMessage: AppFeedback.messageFor(error),
+            failureCategory: error.category,
+          ),
+        );
       },
     );
   }
