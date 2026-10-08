@@ -1,6 +1,6 @@
 ﻿# TODO: analytics
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Analytics model and repository implemented. Metrics are precomputed server-side and fetched via bounded queries; controllers, screens, charts, and advanced visualizations remain deferred per D-25. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 

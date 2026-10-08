@@ -18,6 +18,9 @@ class FirestorePaths {
   static const String auditLogs = 'auditLogs';
   static const String userDevices = 'userDevices';
   static const String contactInquiries = 'contactInquiries';
+  static const String reports = 'reports';
+  static const String reportRequests = 'reportRequests';
+  static const String analytics = 'analytics';
 
   // Document path builders
   static String userDoc(String uid) => '$users/$uid';
@@ -33,6 +36,9 @@ class FirestorePaths {
   static String userDeviceTokenDoc(String uid, String tokenId) =>
       '$userDevices/$uid/tokens/$tokenId';
   static String contactInquiryDoc(String inquiryId) => '$contactInquiries/$inquiryId';
+  static String reportDoc(String reportId) => '$reports/$reportId';
+  static String reportRequestDoc(String requestId) => '$reportRequests/$requestId';
+  static String analyticsDoc(String analyticsId) => '$analytics/$analyticsId';
 
   // Subcollection path builders
   static String eventJoinRequestsCollection(String eventId) =>

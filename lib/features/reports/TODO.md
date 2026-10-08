@@ -1,6 +1,6 @@
 ﻿# TODO: reports
 
-**Status:** Planning scaffold. This file is an implementation plan, not proof of implementation or approval for a deferred capability. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
+**Status:** Report model, repository, controllers, and screens implemented. Report types, formats, generation requests, and history are complete. Export formats (PDF/CSV/XLSX) and scheduling remain deferred per D-19/D-25. Follow the repository rules and the [AI coding workflow](../../../docs/ai-coding/workflow.md).
 
 ## Scope and authority
 
