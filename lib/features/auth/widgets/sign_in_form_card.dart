@@ -77,6 +77,7 @@ class SignInFormCard extends StatelessWidget {
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.username],
             autocorrect: false,
+            style: const TextStyle(color: _ink),
             decoration: _inputDecoration(
               label: 'Email address',
               hint: 'name@example.com',
@@ -92,6 +93,7 @@ class SignInFormCard extends StatelessWidget {
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
             onFieldSubmitted: (_) => onSubmit(),
+            style: const TextStyle(color: _ink),
             decoration:
                 _inputDecoration(
                   label: 'Password',
@@ -181,9 +183,11 @@ class SignInFormCard extends StatelessWidget {
   }) => InputDecoration(
     labelText: label,
     hintText: hint,
-    prefixIcon: Icon(icon, size: 19),
+    prefixIcon: Icon(icon, size: 19, color: _muted),
     filled: true,
     fillColor: const Color(0xFFFBFCFB),
+    labelStyle: const TextStyle(color: _ink),
+    hintStyle: const TextStyle(color: _muted),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(13),
       borderSide: const BorderSide(color: _line),

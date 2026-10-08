@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'package:cmu_sbnu_vms/app.dart';
 import 'package:cmu_sbnu_vms/core/theme/app_theme.dart';
@@ -49,7 +49,8 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
       builder: (context, _) {
         final state = widget.controller.state;
         final profile = widget.sessionController.profile;
-        final isOfficer = profile?.role == UserRole.officer ||
+        final isOfficer =
+            profile?.role == UserRole.officer ||
             profile?.role == UserRole.admin;
         final isReporter = state.incident?.reporterUid == profile?.uid;
 
@@ -71,9 +72,11 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFFE1E8E1)),
                   ),
-                  child: Image.asset('assets/images/SBNU LOGO.png',
-                      fit: BoxFit.contain,
-                      semanticLabel: 'CMU School-Based NSRC Unit logo'),
+                  child: Image.asset(
+                    'assets/images/SBNU LOGO.png',
+                    fit: BoxFit.contain,
+                    semanticLabel: 'CMU School-Based NSRC Unit logo',
+                  ),
                 ),
                 const SizedBox(width: 10),
                 const Flexible(
@@ -87,7 +90,9 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
             ),
             actions: [
               TextButton.icon(
-                onPressed: state.updating ? null : widget.authController.signOut,
+                onPressed: state.updating
+                    ? null
+                    : widget.authController.signOut,
                 icon: const Icon(Icons.logout_rounded, size: 17),
                 label: Text(compact ? '' : 'Sign out'),
                 style: TextButton.styleFrom(foregroundColor: AppTheme.seed),
@@ -106,7 +111,11 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     );
   }
 
-  Widget _buildBody(IncidentDetailViewState state, bool isOfficer, bool isReporter) {
+  Widget _buildBody(
+    IncidentDetailViewState state,
+    bool isOfficer,
+    bool isReporter,
+  ) {
     if (state.loading && state.incident == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -128,108 +137,136 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
       padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header card
-          _IncidentHeaderCard(
-            incident: incident,
-            isOfficer: isOfficer,
-            isReporter: isReporter,
-            onStatusTransition: isOfficer ? _showStatusTransitionDialog : null,
-            onAssign: isOfficer ? _showAssignDialog : null,
-          ),
-          const SizedBox(height: 16),
-          // Description card
-          _InfoCard(
-            title: 'Description',
-            child: Text(
-              incident.description,
-              style: const TextStyle(fontSize: 14, height: 1.5),
-            ),
-          ),
-          if (incident.location != null && incident.location!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            _InfoCard(
-              title: 'Location',
-              child: Text(
-                incident.location!,
-                style: const TextStyle(fontSize: 14, height: 1.5),
-              ),
-            ),
-          ],
-          if (incident.resolution != null && incident.resolution!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            _InfoCard(
-              title: 'Resolution',
-              child: Text(
-                incident.resolution!,
-                style: const TextStyle(fontSize: 14, height: 1.5),
-              ),
-            ),
-          ],
-          const SizedBox(height: 12),
-          // Metadata card
-          _InfoCard(
-            title: 'Details',
-            child: Column(
-              children: [
-                _DetailRow(label: 'Incident ID', value: incident.incidentId),
-                _DetailRow(
-                  label: 'Category',
-                  value: incident.category.wire,
-                  valueWidget: StatusBadge(
-                    status: incident.category.wire,
-                    compact: true,
-                  ),
-                ),
-                _DetailRow(
-                  label: 'Severity',
-                  value: incident.severity.wire,
-                  valueWidget: _SeverityBadge(severity: incident.severity),
-                ),
-                _DetailRow(
-                  label: 'Status',
-                  value: incident.status.wire,
-                  valueWidget: StatusBadge(
-                    status: incident.status.wire,
-                    compact: true,
-                  ),
-                ),
-                if (incident.assignedTo != null)
-                  _DetailRow(label: 'Assigned To', value: incident.assignedTo!),
-                _DetailRow(
-                  label: 'Reported',
-                  value: DateHelpers.formatDateTime(incident.createdAt),
-                ),
-                _DetailRow(
-                  label: 'Last Updated',
-                  value: DateHelpers.formatDateTime(incident.updatedAt),
-                ),
-              ],
-            ),
-          ),
-        ],
+        children: _buildChildren(state, isOfficer, isReporter),
       ),
     );
   }
 
+  List<Widget> _buildChildren(
+    IncidentDetailViewState state,
+    bool isOfficer,
+    bool isReporter,
+  ) {
+    final incident = state.incident!;
+    final children = <Widget>[];
+
+    // Header card
+    children.add(
+      _IncidentHeaderCard(
+        incident: incident,
+        isOfficer: isOfficer,
+        isReporter: isReporter,
+        onStatusTransition: isOfficer ? _showStatusTransitionDialog : null,
+        onAssign: isOfficer ? _showAssignDialog : null,
+      ),
+    );
+
+    children.add(const SizedBox(height: 16));
+
+    // Description card
+    children.add(
+      _InfoCard(
+        title: 'Description',
+        child: Text(
+          incident.description,
+          style: const TextStyle(fontSize: 14, height: 1.5),
+        ),
+      ),
+    );
+
+    if (incident.location != null && incident.location!.isNotEmpty) {
+      children.add(const SizedBox(height: 16));
+      children.add(
+        _InfoCard(
+          title: 'Location',
+          child: Text(
+            incident.location!,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+        ),
+      );
+    }
+
+    if (incident.resolution != null && incident.resolution!.isNotEmpty) {
+      children.add(const SizedBox(height: 12));
+      children.add(
+        _InfoCard(
+          title: 'Resolution',
+          child: Text(
+            incident.resolution!,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+        ),
+      );
+    }
+
+    children.add(const SizedBox(height: 12));
+
+    // Metadata card
+    children.add(
+      _InfoCard(
+        title: 'Details',
+        child: Column(
+          children: [
+            _DetailRow(label: 'Incident ID', value: incident.incidentId),
+            _DetailRow(
+              label: 'Category',
+              value: incident.category.wire,
+              valueWidget: StatusBadge(
+                status: incident.category.wire,
+                compact: true,
+              ),
+            ),
+            _DetailRow(
+              label: 'Severity',
+              value: incident.severity.wire,
+              valueWidget: _SeverityBadge(severity: incident.severity),
+            ),
+            _DetailRow(
+              label: 'Status',
+              value: incident.status.wire,
+              valueWidget: StatusBadge(
+                status: incident.status.wire,
+                compact: true,
+              ),
+            ),
+            if (incident.assignedTo != null)
+              _DetailRow(label: 'Assigned To', value: incident.assignedTo!),
+            _DetailRow(
+              label: 'Reported',
+              value: DateHelpers.formatDateTime(incident.createdAt),
+            ),
+            _DetailRow(
+              label: 'Last Updated',
+              value: DateHelpers.formatDateTime(incident.updatedAt),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return children;
+  }
+
   void _showStatusTransitionDialog() {
-    final incident = widget.controller.state.incident!;
     showDialog(
       context: context,
       builder: (context) => _StatusTransitionDialog(
         incident: widget.controller.state.incident!,
         onConfirm: (status, resolution) {
-          widget.controller.transitionStatus(
-            incidentId: widget.incidentId,
-            newStatus: status.wire,
-            resolution: resolution,
-          ).then((success) {
-            if (success && mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Status updated to ${status.wire}')),
-              );
-            }
-          });
+          widget.controller
+              .transitionStatus(
+                incidentId: widget.incidentId,
+                newStatus: status.wire,
+                resolution: resolution,
+              )
+              .then((success) {
+                if (success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Status updated to ${status.wire}')),
+                  );
+                }
+              });
         },
       ),
     );
@@ -239,96 +276,6 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     // TODO: Implement assign dialog
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Assign incident - to be implemented')),
-    );
-  }
-}
-
-class _IncidentHeaderCard extends StatelessWidget {
-  const _IncidentHeaderCard({
-    required this.incident,
-    required this.isOfficer,
-    required this.isReporter,
-    this.onStatusTransition,
-    this.onAssign,
-  });
-
-  final Incident incident;
-  final bool isOfficer;
-  final bool isReporter;
-  final VoidCallback? onStatusTransition;
-  final VoidCallback? onAssign;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: const Color(0xFFE1E8E1)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    incident.category.wire.toUpperCase(),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _SeverityBadge(severity: incident.severity),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                StatusBadge(status: incident.status.wire),
-                const SizedBox(width: 8),
-                _SeverityBadge(severity: incident.severity),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (isOfficer)
-              Row(
-                children: [
-                  if (onStatusTransition != null)
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onStatusTransition,
-                        icon: const Icon(Icons.sync_rounded, size: 18),
-                        label: const Text('Change Status'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.seed,
-                          side: const BorderSide(color: AppTheme.seed),
-                        ),
-                      ),
-                    ),
-                  if (onAssign != null) ...[
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onAssign,
-                        icon: const Icon(Icons.person_add_rounded, size: 18),
-                        label: const Text('Assign'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.seed,
-                          side: const BorderSide(color: AppTheme.seed),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
     );
   }
 }
@@ -360,18 +307,111 @@ class _SeverityBadge extends StatelessWidget {
   }
 
   static Color _severityColor(IncidentSeverity severity) => switch (severity) {
-        IncidentSeverity.critical => const Color(0xFFB3372C),
-        IncidentSeverity.high => const Color(0xFFB7791F),
-        IncidentSeverity.medium => AppTheme.seed,
-        IncidentSeverity.low => const Color(0xFF65736D),
-      };
+    IncidentSeverity.critical => const Color(0xFFB3372C),
+    IncidentSeverity.high => const Color(0xFFB7791F),
+    IncidentSeverity.medium => AppTheme.seed,
+    IncidentSeverity.low => const Color(0xFF65736D),
+  };
+}
+
+class _IncidentHeaderCard extends StatelessWidget {
+  const _IncidentHeaderCard({
+    required this.incident,
+    required this.isOfficer,
+    required this.isReporter,
+    this.onStatusTransition,
+    this.onAssign,
+  });
+
+  final Incident incident;
+  final bool isOfficer;
+  final bool isReporter;
+  final VoidCallback? onStatusTransition;
+  final VoidCallback? onAssign;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> actionButtons = [];
+    if (isOfficer) {
+      if (onStatusTransition != null) {
+        actionButtons.add(
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onStatusTransition,
+              icon: const Icon(Icons.sync_rounded, size: 18),
+              label: const Text('Change Status'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.seed,
+                side: const BorderSide(color: AppTheme.seed),
+              ),
+            ),
+          ),
+        );
+      }
+      if (onAssign != null) {
+        actionButtons.add(const SizedBox(width: 8));
+        actionButtons.add(
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onAssign,
+              icon: const Icon(Icons.person_add_rounded, size: 18),
+              label: const Text('Assign'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.seed,
+                side: const BorderSide(color: AppTheme.seed),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: const Color(0xFFE1E8E1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    incident.category.wire.toUpperCase(),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _SeverityBadge(severity: incident.severity),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                StatusBadge(status: incident.status.wire),
+                const SizedBox(width: 8),
+                _SeverityBadge(severity: incident.severity),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (isOfficer && actionButtons.isNotEmpty)
+              Row(children: actionButtons),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.title,
-    required this.child,
-  });
+  const _InfoCard({required this.title, required this.child});
 
   final String title;
   final Widget child;
@@ -392,9 +432,9 @@ class _InfoCard extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
             child,
@@ -426,13 +466,11 @@ class _DetailRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 100,
-            child: Text(
-              label,
-              style: TextStyle(color: muted, fontSize: 13),
-            ),
+            child: Text(label, style: TextStyle(color: muted, fontSize: 13)),
           ),
           Expanded(
-            child: valueWidget ??
+            child:
+                valueWidget ??
                 Text(
                   value,
                   style: TextStyle(
@@ -471,9 +509,9 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Couldn\'t load incident',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
@@ -514,7 +552,8 @@ class _StatusTransitionDialog extends StatefulWidget {
   final void Function(IncidentStatus, String?) onConfirm;
 
   @override
-  State<_StatusTransitionDialog> createState() => _StatusTransitionDialogState();
+  State<_StatusTransitionDialog> createState() =>
+      _StatusTransitionDialogState();
 }
 
 class _StatusTransitionDialogState extends State<_StatusTransitionDialog> {
@@ -542,16 +581,14 @@ class _StatusTransitionDialogState extends State<_StatusTransitionDialog> {
             decoration: const InputDecoration(labelText: 'New Status'),
             initialValue: _selectedStatus,
             items: nextStatuses
-                .map((s) => DropdownMenuItem(
-                      value: s,
-                      child: Text(s.wire),
-                    ))
+                .map((s) => DropdownMenuItem(value: s, child: Text(s.wire)))
                 .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
                   _selectedStatus = value;
-                  _showResolution = value == IncidentStatus.resolved ||
+                  _showResolution =
+                      value == IncidentStatus.resolved ||
                       value == IncidentStatus.closed;
                 });
               }
@@ -568,8 +605,8 @@ class _StatusTransitionDialogState extends State<_StatusTransitionDialog> {
               maxLines: 3,
               validator: (v) =>
                   _showResolution && (v == null || v.trim().isEmpty)
-                      ? 'Resolution is required'
-                      : null,
+                  ? 'Resolution is required'
+                  : null,
             ),
           ],
         ],

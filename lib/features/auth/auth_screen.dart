@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cmu_sbnu_vms/core/constants/route_names.dart';
 
-import 'demo_admin_credentials.dart';
 import 'auth_controller.dart';
 import 'widgets/auth_identity_header.dart';
 import 'widgets/sign_in_form_card.dart';
@@ -11,25 +10,11 @@ import 'widgets/sign_in_form_card.dart';
 /// Sign-in screen for the CMU SBNU VMS application.
 ///
 /// Delegates real authentication to [AuthController] (which owns submitting
-/// and safe failure state). Debug builds additionally accept a local-only
-/// demo sign-in callback for the synthetic dashboard preview; those
-/// credentials never reach Firebase Auth.
+/// and safe failure state).
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({
-    super.key,
-    required this.controller,
-    this.demoMode = false,
-    this.demoSignIn,
-  });
+  const AuthScreen({super.key, required this.controller});
 
   final AuthController controller;
-
-  /// Enables the local preview credential hint (debug builds only).
-  final bool demoMode;
-
-  /// Local-only demo sign-in; invoked when the debug demo credentials are
-  /// entered. Never wired in profile/release builds.
-  final Future<void> Function()? demoSignIn;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -40,7 +25,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _demoSubmitting = false;
   String? _localErrorMessage;
 
   @override
@@ -50,8 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  bool get _submitting =>
-      _demoSubmitting || widget.controller.state.submitting;
+  bool get _submitting => widget.controller.state.submitting;
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
@@ -62,28 +45,18 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() => _localErrorMessage = null);
 
     try {
-      // Debug-only local demo preview: credentials checked in the app,
-      // never sent to Firebase Auth, never grants real access.
-      if (widget.demoMode &&
-          widget.demoSignIn != null &&
-          email == DemoAdminCredentials.email &&
-          password == DemoAdminCredentials.password) {
-        setState(() => _demoSubmitting = true);
-        await widget.demoSignIn!();
-        return;
-      }
-
       // Real sign-in: controller owns submitting/failure state. The session
       // watcher drives navigation once the profile is approved.
       await widget.controller.signIn(email, password);
     } catch (_) {
       if (mounted) {
-        setState(() => _localErrorMessage =
-            'We couldn’t sign you in. Check your details and try again.');
+        setState(
+          () => _localErrorMessage =
+              'We couldn’t sign you in. Check your details and try again.',
+        );
       }
     } finally {
       _passwordController.clear();
-      if (mounted) setState(() => _demoSubmitting = false);
     }
   }
 
@@ -102,7 +75,11 @@ class _AuthScreenState extends State<AuthScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF08150D), Color(0xFF123520), Color(0xFF0B1F2E)],
+                colors: [
+                  Color(0xFF08150D),
+                  Color(0xFF123520),
+                  Color(0xFF0B1F2E),
+                ],
               ),
             ),
             child: SafeArea(
@@ -125,23 +102,23 @@ class _AuthScreenState extends State<AuthScreen> {
                           passwordController: _passwordController,
                           isSubmitting: _submitting,
                           isEnabled: true,
-                          infoMessage: widget.demoMode
-                              ? 'Local demo only. Sign in with ${DemoAdminCredentials.email} / ${DemoAdminCredentials.password}. This does not create or access a real admin account.'
-                              : null,
+                          infoMessage: null,
                           obscurePassword: _obscurePassword,
                           errorMessage: errorMessage,
                           onSubmit: _submit,
                           onTogglePassword: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
-                          onPasswordReset: () => GoRouter.of(context)
-                              .push(RouteNames.passwordReset),                          validateEmail: _validateEmail,
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
+                          onPasswordReset: () => GoRouter.of(
+                            context,
+                          ).push(RouteNames.passwordReset),
+                          validateEmail: _validateEmail,
                         ),
                         const SizedBox(height: 18),
                         const Text(
                           'For authorized CMU SBNU unit members',
                           textAlign: TextAlign.center,
-                          style:
-                              TextStyle(color: Colors.white70, fontSize: 12),
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),

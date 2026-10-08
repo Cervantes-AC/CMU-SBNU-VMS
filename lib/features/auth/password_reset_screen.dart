@@ -119,12 +119,18 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                       textInputAction: TextInputAction.done,
                       autofillHints: const [AutofillHints.email],
                       onFieldSubmitted: (_) => _submit(),
+                      style: const TextStyle(color: _ink),
                       decoration: InputDecoration(
                         labelText: 'Email address',
                         hintText: 'name@example.com',
-                        prefixIcon: const Icon(Icons.alternate_email_rounded),
+                        prefixIcon: const Icon(
+                          Icons.alternate_email_rounded,
+                          color: _muted,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFFBFCFB),
+                        labelStyle: const TextStyle(color: _ink),
+                        hintStyle: const TextStyle(color: _muted),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(13),
                           borderSide: const BorderSide(color: _line),
@@ -132,6 +138,13 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(13),
                           borderSide: const BorderSide(color: _line),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(13),
+                          borderSide: const BorderSide(
+                            color: _green,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                       validator: _validateEmail,

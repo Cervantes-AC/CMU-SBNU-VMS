@@ -30,7 +30,6 @@ import 'package:cmu_sbnu_vms/features/announcements/announcements_controller.dar
 import 'package:cmu_sbnu_vms/features/announcements/announcements_screen.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/admin_dashboard.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/dashboard_router.dart';
-import 'package:cmu_sbnu_vms/features/dashboard/demo_admin_dashboard_screen.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/member_dashboard.dart';
 import 'package:cmu_sbnu_vms/features/dashboard/officer_dashboard.dart';
 import 'package:cmu_sbnu_vms/features/events/events_controller.dart';
@@ -50,7 +49,7 @@ import 'package:cmu_sbnu_vms/shared/app_shell.dart';
 /// `null` (fail closed) with `profileReady == true`.
 class SessionController extends ChangeNotifier {
   SessionController({required AuthRepository authRepository})
-      : _authRepository = authRepository {
+    : _authRepository = authRepository {
     _sessionSub = _authRepository.watchSession().listen(_onSession);
   }
 
@@ -88,21 +87,23 @@ class SessionController extends ChangeNotifier {
   }
 
   void _subscribeProfile(String uid) {
-    _profileSub = _authRepository.watchCurrentProfile(uid).listen(
-      (profile) {
-        _profile = profile;
-        _profileReady = true;
-        notifyListeners();
-      },
-      onError: (Object _) {
-        // Permission denial/offline while loading: fail closed rather than
-        // granting a default view. The route guard sends the user to the
-        // neutral access-denied screen.
-        _profile = null;
-        _profileReady = true;
-        notifyListeners();
-      },
-    );
+    _profileSub = _authRepository
+        .watchCurrentProfile(uid)
+        .listen(
+          (profile) {
+            _profile = profile;
+            _profileReady = true;
+            notifyListeners();
+          },
+          onError: (Object _) {
+            // Permission denial/offline while loading: fail closed rather than
+            // granting a default view. The route guard sends the user to the
+            // neutral access-denied screen.
+            _profile = null;
+            _profileReady = true;
+            notifyListeners();
+          },
+        );
   }
 
   /// Re-checks the session/profile after a user-initiated retry.
@@ -174,42 +175,45 @@ class UnconfiguredUserRepository implements UserRepository {
   const UnconfiguredUserRepository();
 
   @override
-  Stream<UserProfile?> watchProfile(String uid) => Stream<UserProfile?>.value(null);
+  Stream<UserProfile?> watchProfile(String uid) =>
+      Stream<UserProfile?>.value(null);
 
   @override
-  Future<Result<UserProfile>> getProfile(String uid) async =>
-      const Failure(UnavailableException(
-        message: 'Profile service is not available in this build.',
-      ));
+  Future<Result<UserProfile>> getProfile(String uid) async => const Failure(
+    UnavailableException(
+      message: 'Profile service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<UserProfile>> updateOwnProfile({
     required String uid,
     required Map<String, dynamic> fields,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Profile service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Profile service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<UserProfile>> updateProfileAdmin({
     required String uid,
     required Map<String, dynamic> fields,
     required int expectedRevision,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Profile service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Profile service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<({List<UserProfile> items, String? nextCursor})>> searchMembers({
-    String? query,
-    int limit = 20,
-    String? startAfter,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Directory service is not available in this build.',
-      ));
+  Future<Result<({List<UserProfile> items, String? nextCursor})>>
+  searchMembers({String? query, int limit = 20, String? startAfter}) async =>
+      const Failure(
+        UnavailableException(
+          message: 'Directory service is not available in this build.',
+        ),
+      );
 }
 
 /// Event repository used when Firebase was not initialized at bootstrap.
@@ -221,73 +225,83 @@ class UnconfiguredEventRepository implements EventRepository {
   Stream<({List<Event> items, String? nextCursor})> watchEvents({
     String? audienceFilter,
     int limit = 20,
-  }) =>
-      Stream.value((items: <Event>[], nextCursor: null));
+  }) => Stream.value((items: <Event>[], nextCursor: null));
 
   @override
   Future<Result<({List<Event> items, String? nextCursor})>> getEvents({
     String? audienceFilter,
     int limit = 20,
     String? startAfter,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<Event>> getEvent(String eventId) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  Future<Result<Event>> getEvent(String eventId) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
-  Stream<Event?> watchEvent(String eventId) =>
-      Stream.value(null);
+  Stream<Event?> watchEvent(String eventId) => Stream.value(null);
 
   @override
-  Future<Result<Event>> createEvent(EventDraft draft) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  Future<Result<Event>> createEvent(EventDraft draft) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<Event>> updateEvent({
     required String eventId,
     required EventDraft draft,
     required int expectedRevision,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<void>> cancelEvent(String eventId,
-      {required int expectedRevision}) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  Future<Result<void>> cancelEvent(
+    String eventId, {
+    required int expectedRevision,
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<void>> requestJoin(String eventId) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  Future<Result<void>> requestJoin(String eventId) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<void>> reviewJoinRequest({
     required String eventId,
     required String requesterUid,
     required JoinRequestDecision decision,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<JoinRequestStatus?>> getJoinRequestStatus(String eventId) async =>
-      const Failure(UnavailableException(
-        message: 'Events service is not available in this build.',
-      ));
+  Future<Result<JoinRequestStatus?>> getJoinRequestStatus(
+    String eventId,
+  ) async => const Failure(
+    UnavailableException(
+      message: 'Events service is not available in this build.',
+    ),
+  );
 }
 
 /// Announcement repository used when Firebase was not initialized at bootstrap.
@@ -298,55 +312,66 @@ class UnconfiguredAnnouncementRepository implements AnnouncementRepository {
   @override
   Stream<({List<Announcement> items, String? nextCursor})> watchAnnouncements({
     int limit = 20,
-  }) =>
-      Stream.value((items: <Announcement>[], nextCursor: null));
+  }) => Stream.value((items: <Announcement>[], nextCursor: null));
 
   @override
-  Future<Result<({List<Announcement> items, String? nextCursor})>> getAnnouncements({
-    int limit = 20,
-    String? startAfter,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+  Future<Result<({List<Announcement> items, String? nextCursor})>>
+  getAnnouncements({int limit = 20, String? startAfter}) async => const Failure(
+    UnavailableException(
+      message: 'Announcements service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<Announcement>> getAnnouncement(String id) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+      const Failure(
+        UnavailableException(
+          message: 'Announcements service is not available in this build.',
+        ),
+      );
 
   @override
-  Stream<Announcement?> watchAnnouncement(String id) =>
-      Stream.value(null);
+  Stream<Announcement?> watchAnnouncement(String id) => Stream.value(null);
 
   @override
-  Future<Result<Announcement>> createAnnouncement(AnnouncementDraft draft) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+  Future<Result<Announcement>> createAnnouncement(
+    AnnouncementDraft draft,
+  ) async => const Failure(
+    UnavailableException(
+      message: 'Announcements service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<Announcement>> updateAnnouncement({
     required String id,
     required AnnouncementDraft draft,
     required int expectedRevision,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Announcements service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<Announcement>> publishAnnouncement(String id, {required int expectedRevision}) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+  Future<Result<Announcement>> publishAnnouncement(
+    String id, {
+    required int expectedRevision,
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Announcements service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<Announcement>> unpublishAnnouncement(String id, {required int expectedRevision}) async =>
-      const Failure(UnavailableException(
-        message: 'Announcements service is not available in this build.',
-      ));
+  Future<Result<Announcement>> unpublishAnnouncement(
+    String id, {
+    required int expectedRevision,
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Announcements service is not available in this build.',
+    ),
+  );
 }
 
 /// Attendance repository used when Firebase was not initialized at bootstrap.
@@ -358,54 +383,61 @@ class UnconfiguredAttendanceRepository implements AttendanceRepository {
   Stream<({List<Attendance> items, String? nextCursor})> watchEventAttendance({
     required String eventId,
     int limit = 50,
-  }) =>
-      Stream.value((items: <Attendance>[], nextCursor: null));
+  }) => Stream.value((items: <Attendance>[], nextCursor: null));
 
   @override
-  Future<Result<({List<Attendance> items, String? nextCursor})>> getEventAttendance({
+  Future<Result<({List<Attendance> items, String? nextCursor})>>
+  getEventAttendance({
     required String eventId,
     int limit = 50,
     String? startAfter,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Attendance service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Attendance service is not available in this build.',
+    ),
+  );
 
   @override
-  Stream<Attendance?> watchMyAttendance(String eventId) =>
-      Stream.value(null);
+  Stream<Attendance?> watchMyAttendance(String eventId) => Stream.value(null);
 
   @override
   Future<Result<Attendance?>> getMyAttendance(String eventId) async =>
-      const Failure(UnavailableException(
-        message: 'Attendance service is not available in this build.',
-      ));
+      const Failure(
+        UnavailableException(
+          message: 'Attendance service is not available in this build.',
+        ),
+      );
 
   @override
   Future<Result<Attendance>> recordAttendance({
     required String eventId,
     required AttendanceStatus status,
     required AttendanceSource source,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Attendance service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Attendance service is not available in this build.',
+    ),
+  );
 
   @override
   Future<Result<Attendance>> correctAttendance({
     required String attendanceId,
     required AttendanceStatus newStatus,
     required int expectedRevision,
-  }) async =>
-      const Failure(UnavailableException(
-        message: 'Attendance service is not available in this build.',
-      ));
+  }) async => const Failure(
+    UnavailableException(
+      message: 'Attendance service is not available in this build.',
+    ),
+  );
 
   @override
-  Future<Result<AttendanceSummary>> getAttendanceSummary(String eventId) async =>
-      const Failure(UnavailableException(
-        message: 'Attendance service is not available in this build.',
-      ));
+  Future<Result<AttendanceSummary>> getAttendanceSummary(
+    String eventId,
+  ) async => const Failure(
+    UnavailableException(
+      message: 'Attendance service is not available in this build.',
+    ),
+  );
 }
 
 /// Application composition root.
@@ -471,20 +503,28 @@ class _NSRCAppState extends State<NSRCApp> {
     _themeProvider.load();
     _authRepository =
         widget.authRepository ?? const UnconfiguredAuthRepository();
-    _userRepository = widget.userRepository ?? const UnconfiguredUserRepository();
+    _userRepository =
+        widget.userRepository ?? const UnconfiguredUserRepository();
     _authController = AuthController(authRepository: _authRepository);
     _profileController = ProfileController(userRepository: _userRepository);
     _eventsController = EventsController(
-      eventRepository: widget.eventRepository ?? const UnconfiguredEventRepository(),
+      eventRepository:
+          widget.eventRepository ?? const UnconfiguredEventRepository(),
     );
     _announcementsController = AnnouncementsController(
-      announcementRepository: widget.announcementRepository ?? const UnconfiguredAnnouncementRepository(),
+      announcementRepository:
+          widget.announcementRepository ??
+          const UnconfiguredAnnouncementRepository(),
     );
     _memberAttendanceController = MemberAttendanceController(
-      attendanceRepository: widget.attendanceRepository ?? const UnconfiguredAttendanceRepository(),
+      attendanceRepository:
+          widget.attendanceRepository ??
+          const UnconfiguredAttendanceRepository(),
     );
     _officerAttendanceController = OfficerAttendanceController(
-      attendanceRepository: widget.attendanceRepository ?? const UnconfiguredAttendanceRepository(),
+      attendanceRepository:
+          widget.attendanceRepository ??
+          const UnconfiguredAttendanceRepository(),
     );
     _sessionController = SessionController(authRepository: _authRepository);
     _router = _createRouter();
@@ -506,164 +546,149 @@ class _NSRCAppState extends State<NSRCApp> {
   Future<void> _signOut() => _authController.signOut();
 
   GoRouter _createRouter() => GoRouter(
-        initialLocation: RouteNames.landing,
-        refreshListenable: Listenable.merge([
-          _sessionController,
-          _themeProvider,
-        ]),
-        redirect: (context, state) {
-          final result = RouteGuard(
-            location: state.matchedLocation,
-            authenticated: _sessionController.authenticated,
+    initialLocation: RouteNames.landing,
+    refreshListenable: Listenable.merge([_sessionController, _themeProvider]),
+    redirect: (context, state) {
+      final result = RouteGuard(
+        location: state.matchedLocation,
+        authenticated: _sessionController.authenticated,
+        profile: _sessionController.profile,
+        profileReady: _sessionController.profileReady,
+      ).evaluate();
+      return switch (result.decision) {
+        GuardDecision.allow => null,
+        _ => result.location,
+      };
+    },
+    errorBuilder: (context, state) => _PageUnavailableScreen(
+      location: state.uri.path,
+      onHome: () => context.go(RouteNames.landing),
+    ),
+    routes: [
+      GoRoute(
+        path: RouteNames.landing,
+        builder: (context, state) => const LandingPage(),
+      ),
+      GoRoute(
+        path: RouteNames.signIn,
+        builder: (context, state) => AuthScreen(controller: _authController),
+      ),
+      GoRoute(
+        path: RouteNames.passwordReset,
+        builder: (context, state) =>
+            PasswordResetScreen(onSubmit: _authController.sendPasswordReset),
+      ),
+      GoRoute(
+        path: RouteNames.accessDenied,
+        builder: (context, state) => AccessDeniedScreen(
+          onSignOut: _signOut,
+          onRetry: _sessionController.retry,
+        ),
+      ),
+      // Protected routes are wrapped in AppShell
+      ShellRoute(
+        builder: (context, state, child) => ListenableBuilder(
+          listenable: _sessionController,
+          builder: (context, _) => AppShell(
+            currentRoute: state.matchedLocation,
             profile: _sessionController.profile,
-            profileReady: _sessionController.profileReady,
-          ).evaluate();
-          return switch (result.decision) {
-            GuardDecision.allow => null,
-            _ => result.location,
-          };
-        },
-        errorBuilder: (context, state) => _PageUnavailableScreen(
-          location: state.uri.path,
-          onHome: () => context.go(RouteNames.landing),
+            onNavigate: (route) => context.go(route),
+            onSignOut: _signOut,
+            child: child,
+          ),
         ),
         routes: [
           GoRoute(
-            path: RouteNames.landing,
-            builder: (context, state) => const LandingPage(),
-          ),
-          GoRoute(
-            path: RouteNames.signIn,
-            builder: (context, state) => AuthScreen(
-              controller: _authController,
-              demoMode: kDebugMode,
-              demoSignIn: kDebugMode ? _openDemoPreview : null,
-            ),
-          ),
-          GoRoute(
-            path: RouteNames.passwordReset,
-            builder: (context, state) =>
-                PasswordResetScreen(onSubmit: _authController.sendPasswordReset),
-          ),
-          GoRoute(
-            path: RouteNames.accessDenied,
-            builder: (context, state) => AccessDeniedScreen(
+            path: RouteNames.dashboard,
+            builder: (context, state) => DashboardRouter(
+              profile: _sessionController.profile,
               onSignOut: _signOut,
-              onRetry: _sessionController.retry,
             ),
           ),
-          // Protected routes are wrapped in AppShell
-          ShellRoute(
-            builder: (context, state, child) => ListenableBuilder(
+          GoRoute(
+            path: RouteNames.memberDashboard,
+            builder: (context, state) => MemberDashboard(
+              displayName: _sessionController.profile?.displayName ?? '',
+              onSignOut: _signOut,
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.officerDashboard,
+            builder: (context, state) => OfficerDashboard(
+              displayName: _sessionController.profile?.displayName ?? '',
+              onSignOut: _signOut,
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.adminDashboard,
+            builder: (context, state) => AdminDashboard(
+              displayName: _sessionController.profile?.displayName ?? '',
+              onSignOut: _signOut,
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.profile,
+            builder: (context, state) => ListenableBuilder(
               listenable: _sessionController,
-              builder: (context, _) => AppShell(
-                currentRoute: state.matchedLocation,
-                profile: _sessionController.profile,
-                onNavigate: (route) => context.go(route),
+              builder: (context, _) => ProfileScreen(
+                controller: _profileController,
+                profile: _sessionController.profile!,
                 onSignOut: _signOut,
-                child: child,
               ),
             ),
-            routes: [
-              GoRoute(
-                path: RouteNames.dashboard,
-                builder: (context, state) => DashboardRouter(
-                  profile: _sessionController.profile,
-                  onSignOut: _signOut,
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.memberDashboard,
-                builder: (context, state) => MemberDashboard(
-                  displayName: _sessionController.profile?.displayName ?? '',
-                  onSignOut: _signOut,
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.officerDashboard,
-                builder: (context, state) => OfficerDashboard(
-                  displayName: _sessionController.profile?.displayName ?? '',
-                  onSignOut: _signOut,
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.adminDashboard,
-                builder: (context, state) => AdminDashboard(
-                  displayName: _sessionController.profile?.displayName ?? '',
-                  onSignOut: _signOut,
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.profile,
-                builder: (context, state) => ListenableBuilder(
-                  listenable: _sessionController,
-                  builder: (context, _) => ProfileScreen(
-                    controller: _profileController,
-                    profile: _sessionController.profile!,
-                    onSignOut: _signOut,
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.events,
-                builder: (context, state) => ListenableBuilder(
-                  listenable: _sessionController,
-                  builder: (context, _) => EventsScreen(
-                    controller: _eventsController,
-                    sessionController: _sessionController,
-                    authController: _authController,
-                    onEventTap: (event) =>
-                        context.go('${RouteNames.eventDetail}/${event.eventId}'),
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.announcements,
-                builder: (context, state) => ListenableBuilder(
-                  listenable: _sessionController,
-                  builder: (context, _) => AnnouncementsScreen(
-                    controller: _announcementsController,
-                    sessionController: _sessionController,
-                    authController: _authController,
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.memberAttendance,
-                builder: (context, state) => ListenableBuilder(
-                  listenable: _sessionController,
-                  builder: (context, _) => MemberAttendanceScreen(
-                    controller: _memberAttendanceController,
-                    sessionController: _sessionController,
-                    authController: _authController,
-                    eventId: state.pathParameters['eventId']!,
-                  ),
-                ),
-              ),
-              GoRoute(
-                path: RouteNames.eventAttendance,
-                builder: (context, state) => ListenableBuilder(
-                  listenable: _sessionController,
-                  builder: (context, _) => EventAttendanceScreen(
-                    controller: _officerAttendanceController,
-                    sessionController: _sessionController,
-                    authController: _authController,
-                    eventId: state.pathParameters['eventId']!,
-                  ),
-                ),
-              ),
-            ],
           ),
-          if (kDebugMode)
-            GoRoute(
-              path: '/demo-admin',
-              builder: (context, state) => const DemoAdminDashboardScreen(),
+          GoRoute(
+            path: RouteNames.events,
+            builder: (context, state) => ListenableBuilder(
+              listenable: _sessionController,
+              builder: (context, _) => EventsScreen(
+                controller: _eventsController,
+                sessionController: _sessionController,
+                authController: _authController,
+                onEventTap: (event) =>
+                    context.go('${RouteNames.eventDetail}/${event.eventId}'),
+              ),
             ),
+          ),
+          GoRoute(
+            path: RouteNames.announcements,
+            builder: (context, state) => ListenableBuilder(
+              listenable: _sessionController,
+              builder: (context, _) => AnnouncementsScreen(
+                controller: _announcementsController,
+                sessionController: _sessionController,
+                authController: _authController,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.memberAttendance,
+            builder: (context, state) => ListenableBuilder(
+              listenable: _sessionController,
+              builder: (context, _) => MemberAttendanceScreen(
+                controller: _memberAttendanceController,
+                sessionController: _sessionController,
+                authController: _authController,
+                eventId: state.pathParameters['eventId']!,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.eventAttendance,
+            builder: (context, state) => ListenableBuilder(
+              listenable: _sessionController,
+              builder: (context, _) => EventAttendanceScreen(
+                controller: _officerAttendanceController,
+                sessionController: _sessionController,
+                authController: _authController,
+                eventId: state.pathParameters['eventId']!,
+              ),
+            ),
+          ),
         ],
-      );
-
-  /// Debug-only local synthetic preview entry. No session, no data.
-  Future<void> _openDemoPreview() async => _router.go('/demo-admin');
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -671,13 +696,24 @@ class _NSRCAppState extends State<NSRCApp> {
       providers: [
         ChangeNotifierProvider<ThemeProvider>.value(value: _themeProvider),
         ChangeNotifierProvider<AuthController>.value(value: _authController),
-        ChangeNotifierProvider<ProfileController>.value(value: _profileController),
-        ChangeNotifierProvider<EventsController>.value(value: _eventsController),
-        ChangeNotifierProvider<AnnouncementsController>.value(value: _announcementsController),
-        ChangeNotifierProvider<MemberAttendanceController>.value(value: _memberAttendanceController),
-        ChangeNotifierProvider<OfficerAttendanceController>.value(value: _officerAttendanceController),
+        ChangeNotifierProvider<ProfileController>.value(
+          value: _profileController,
+        ),
+        ChangeNotifierProvider<EventsController>.value(
+          value: _eventsController,
+        ),
+        ChangeNotifierProvider<AnnouncementsController>.value(
+          value: _announcementsController,
+        ),
+        ChangeNotifierProvider<MemberAttendanceController>.value(
+          value: _memberAttendanceController,
+        ),
+        ChangeNotifierProvider<OfficerAttendanceController>.value(
+          value: _officerAttendanceController,
+        ),
         ChangeNotifierProvider<SessionController>.value(
-            value: _sessionController),
+          value: _sessionController,
+        ),
       ],
       child: ListenableBuilder(
         listenable: _themeProvider,
@@ -698,51 +734,48 @@ class _NSRCAppState extends State<NSRCApp> {
 /// registered yet (feature not implemented in this build). Fails closed:
 /// no protected content is rendered.
 class _PageUnavailableScreen extends StatelessWidget {
-  const _PageUnavailableScreen({
-    required this.location,
-    required this.onHome,
-  });
+  const _PageUnavailableScreen({required this.location, required this.onHome});
 
   final String location;
   final VoidCallback onHome;
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Not available')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.construction_rounded, size: 34),
-                  const SizedBox(height: 16),
-                  Text(
-                    'This area isn\'t available in this build yet.',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'It is still being connected. Return to your dashboard '
-                    'and check again later.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      height: 1.5,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  FilledButton(onPressed: onHome, child: const Text('Go home')),
-                ],
+    appBar: AppBar(title: const Text('Not available')),
+    body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.construction_rounded, size: 34),
+              const SizedBox(height: 16),
+              Text(
+                'This area isn\'t available in this build yet.',
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                'It is still being connected. Return to your dashboard '
+                'and check again later.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  height: 1.5,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FilledButton(onPressed: onHome, child: const Text('Go home')),
+            ],
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
