@@ -2,7 +2,7 @@
 
 `cmu_sbnu_vms` is a Flutter application project for the Central Mindanao University School-Based National Service Reserve Corps Unit (CMU SBNU). Its planned purpose is to give volunteers and authorized unit officers a role-aware place to coordinate approved activities while protecting member information and recording privileged actions.
 
-This repository is the project of record. The older `nsrc_vms` prototype is separate design reference material; its Firebase project, credentials, data, and configuration must not be used here.
+Use only approved project configuration and synthetic data during local development. Never commit credentials or service-account keys to the Flutter client.
 
 ## Current state
 
@@ -107,7 +107,7 @@ Select a device with `flutter devices`, then pass its ID, for example `flutter r
 
 Firebase work is not fully wired into the current starter app. Before adding it, confirm the generated options and every emulator/configuration file point only to `cmu-sbnu-vms` or an explicitly named local demo emulator project. Emulator setup must use an explicit demo project ID and deny-by-default Firestore rules until reviewed rules and security tests exist. Do not run a Firebase deploy command as a substitute for local testing.
 
-The Firebase client configuration file, if regenerated, must be generated for approved target app registrations. Do not copy options or credentials from `D:\nsrc_vms`. Never put service-account keys in the Flutter client.
+The Firebase client configuration file, if regenerated, must be generated for approved target app registrations. Do not copy options or credentials from unapproved projects. Never put service-account keys in the Flutter client.
 
 ## Repository layout
 

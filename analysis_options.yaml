@@ -11,9 +11,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    # Archived prototype source is retained for reference, not analyzed as part
-    # of the cmu_sbnu_vms application.
-    - docs/nsrc_vms/**
+    # Documentation trees are not application source.
+    - docs/**
 
 linter:
   # The lint rules applied to this project can be customized in the

@@ -40,4 +40,10 @@ Display the organization marks side by side in this order: Central Mindanao Univ
 - ODRRM: [`assets/images/odrrm_logo.svg`](../assets/images/odrrm_logo.svg)
 - SBNU: [`assets/images/sbnu_logo.svg`](../assets/images/sbnu_logo.svg)
 
-The logo files are referenced in place; this document does not create modified logo artwork or specify colors, spacing rules, or other brand standards.
+## App theme direction
+
+The app theme draws supporting colors from all three supplied marks while keeping SBNU as the primary identity. Use SBNU navy and warm orange as the main interface colors. Use CMU gold and green, plus ODRRM forest green, olive, and yellow, as restrained supporting accents. Keep the supplied logo artwork intact; these UI colors do not redefine official institutional brand standards.
+
+The local landing page presents the organization marks in CMU, ODRRM, SBNU order, with the SBNU mark emphasized as the primary unit identity.
+
+The logo files are referenced in place; this document does not create modified logo artwork or specify official colors, spacing rules, or other brand standards.

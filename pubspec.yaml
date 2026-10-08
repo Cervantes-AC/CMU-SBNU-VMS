@@ -86,6 +86,10 @@ flutter:
     - assets/images/cmu_logo.svg
     - assets/images/odrrm_logo.svg
     - assets/images/sbnu_logo.svg
+    - assets/images/sbnu_app_icon.png
+    - assets/images/cmu_logo_brand.png
+    - assets/images/odrrm_logo_brand.png
+    - assets/images/sbnu_logo_brand.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

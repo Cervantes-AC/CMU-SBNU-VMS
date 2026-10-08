@@ -13,8 +13,7 @@ The plans are split into numbered areas. These folder names describe intended ow
 
 ## Shared starting point
 
-- The current Flutter app is a starter screen; most features are not implemented.
+- The current Flutter app contains a local landing-page preview; no sign-in or data workflow is connected, and most features are not implemented.
 - Firebase is declared but not initialized by the app. Firestore rules currently deny client access.
 - Android is the first intended platform. Hosting and production deployment are not approved.
-- `docs/nsrc_vms/` is reference material only; do not copy its credentials, data, or backend configuration.
 - Use synthetic data and local development. Confirm product, privacy, and security decisions before dependent implementation.

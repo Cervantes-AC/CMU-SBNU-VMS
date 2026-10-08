@@ -1,6 +1,8 @@
 # Flutter Source Architecture
 
-This document is the proposed source organization for `cmu_sbnu_vms`. The current `lib/` contains `main.dart`, `app.dart`, and generated `firebase_options.dart`; the other directories currently present under `lib/` are empty. Add files as features are implemented. Do not create placeholder code or implement every planned feature at once.
+This document describes the source organization for `cmu_sbnu_vms`. Add files as features are implemented. Do not create placeholder code or implement every planned feature at once.
+
+For file-level guidance on focused widgets, separation of responsibilities, and reusing existing components, see the [Flutter Coding Guide](FLUTTER_CODING_GUIDE.md).
 
 ## Principles
 
@@ -61,7 +63,6 @@ Keep feature models close to the feature that owns them. Promote a model or comp
 
 ## Project boundaries
 
-- `docs/nsrc_vms/` is prototype reference material, not runnable target source. Do not copy its credentials, data, or backend configuration.
 - Firebase is not initialized by the current starter app. Firestore rules currently deny client access.
 - Use synthetic data and local development. Do not access production data or deploy without explicit authorization.
 - See [`Development plans`](Development/README.md) for area-by-area planning. The plan does not grant feature or deployment approval.

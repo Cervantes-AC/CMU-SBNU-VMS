@@ -21,7 +21,7 @@ This workflow describes how to take a project change from request to review. Fol
 
 - Use synthetic data and local development by default.
 - Pause dependent implementation when approved scope, data fields, access rules, or retention policy are unclear.
-- Keep `docs/nsrc_vms/` as reference only. Do not reuse its credentials, data, or backend configuration.
+- Use synthetic data and approved project configuration. Never reuse credentials or backend configuration from an unapproved source.
 - Keep secrets out of source control and never put privileged credentials in the Flutter client.
 
 ## 4. Implement a focused slice

@@ -20,7 +20,7 @@ Use this guide to keep changes focused and protect existing work in `cmu_sbnu_vm
 - Do not use `git reset --hard`, `git clean`, or file checkout/restore commands to discard working changes.
 - If you find an unrelated change, leave it untouched and mention it in your handoff.
 - Never add secrets, service-account files, `.env` files, real member data, or private incident information. The repository ignore rules cover `.env*`, `service-account.json`, and `node_modules/`; verify files are ignored before staging sensitive local configuration.
-- Keep `docs/nsrc_vms/` as prototype reference material. Do not treat its files as target app source or copy its data and backend configuration.
+- Use synthetic data and approved project configuration. Do not add unapproved source snapshots, credentials, or backend configuration to the application.
 
 ## Review before staging
 
