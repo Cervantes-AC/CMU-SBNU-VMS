@@ -299,13 +299,14 @@ class _EmergencyPageState extends State<EmergencyPage> {
               ),
               title: Text(incident.category),
               subtitle: Text(
-                '${DateFormat.yMMMd().add_jm().format(incident.occurredAt)}\n${incident.description}',
-                maxLines: 2,
+                'Local only · ${DateFormat.yMMMd().add_jm().format(incident.occurredAt)}\n${incident.description}',
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              trailing: const Text(
-                'Local only',
-                style: TextStyle(fontSize: 9, color: Color(0xFF748078)),
+              trailing: IconButton(
+                tooltip: 'Delete local incident draft',
+                onPressed: () => _discardIncident(incident),
+                icon: const Icon(Icons.delete_outline),
               ),
             ),
           ),
@@ -333,6 +334,31 @@ class _EmergencyPageState extends State<EmergencyPage> {
       ],
     ),
   );
+
+  Future<void> _discardIncident(_LocalIncident incident) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete local incident draft?'),
+        content: const Text(
+          'This removes the draft narrative from this session. The report has not been sent or saved to a service.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep draft'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete draft'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      setState(() => _localIncidents.remove(incident));
+    }
+  }
 }
 
 class _LocalIncident {
