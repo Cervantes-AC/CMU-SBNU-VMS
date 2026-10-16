@@ -8,19 +8,24 @@ import 'view_models/activities_view_model.dart';
 class ActivitiesPage extends StatelessWidget {
   const ActivitiesPage({super.key});
 
-  Future<void> _createActivity(BuildContext context) async {
-    final title = TextEditingController();
-    final venue = TextEditingController();
-    final schedule = TextEditingController();
-    final description = TextEditingController();
-    final capacity = TextEditingController(text: '20');
+  Future<void> _createActivity(
+    BuildContext context, {
+    Activity? existing,
+  }) async {
+    final title = TextEditingController(text: existing?.title);
+    final venue = TextEditingController(text: existing?.venue);
+    final schedule = TextEditingController(text: existing?.scheduleLabel);
+    final description = TextEditingController(text: existing?.description);
+    final capacity = TextEditingController(text: '${existing?.capacity ?? 20}');
     final formKey = GlobalKey<FormState>();
-    var category = ActivityCategory.community;
+    var category = existing?.category ?? ActivityCategory.community;
     final created = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Activity draft'),
+          title: Text(
+            existing == null ? 'Activity draft' : 'Edit local activity draft',
+          ),
           content: SizedBox(
             width: 440,
             child: ConstrainedBox(
@@ -129,21 +134,36 @@ class ActivitiesPage extends StatelessWidget {
                   Navigator.pop(context, true);
                 }
               },
-              child: const Text('Save local draft'),
+              child: Text(
+                existing == null ? 'Save local draft' : 'Save draft changes',
+              ),
             ),
           ],
         ),
       ),
     );
     if (created == true && context.mounted) {
-      context.read<ActivitiesViewModel>().createDraft(
-        title: title.text,
-        category: category,
-        scheduleLabel: schedule.text,
-        venue: venue.text,
-        description: description.text,
-        capacity: int.parse(capacity.text),
-      );
+      final viewModel = context.read<ActivitiesViewModel>();
+      if (existing == null) {
+        viewModel.createDraft(
+          title: title.text,
+          category: category,
+          scheduleLabel: schedule.text,
+          venue: venue.text,
+          description: description.text,
+          capacity: int.parse(capacity.text),
+        );
+      } else {
+        viewModel.updateDraft(
+          id: existing.id,
+          title: title.text,
+          category: category,
+          scheduleLabel: schedule.text,
+          venue: venue.text,
+          description: description.text,
+          capacity: int.parse(capacity.text),
+        );
+      }
     }
     title.dispose();
     venue.dispose();
@@ -214,6 +234,7 @@ class ActivitiesPage extends StatelessWidget {
           _ActivityCard(
             activity: activity,
             onDetails: () => _showDetails(context, activity),
+            onEditDraft: () => _createActivity(context, existing: activity),
             onJoin: () => viewModel.toggleJoinRequest(activity.id),
           ),
       ],
@@ -282,10 +303,12 @@ class _ActivityCard extends StatelessWidget {
   const _ActivityCard({
     required this.activity,
     required this.onDetails,
+    required this.onEditDraft,
     required this.onJoin,
   });
   final Activity activity;
   final VoidCallback onDetails;
+  final VoidCallback onEditDraft;
   final VoidCallback onJoin;
 
   @override
@@ -392,11 +415,11 @@ class _ActivityCard extends StatelessWidget {
                 const Spacer(),
                 OutlinedButton.icon(
                   onPressed: activity.status == ActivityStatus.draft
-                      ? null
+                      ? onEditDraft
                       : onJoin,
                   icon: Icon(
                     activity.status == ActivityStatus.draft
-                        ? Icons.edit_note_outlined
+                        ? Icons.edit_outlined
                         : activity.joinRequested
                         ? Icons.check
                         : Icons.arrow_forward,
@@ -404,7 +427,7 @@ class _ActivityCard extends StatelessWidget {
                   ),
                   label: Text(
                     activity.status == ActivityStatus.draft
-                        ? 'Draft · not published'
+                        ? 'Edit local draft'
                         : activity.joinRequested
                         ? 'Join request in preview'
                         : 'Request to join',

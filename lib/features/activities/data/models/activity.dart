@@ -28,18 +28,23 @@ class Activity {
   final bool joinRequested;
 
   Activity copyWith({
+    String? title,
+    ActivityCategory? category,
+    String? scheduleLabel,
+    String? venue,
     int? joinedCount,
+    int? capacity,
     String? description,
     ActivityStatus? status,
     bool? joinRequested,
   }) => Activity(
     id: id,
-    title: title,
-    category: category,
-    scheduleLabel: scheduleLabel,
-    venue: venue,
+    title: title ?? this.title,
+    category: category ?? this.category,
+    scheduleLabel: scheduleLabel ?? this.scheduleLabel,
+    venue: venue ?? this.venue,
     joinedCount: joinedCount ?? this.joinedCount,
-    capacity: capacity,
+    capacity: capacity ?? this.capacity,
     description: description ?? this.description,
     status: status ?? this.status,
     joinRequested: joinRequested ?? this.joinRequested,

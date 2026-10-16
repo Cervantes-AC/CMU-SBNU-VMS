@@ -55,4 +55,28 @@ class ActivitiesViewModel extends ChangeNotifier {
     _repository.toggleJoinRequest(activityId);
     notifyListeners();
   }
+
+  void updateDraft({
+    required String id,
+    required String title,
+    required ActivityCategory category,
+    required String scheduleLabel,
+    required String venue,
+    required String description,
+    required int capacity,
+  }) {
+    final index = activities.indexWhere((activity) => activity.id == id);
+    if (index < 0 || activities[index].status != ActivityStatus.draft) return;
+    _repository.updateDraft(
+      activities[index].copyWith(
+        title: title.trim(),
+        category: category,
+        scheduleLabel: scheduleLabel.trim(),
+        venue: venue.trim(),
+        description: description.trim(),
+        capacity: capacity,
+      ),
+    );
+    notifyListeners();
+  }
 }

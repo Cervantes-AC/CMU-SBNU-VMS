@@ -3,6 +3,7 @@ import 'models/activity.dart';
 abstract interface class ActivitiesRepository {
   List<Activity> get activities;
   void saveDraft(Activity activity);
+  void updateDraft(Activity activity);
   void toggleJoinRequest(String activityId);
 }
 
@@ -61,6 +62,13 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
 
   @override
   void saveDraft(Activity activity) => _activities.insert(0, activity);
+
+  @override
+  void updateDraft(Activity activity) {
+    final index = _activities.indexWhere((item) => item.id == activity.id);
+    if (index < 0 || _activities[index].status != ActivityStatus.draft) return;
+    _activities[index] = activity;
+  }
 
   @override
   void toggleJoinRequest(String activityId) {
