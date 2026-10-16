@@ -1,6 +1,6 @@
 # Development Status
 
-**Last updated:** 2026-10-16
+**Last updated:** 2026-10-17
 **Status:** Interface development in progress. The planning specification remains proposed and requires institutional review.
 
 ## Implemented in the Flutter client
@@ -14,6 +14,7 @@
 - The overview activity count and upcoming list read the same local activity ViewModel as the Activities screen; its activity and safety cards navigate to their respective sections.
 - Attendance uses a feature-owned preview repository and ViewModel; local status corrections require a reason and show a session-only history. QR session creation and server validation remain unavailable.
 - Announcements use a feature-owned preview repository and ViewModel. Drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
+- Emergency incident drafts use a feature-owned in-memory preview repository and ViewModel. Fictional narrative can be added and deleted within the session; there is no location collection, remote submission, map, hotline, or SOS delivery.
 - Reports calculate synthetic participation, hours, and activity totals from local sample rows, with program/date filters and matching CSV output.
 - GoRouter handles the public landing and workspace routes.
 - Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
