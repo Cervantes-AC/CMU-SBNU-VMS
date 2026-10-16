@@ -1,69 +1,69 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
-import '../../data/models/report_record.dart';
+import '../../../../core/errors/app_failure.dart';
+import '../../../../core/types/app_types.dart';
 import '../../data/reports_repository.dart';
+import '../../data/models/report_record.dart';
 
 class ReportsViewModel extends ChangeNotifier {
-  ReportsViewModel(this._repository);
+  ReportsViewModel({required this.repository});
 
-  static const programs = [
-    'All programs',
-    'Safety',
-    'Environment',
-    'Community',
-    'Training',
-  ];
+  final ReportsRepository repository;
 
-  final ReportsRepository _repository;
-  String _program = 'All programs';
-  ReportDateRange _dateRange = ReportDateRange.last90Days;
+  LoadStatus _status = LoadStatus.initial;
+  AppFailure? _error;
+  List<ReportRecord> _records = [];
+  String? _csvContent;
 
-  String get program => _program;
-  ReportDateRange get dateRange => _dateRange;
+  LoadStatus get status => _status;
+  AppFailure? get error => _error;
+  List<ReportRecord> get records => _records;
+  String? get csvContent => _csvContent;
+  bool get isLoading => _status == LoadStatus.loading;
 
-  List<ReportRecord> get filteredRecords {
-    final now = DateTime.now();
-    final cutoff = switch (_dateRange) {
-      ReportDateRange.last30Days => now.subtract(const Duration(days: 30)),
-      ReportDateRange.last90Days => now.subtract(const Duration(days: 90)),
-      ReportDateRange.allTime => DateTime(2000),
-    };
-    return _repository.records
-        .where(
-          (record) =>
-              !record.date.isBefore(cutoff) &&
-              (_program == 'All programs' || record.program == _program),
-        )
-        .toList();
+  void init() {
+    _status = LoadStatus.loading;
+    notifyListeners();
+
+    repository.summaryRecords.listen((records) {
+      _records = records;
+      _status = LoadStatus.loaded;
+      _error = null;
+      notifyListeners();
+    }, onError: (e) {
+      _status = LoadStatus.error;
+      _error = e is AppFailure ? e : UnknownFailure();
+      notifyListeners();
+    });
   }
 
-  int get participations =>
-      filteredRecords.fold(0, (total, record) => total + record.participations);
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
 
-  int get serviceHours =>
-      filteredRecords.fold(0, (total, record) => total + record.serviceHours);
+  Future<void> generateExport({required String type, required Map<String, dynamic> filters}) async {
+    _status = LoadStatus.loading;
+    notifyListeners();
 
-  Map<String, int> get hoursByProgram {
-    final result = <String, int>{};
-    for (final record in filteredRecords) {
-      result.update(
-        record.program,
-        (hours) => hours + record.serviceHours,
-        ifAbsent: () => record.serviceHours,
-      );
+    final result = await repository.generateCsvExport(type: type, filters: filters);
+    if (result.hasData) {
+      _csvContent = result.data;
+      _status = LoadStatus.loaded;
+    } else {
+      _status = LoadStatus.error;
+      _error = result.error;
     }
-    return result;
-  }
-
-  void setProgram(String value) {
-    if (_program == value || !programs.contains(value)) return;
-    _program = value;
     notifyListeners();
   }
+}
 
-  void setDateRange(ReportDateRange value) {
-    if (_dateRange == value) return;
-    _dateRange = value;
-    notifyListeners();
-  }
+ReportsViewModel createReportsViewModel(ReportsRepository repository) {
+  return ReportsViewModel(repository: repository);
+}
+
+ReportsViewModel reportsViewModelOf(BuildContext context) {
+  return Provider.of<ReportsViewModel>(context, listen: false);
 }

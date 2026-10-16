@@ -1,23 +1,20 @@
 class ReportRecord {
   const ReportRecord({
-    required this.date,
-    required this.program,
-    required this.participations,
-    required this.serviceHours,
+    required this.metric,
+    required this.value,
+    this.format,
+    this.unit,
   });
 
-  final DateTime date;
-  final String program;
-  final int participations;
-  final int serviceHours;
-}
+  final String metric;
+  final num value;
+  final String? format;
+  final String? unit;
 
-enum ReportDateRange { last30Days, last90Days, allTime }
-
-extension ReportDateRangeLabel on ReportDateRange {
-  String get label => switch (this) {
-    ReportDateRange.last30Days => 'Last 30 days',
-    ReportDateRange.last90Days => 'Last 90 days',
-    ReportDateRange.allTime => 'All sample records',
-  };
+  String get displayValue {
+    if (format == 'percent') return '${value}%';
+    if (format == 'hours') return '${value} hrs';
+    if (format == 'currency') return '₱${value}';
+    return value.toString();
+  }
 }

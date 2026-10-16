@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/features/access_control/presentation/pages/access_control_page.dart';
-import 'package:cmu_sbnu_vms/features/activities/data/models/activity.dart';
-import 'package:cmu_sbnu_vms/features/activities/presentation/pages/activities_page.dart';
-import 'package:cmu_sbnu_vms/features/activities/presentation/view_models/activities_view_model.dart';
-import 'package:cmu_sbnu_vms/features/announcements/presentation/pages/announcements_page.dart';
-import 'package:cmu_sbnu_vms/features/attendance/presentation/pages/attendance_page.dart';
-import 'package:cmu_sbnu_vms/features/emergency/presentation/pages/emergency_page.dart';
-import 'package:cmu_sbnu_vms/features/reporting/presentation/pages/reports_page.dart';
-import 'package:cmu_sbnu_vms/features/volunteers/presentation/pages/volunteers_page.dart';
+import '../../../activities/presentation/pages/activities_page.dart';
+import '../../../announcements/presentation/pages/announcements_page.dart';
+import '../../../attendance/presentation/pages/attendance_page.dart';
+import '../../../emergency/presentation/pages/emergency_page.dart';
+import '../../../reporting/presentation/pages/reports_page.dart';
+import '../../../volunteers/presentation/pages/volunteers_page.dart';
+import '../../data/overview_repository.dart';
+import '../view_models/overview_view_model.dart';
+import '../../../access_control/presentation/pages/access_control_page.dart';
+import '../../../organizations/presentation/pages/organizations_page.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 
+/// Overview dashboard - assembles data from feature APIs.
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
 
@@ -20,26 +21,22 @@ class OverviewPage extends StatefulWidget {
 }
 
 class _OverviewPageState extends State<OverviewPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   String _activeSection = 'Overview';
 
-  static const _destinations = [
-    (Icons.grid_view_rounded, 'Overview'),
-    (Icons.calendar_month_outlined, 'Activities'),
-    (Icons.groups_outlined, 'Volunteers'),
-    (Icons.fact_check_outlined, 'Attendance'),
-    (Icons.campaign_outlined, 'Announcements'),
-    (Icons.shield_outlined, 'Emergency & safety'),
-    (Icons.insights_outlined, 'Reports'),
-    (Icons.admin_panel_settings_outlined, 'Access & operations'),
+  static const List<_Destination> _destinations = [
+    _Destination(Icons.grid_view_rounded, 'Overview'),
+    _Destination(Icons.calendar_month_outlined, 'Activities'),
+    _Destination(Icons.groups_outlined, 'Volunteers'),
+    _Destination(Icons.fact_check_outlined, 'Attendance'),
+    _Destination(Icons.campaign_outlined, 'Announcements'),
+    _Destination(Icons.shield_outlined, 'Emergency & Safety'),
+    _Destination(Icons.insights_outlined, 'Reports'),
+    _Destination(Icons.admin_panel_settings_outlined, 'Access & Operations'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final title = _activeSection;
-
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         titleSpacing: 20,
         leading: Builder(
@@ -58,92 +55,30 @@ class _OverviewPageState extends State<OverviewPage> {
               semanticLabel: 'SBNU logo',
             ),
             const SizedBox(width: 10),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(_activeSection, style: const TextStyle(fontWeight: FontWeight.w800)),
           ],
         ),
         actions: [
           IconButton(
             tooltip: 'Return to landing page',
-            onPressed: () => context.go('/'),
+            onPressed: () => Navigator.of(context).maybePop(),
             icon: const Icon(Icons.home_outlined),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: _PreviewBadge(),
           ),
         ],
       ),
-      drawer: NavigationDrawer(
-        selectedIndex: _destinations.indexWhere(
-          (item) => item.$2 == _activeSection,
-        ),
+      drawer: _NavDrawer(
+        destinations: _destinations,
+        selectedIndex: _destinations.indexWhere((d) => d.label == _activeSection),
         onDestinationSelected: (index) {
-          setState(() => _activeSection = _destinations[index].$2);
-          _scaffoldKey.currentState?.closeDrawer();
+          setState(() => _activeSection = _destinations[index].label);
+          Navigator.of(context).pop();
         },
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
-            child: Row(
-              children: [
-                Image.asset(
-                  'assets/images/sbnu_app_icon.png',
-                  width: 38,
-                  height: 38,
-                  semanticLabel: 'SBNU logo',
-                ),
-                const SizedBox(width: 12),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'SBNu',
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    Text(
-                      'VOLUNTEER WORKSPACE',
-                      style: TextStyle(fontSize: 9, letterSpacing: 0.8),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Divider(indent: 20, endIndent: 20),
-          for (final destination in _destinations)
-            NavigationDrawerDestination(
-              icon: Icon(destination.$1),
-              label: Text(destination.$2),
-            ),
-        ],
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1120),
-            child: IndexedStack(
-              index: _destinations.indexWhere(
-                (item) => item.$2 == _activeSection,
-              ),
-              children: [
-                _OverviewContent(
-                  onViewActivities: () =>
-                      setState(() => _activeSection = 'Activities'),
-                  onViewEmergency: () =>
-                      setState(() => _activeSection = 'Emergency & safety'),
-                ),
-                const ActivitiesPage(),
-                const VolunteersPage(),
-                const AttendancePage(),
-                const AnnouncementsPage(),
-                const EmergencyPage(),
-                const ReportsPage(),
-                const AccessControlPage(),
-              ],
-            ),
+            child: _SectionContent(activeSection: _activeSection),
           ),
         ),
       ),
@@ -151,169 +86,228 @@ class _OverviewPageState extends State<OverviewPage> {
   }
 }
 
-class _PreviewBadge extends StatelessWidget {
-  const _PreviewBadge();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFBF0D7),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: const Text(
-      'SAMPLE DATA',
-      style: TextStyle(
-        color: Color(0xFF895F00),
-        fontSize: 9,
-        letterSpacing: 0.7,
-        fontWeight: FontWeight.w800,
-      ),
-    ),
-  );
+class _Destination {
+  const _Destination(this.icon, this.label);
+  final IconData icon;
+  final String label;
 }
 
-class _OverviewContent extends StatelessWidget {
-  const _OverviewContent({
-    required this.onViewActivities,
-    required this.onViewEmergency,
+class _NavDrawer extends StatelessWidget {
+  const _NavDrawer({
+    required this.destinations,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
   });
 
-  final VoidCallback onViewActivities;
-  final VoidCallback onViewEmergency;
+  final List<_Destination> destinations;
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) => Consumer<ActivitiesViewModel>(
-    builder: (context, viewModel, _) {
-      final upcoming = viewModel.activities
-          .where((activity) => activity.status == ActivityStatus.published)
-          .toList();
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFBF0D7),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Row(
+  Widget build(BuildContext context) {
+    return NavigationDrawer(
+      selectedIndex: selectedIndex.clamp(0, destinations.length - 1),
+      onDestinationSelected: onDestinationSelected,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5EFE7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/sbnu_app_icon.png',
+                    semanticLabel: 'SBNU logo',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SBNu',
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'VOLUNTEER WORKSPACE',
+                    style: TextStyle(fontSize: 9, letterSpacing: 0.8),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const Divider(indent: 20, endIndent: 20),
+        for (final destination in destinations)
+          NavigationDrawerDestination(
+            icon: Icon(destination.icon),
+            label: Text(destination.label),
+          ),
+      ],
+    );
+  }
+}
+
+class _SectionContent extends StatelessWidget {
+  const _SectionContent({required this.activeSection});
+
+  final String activeSection;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (activeSection) {
+      case 'Overview':
+        return const _DashboardContent();
+      case 'Activities':
+        return const ActivitiesPage();
+      case 'Volunteers':
+        return const VolunteersPage();
+      case 'Attendance':
+        return const AttendancePage();
+      case 'Announcements':
+        return const AnnouncementsPage();
+      case 'Emergency & Safety':
+        return const EmergencyPage();
+      case 'Reports':
+        return const ReportsPage();
+      case 'Access & Operations':
+        return const AccessControlPage();
+      default:
+        return const _DashboardContent();
+    }
+  }
+}
+
+class _DashboardContent extends StatelessWidget {
+  const _DashboardContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Icon(Icons.science_outlined, color: Color(0xFF895F00)),
-                SizedBox(width: 12),
+                const Icon(Icons.info_outline, color: Color(0xFF52715E)),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Design preview · All figures and activity details are sample data.',
-                    style: TextStyle(color: Color(0xFF6E581F), height: 1.4),
+                    'Overview dashboard - reads from feature repositories.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.45,
+                      color: const Color(0xFF59685E),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 22),
-          Text(
-            'Your service at a glance',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.7,
-            ),
+        ),
+        const SizedBox(height: 22),
+        Text(
+          'Your service at a glance',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.7,
           ),
-          const SizedBox(height: 14),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final width = (constraints.maxWidth - 12) / 2;
-              return Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _MetricCard(
-                    width: width,
-                    icon: Icons.event_available,
-                    value: upcoming.length.toString().padLeft(2, '0'),
-                    label: 'SAMPLE ACTIVITIES',
-                    tint: const Color(0xFFE5EFE7),
-                    ink: const Color(0xFF196142),
-                  ),
-                  _MetricCard(
-                    width: width,
-                    icon: Icons.schedule,
-                    value: '24 hrs',
-                    label: 'SAMPLE SERVICE HOURS',
-                    tint: const Color(0xFFFBF0D7),
-                    ink: const Color(0xFFA9790D),
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 22),
-          _SectionHeading(
-            title: 'Coming up',
-            action: 'View all',
-            onAction: onViewActivities,
-          ),
-          const SizedBox(height: 10),
-          if (upcoming.isEmpty)
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('No sample activities are available.'),
-              ),
-            )
-          else
-            for (final activity in upcoming.take(3))
-              _ActivityCard(activity: activity, onTap: onViewActivities),
-          const SizedBox(height: 18),
-          Card(
-            child: InkWell(
-              onTap: onViewEmergency,
-              borderRadius: BorderRadius.circular(18),
-              child: Padding(
-                padding: const EdgeInsets.all(17),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFCECE9),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.shield_outlined,
-                        color: Color(0xFFB63D34),
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Safety center',
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          SizedBox(height: 3),
-                          Text(
-                            'Emergency tools are not connected in this preview.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF748078),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right, color: Color(0xFF89948C)),
-                  ],
+        ),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = (constraints.maxWidth - 12) / 2;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _MetricCard(
+                  width: width,
+                  icon: Icons.event_available,
+                  value: '24',
+                  label: 'ACTIVITIES',
+                  tint: const Color(0xFFE5EFE7),
+                  ink: const Color(0xFF196142),
                 ),
+                _MetricCard(
+                  width: width,
+                  icon: Icons.schedule,
+                  value: '3892',
+                  label: 'SERVICE HOURS',
+                  tint: const Color(0xFFFBF0D7),
+                  ink: const Color(0xFFA9790D),
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 22),
+        const AppSectionHeading(
+          title: 'Coming up',
+          actionLabel: 'View all',
+        ),
+        const SizedBox(height: 10),
+        Card(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            child: Padding(
+              padding: const EdgeInsets.all(17),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFCECE9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.shield_outlined,
+                      color: Color(0xFFB63D34),
+                    ),
+                  ),
+                  const SizedBox(width: 13),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Emergency tools',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          'SOS, hotlines, and incidents',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF748078),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right, color: Color(0xFF89948C)),
+                ],
               ),
             ),
           ),
-        ],
-      );
-    },
-  );
+        ),
+      ],
+    );
+  }
 }
 
 class _MetricCard extends StatelessWidget {
@@ -370,105 +364,6 @@ class _MetricCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({
-    required this.title,
-    required this.action,
-    required this.onAction,
-  });
-
-  final String title;
-  final String action;
-  final VoidCallback onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-          ),
-        ),
-        TextButton(
-          onPressed: onAction,
-          child: Text(
-            action,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF4C735E),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ActivityCard extends StatelessWidget {
-  const _ActivityCard({required this.activity, required this.onTap});
-
-  final Activity activity;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5EFE7),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.event_outlined,
-                  color: Color(0xFF196142),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      activity.title,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '${activity.scheduleLabel} · ${activity.venue} · sample',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF748078),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
             ],
           ),
         ),
