@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../overview/presentation/overview_page.dart';
+import 'package:go_router/go_router.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -153,9 +152,7 @@ class _PreviewButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FilledButton.icon(
-      onPressed: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (_) => const OverviewPage())),
+      onPressed: () => context.go('/workspace'),
       icon: const Icon(Icons.arrow_forward, size: 18),
       label: const Text('Explore the volunteer workspace'),
     );

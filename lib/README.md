@@ -1,6 +1,6 @@
 ﻿# Flutter client structure
 
-The client is planned as a **modular monolith** organized around CMU–SBNU workflows. Its boundary rules and rationale are in [the project architecture decision](../docs/architecture.md). Folders are scaffolding only; no implementation or approval is implied.
+The client follows a **modular monolith** organized around CMU–SBNU workflows. Its boundary rules and rationale are in [the project architecture decision](../docs/architecture.md). The landing page and local preview workspace are implemented; the preview uses synthetic data and does not imply institutional approval or a connected backend.
 
 ```text
 lib/
@@ -45,4 +45,4 @@ Keep each feature folder small until its first implementation. A feature usually
 - Do not create a generic `FirebaseService` or `AppService`. Keep one-feature integrations local, such as QR scanning in attendance and phone handoff in hotlines.
 - Firestore Rules and trusted backend operations enforce access; route guards and UI visibility only guide navigation.
 
-Use the existing Provider and GoRouter dependencies. Do not add another state-management or routing package without a demonstrated need. See [architecture.md](../docs/architecture.md) for the Firebase trust boundary, module dependencies, and implementation order.
+Use the existing Provider and GoRouter dependencies. The app uses GoRouter for landing/workspace routes and Provider with a feature-owned ViewModel/repository for activity preview state. Other preview sections still hold presentation state locally and should move behind feature-owned view models/repositories as they gain behavior. Do not add another state-management or routing package without a demonstrated need. See [architecture.md](../docs/architecture.md) for the Firebase trust boundary, module dependencies, and implementation order.

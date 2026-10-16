@@ -1,56 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ActivitiesPage extends StatefulWidget {
+import '../data/models/activity.dart';
+import 'view_models/activities_view_model.dart';
+
+class ActivitiesPage extends StatelessWidget {
   const ActivitiesPage({super.key});
 
-  @override
-  State<ActivitiesPage> createState() => _ActivitiesPageState();
-}
-
-class _ActivitiesPageState extends State<ActivitiesPage> {
-  String _filter = 'All';
-  final Set<String> _joined = {};
-
-  final List<_Activity> _activities = [
-    const _Activity(
-      'Campus preparedness workshop',
-      'Safety',
-      'Oct 22 · 9:00 AM',
-      'University Convention Center',
-      24,
-      40,
-    ),
-    const _Activity(
-      'Community river clean-up',
-      'Environment',
-      'Oct 26 · 6:30 AM',
-      'Sawaga River access point',
-      18,
-      30,
-    ),
-    const _Activity(
-      'First aid skills session',
-      'Training',
-      'Nov 02 · 1:00 PM',
-      'College of Nursing',
-      12,
-      24,
-    ),
-    const _Activity(
-      'Community learning day',
-      'Community',
-      'Nov 08 · 8:00 AM',
-      'CMU Main Campus',
-      31,
-      50,
-    ),
-  ];
-
-  Future<void> _createActivity() async {
+  Future<void> _createActivity(BuildContext context) async {
     final title = TextEditingController();
     final venue = TextEditingController();
-    String category = 'Community';
-    final created = await showDialog<_Activity>(
+    var category = ActivityCategory.community;
+    final created = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
@@ -66,18 +27,17 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                   decoration: const InputDecoration(labelText: 'Activity name'),
                 ),
                 const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
+                DropdownButtonFormField<ActivityCategory>(
                   initialValue: category,
                   decoration: const InputDecoration(labelText: 'Category'),
-                  items:
-                      const ['Environment', 'Safety', 'Training', 'Community']
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value),
-                            ),
-                          )
-                          .toList(),
+                  items: ActivityCategory.values
+                      .map(
+                        (value) => DropdownMenuItem(
+                          value: value,
+                          child: Text(_categoryLabel(value)),
+                        ),
+                      )
+                      .toList(),
                   onChanged: (value) =>
                       setDialogState(() => category = value ?? category),
                 ),
@@ -96,25 +56,14 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context, false),
               child: const Text('Cancel'),
             ),
             FilledButton(
               onPressed: () {
-                final name = title.text.trim();
-                final place = venue.text.trim();
-                if (name.isNotEmpty && place.isNotEmpty) {
-                  Navigator.pop(
-                    context,
-                    _Activity(
-                      name,
-                      category,
-                      'Schedule to be set',
-                      place,
-                      0,
-                      20,
-                    ),
-                  );
+                if (title.text.trim().isNotEmpty &&
+                    venue.text.trim().isNotEmpty) {
+                  Navigator.pop(context, true);
                 }
               },
               child: const Text('Save local draft'),
@@ -123,21 +72,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         ),
       ),
     );
+    if (created == true && context.mounted) {
+      context.read<ActivitiesViewModel>().createDraft(
+        title: title.text,
+        category: category,
+        venue: venue.text,
+      );
+    }
     title.dispose();
     venue.dispose();
-    if (created != null && mounted) {
-      setState(() => _activities.insert(0, created));
-    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final visible = _filter == 'All'
-        ? _activities
-        : _activities
-              .where((activity) => activity.category == _filter)
-              .toList();
-    return ListView(
+  Widget build(BuildContext context) => Consumer<ActivitiesViewModel>(
+    builder: (context, viewModel, _) => ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       children: [
         Row(
@@ -154,7 +102,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             ),
             IconButton.filledTonal(
               tooltip: 'Create local activity draft',
-              onPressed: _createActivity,
+              onPressed: () => _createActivity(context),
               icon: const Icon(Icons.add),
             ),
           ],
@@ -178,68 +126,46 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              for (final filter in [
-                'All',
-                'Safety',
-                'Environment',
-                'Training',
-                'Community',
-              ])
+              for (final filter in [null, ...ActivityCategory.values])
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    label: Text(filter),
-                    selected: _filter == filter,
-                    onSelected: (_) => setState(() => _filter = filter),
+                    label: Text(
+                      filter == null ? 'All' : _categoryLabel(filter),
+                    ),
+                    selected: viewModel.categoryFilter == filter,
+                    onSelected: (_) => viewModel.setCategoryFilter(filter),
                   ),
                 ),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        for (final activity in visible)
+        for (final activity in viewModel.visibleActivities)
           _ActivityCard(
             activity: activity,
-            joined: _joined.contains(activity.title),
-            onJoin: () => setState(() {
-              if (!_joined.add(activity.title)) _joined.remove(activity.title);
-            }),
+            onJoin: () => viewModel.toggleJoinRequest(activity.id),
           ),
       ],
-    );
-  }
+    ),
+  );
 }
 
-class _Activity {
-  const _Activity(
-    this.title,
-    this.category,
-    this.date,
-    this.venue,
-    this.joined,
-    this.capacity,
-  );
-  final String title;
-  final String category;
-  final String date;
-  final String venue;
-  final int joined;
-  final int capacity;
-}
+String _categoryLabel(ActivityCategory category) => switch (category) {
+  ActivityCategory.environment => 'Environment',
+  ActivityCategory.safety => 'Safety',
+  ActivityCategory.training => 'Training',
+  ActivityCategory.community => 'Community',
+};
 
 class _ActivityCard extends StatelessWidget {
-  const _ActivityCard({
-    required this.activity,
-    required this.joined,
-    required this.onJoin,
-  });
-  final _Activity activity;
-  final bool joined;
+  const _ActivityCard({required this.activity, required this.onJoin});
+  final Activity activity;
   final VoidCallback onJoin;
 
   @override
   Widget build(BuildContext context) {
-    final percent = activity.joined / activity.capacity;
+    final percent = activity.joinedCount / activity.capacity;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -251,7 +177,9 @@ class _ActivityCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    activity.category.toUpperCase(),
+                    activity.status == ActivityStatus.draft
+                        ? 'LOCAL DRAFT'
+                        : _categoryLabel(activity.category).toUpperCase(),
                     style: const TextStyle(
                       color: Color(0xFFAA7C10),
                       fontSize: 9,
@@ -267,7 +195,7 @@ class _ActivityCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  activity.date,
+                  activity.scheduleLabel,
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0xFF65746A),
@@ -304,7 +232,7 @@ class _ActivityCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${activity.joined} of ${activity.capacity} places',
+                  '${activity.joinedCount} of ${activity.capacity} places',
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -334,10 +262,14 @@ class _ActivityCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onJoin,
                 icon: Icon(
-                  joined ? Icons.check : Icons.arrow_forward,
+                  activity.joinRequested ? Icons.check : Icons.arrow_forward,
                   size: 16,
                 ),
-                label: Text(joined ? 'Joined in preview' : 'Request to join'),
+                label: Text(
+                  activity.joinRequested
+                      ? 'Join request in preview'
+                      : 'Request to join',
+                ),
               ),
             ),
           ],

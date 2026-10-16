@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../access_control/presentation/access_control_page.dart';
 import '../../activities/presentation/activities_page.dart';
@@ -60,7 +61,7 @@ class _OverviewPageState extends State<OverviewPage> {
         actions: [
           IconButton(
             tooltip: 'Return to landing page',
-            onPressed: () => Navigator.of(context).maybePop(),
+            onPressed: () => context.go('/'),
             icon: const Icon(Icons.home_outlined),
           ),
           const Padding(
