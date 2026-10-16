@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/incident_draft.dart';
+import '../data/models/incident_preview_record.dart';
 import 'view_models/emergency_view_model.dart';
 
 class EmergencyPage extends StatefulWidget {
@@ -248,11 +249,11 @@ class _EmergencyPageState extends State<EmergencyPage> {
         const SizedBox(height: 10),
         _SafetyCard(
           icon: Icons.map_outlined,
-          title: 'Incident map and list',
+          title: 'Incident list and map',
           description:
-              'No incident map, approved location policy, or authorized live records are configured.',
-          action: 'View map status',
-          onPressed: _showMapStatus,
+              'Review fictional status examples. Live records and map locations are not available.',
+          action: 'Open sample incident list',
+          onPressed: () => _showIncidentList(viewModel),
         ),
         const SizedBox(height: 10),
         _SafetyCard(
@@ -316,13 +317,54 @@ class _EmergencyPageState extends State<EmergencyPage> {
     ),
   );
 
-  Future<void> _showMapStatus() => showDialog<void>(
+  Future<void> _showIncidentList(
+    EmergencyViewModel viewModel,
+  ) => showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
       icon: const Icon(Icons.map_outlined, color: Color(0xFF47745A), size: 36),
-      title: const Text('Incident map and list'),
-      content: const Text(
-        'A map provider, location precision policy, and reviewer access rules have not been approved. This preview does not collect location or display incident markers. Use institution procedures for current safety information.',
+      title: const Text('Sample incident list'),
+      content: SizedBox(
+        width: 460,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * .65,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFBF0D7),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Fictional examples only. These rows have no dates, location, reporter identity, or incident narrative and do not describe current campus conditions.',
+                    style: TextStyle(
+                      fontSize: 11,
+                      height: 1.45,
+                      color: Color(0xFF6E581F),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                for (final record in viewModel.sampleIncidentRecords)
+                  _IncidentPreviewCard(record: record),
+                const SizedBox(height: 4),
+                const Text(
+                  'Map markers are unavailable until the location precision policy, map provider, and reviewer access rules are approved. Use institution procedures for current safety information.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    height: 1.45,
+                    color: Color(0xFF748078),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       actions: [
         TextButton(
@@ -559,4 +601,67 @@ class _HotlinePreviewCard extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _IncidentPreviewCard extends StatelessWidget {
+  const _IncidentPreviewCard({required this.record});
+
+  final IncidentPreviewRecord record;
+
+  @override
+  Widget build(BuildContext context) {
+    final severity = switch (record.severity) {
+      IncidentPreviewSeverity.low => ('LOW', const Color(0xFF47745A)),
+      IncidentPreviewSeverity.medium => ('MEDIUM', const Color(0xFF9A6810)),
+      IncidentPreviewSeverity.high => ('HIGH', const Color(0xFF9E342B)),
+    };
+    final status = switch (record.status) {
+      IncidentPreviewStatus.underReview => 'Under review',
+      IncidentPreviewStatus.actionInProgress => 'Action in progress',
+      IncidentPreviewStatus.resolved => 'Resolved',
+    };
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(13),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.description_outlined,
+                  size: 17,
+                  color: Color(0xFF47745A),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    record.category,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Text(
+                  severity.$1,
+                  style: TextStyle(
+                    color: severity.$2,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 7),
+            Text(status, style: const TextStyle(fontSize: 11)),
+            const SizedBox(height: 4),
+            const Text(
+              'Sample record · no location shared',
+              style: TextStyle(fontSize: 10, color: Color(0xFF748078)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -1,18 +1,45 @@
 import 'models/incident_draft.dart';
+import 'models/incident_preview_record.dart';
 
 abstract interface class EmergencyRepository {
   List<IncidentDraft> get localIncidentDrafts;
+  List<IncidentPreviewRecord> get sampleIncidentRecords;
   void saveLocalIncidentDraft(IncidentDraft draft);
   void deleteLocalIncidentDraft(String id);
 }
 
 /// Holds fictional incident preview text in memory for this app session only.
 class PreviewEmergencyRepository implements EmergencyRepository {
+  static const _sampleIncidentRecords = [
+    IncidentPreviewRecord(
+      id: 'sample-incident-001',
+      category: 'Facility or environment',
+      severity: IncidentPreviewSeverity.low,
+      status: IncidentPreviewStatus.underReview,
+    ),
+    IncidentPreviewRecord(
+      id: 'sample-incident-002',
+      category: 'Safety concern',
+      severity: IncidentPreviewSeverity.medium,
+      status: IncidentPreviewStatus.actionInProgress,
+    ),
+    IncidentPreviewRecord(
+      id: 'sample-incident-003',
+      category: 'Transport',
+      severity: IncidentPreviewSeverity.low,
+      status: IncidentPreviewStatus.resolved,
+    ),
+  ];
+
   final List<IncidentDraft> _localIncidentDrafts = [];
 
   @override
   List<IncidentDraft> get localIncidentDrafts =>
       List.unmodifiable(_localIncidentDrafts);
+
+  @override
+  List<IncidentPreviewRecord> get sampleIncidentRecords =>
+      _sampleIncidentRecords;
 
   @override
   void saveLocalIncidentDraft(IncidentDraft draft) {

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../data/emergency_repository.dart';
 import '../../data/models/incident_draft.dart';
+import '../../data/models/incident_preview_record.dart';
 
 class EmergencyViewModel extends ChangeNotifier {
   EmergencyViewModel(this._repository);
@@ -10,6 +11,8 @@ class EmergencyViewModel extends ChangeNotifier {
 
   List<IncidentDraft> get localIncidentDrafts =>
       _repository.localIncidentDrafts;
+  List<IncidentPreviewRecord> get sampleIncidentRecords =>
+      _repository.sampleIncidentRecords;
 
   void saveLocalIncidentDraft({
     required String category,
