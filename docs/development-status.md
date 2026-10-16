@@ -13,7 +13,7 @@
 - Activities use a feature-owned preview repository and ViewModel; local drafts capture, edit, and discard title, category, schedule, venue, description, and capacity, and sample records have a details view. The source can be replaced by an approved adapter without making the widget call Firestore.
 - The overview activity count and upcoming list read the same local activity ViewModel as the Activities screen; its activity and safety cards navigate to their respective sections.
 - Attendance uses a feature-owned preview repository and ViewModel; local status corrections require a reason and show a session-only history. QR session creation and server validation remain unavailable.
-- Announcement drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
+- Announcements use a feature-owned preview repository and ViewModel. Drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
 - Reports calculate synthetic participation, hours, and activity totals from local sample rows, with program/date filters and matching CSV output.
 - GoRouter handles the public landing and workspace routes.
 - Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.

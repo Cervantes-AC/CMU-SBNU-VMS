@@ -6,6 +6,8 @@ import 'features/activities/data/activities_repository.dart';
 import 'features/activities/presentation/view_models/activities_view_model.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/attendance/presentation/view_models/attendance_view_model.dart';
+import 'features/announcements/data/announcements_repository.dart';
+import 'features/announcements/presentation/view_models/announcements_view_model.dart';
 import 'features/auth/presentation/auth_page.dart';
 import 'features/landing/presentation/landing_page.dart';
 import 'features/overview/presentation/overview_page.dart';
@@ -56,6 +58,10 @@ class NSRCApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => AttendanceViewModel(PreviewAttendanceRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              AnnouncementsViewModel(PreviewAnnouncementsRepository()),
         ),
       ],
       child: MaterialApp.router(
