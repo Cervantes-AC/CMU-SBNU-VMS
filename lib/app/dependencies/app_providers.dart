@@ -32,50 +32,58 @@ import '../../../core/logging/app_logger.dart';
 Widget withAppProviders({required Widget child}) {
   final logger = ConsoleAppLogger();
 
+  // Real data (Firestore) is only used when explicitly opted in via the
+  // Firebase emulator flag. Ordinary builds keep preview data — no silent
+  // redirect to production Firestore.
+  const useFirestore = bool.fromEnvironment(
+    'USE_FIREBASE_EMULATORS',
+    defaultValue: false,
+  );
+
   // Repositories
   final authRepository = FirebaseAuthRepository(
     remoteSource: AuthRemoteSource(),
     logger: logger,
   );
   final activitiesRepository = createActivitiesRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final announcementsRepository = createAnnouncementsRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final attendanceRepository = createAttendanceRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final auditRepository = createAuditRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final hotlinesRepository = createHotlinesRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final incidentsRepository = createIncidentsRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final organizationsRepository = createOrganizationsRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final overviewRepository = createOverviewRepository();
   final reportsRepository = createReportsRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final sosRepository = createSosRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
   final volunteersRepository = createVolunteersRepository(
-    useFirestore: false,
+    useFirestore: useFirestore,
     logger: logger,
   );
 

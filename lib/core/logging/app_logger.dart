@@ -38,6 +38,10 @@ class NoOpAppLogger implements AppLogger {
 }
 
 /// Console logger for development. Only safe fields are logged.
+///
+/// Stack traces are only emitted in debug mode to avoid leaking internal
+/// implementation details in release builds. Sensitive keys are always
+/// redacted.
 class ConsoleAppLogger implements AppLogger {
   const ConsoleAppLogger();
 
@@ -65,7 +69,8 @@ class ConsoleAppLogger implements AppLogger {
     final safeFields = _sanitize(fields);
     // ignore: avoid_print
     print('[ERROR] $event error=$error fields=$safeFields');
-    if (stackTrace != null) {
+    // Stack traces can leak internal paths and logic; only emit in debug.
+    if (stackTrace != null && _isDebug) {
       // ignore: avoid_print
       print(stackTrace.toString());
     }
@@ -87,10 +92,25 @@ class ConsoleAppLogger implements AppLogger {
       if (_isSensitiveKey(key)) {
         result[entry.key] = '[REDACTED]';
       } else {
-        result[entry.key] = entry.value;
+        result[entry.key] = _sanitizeValue(entry.value);
       }
     }
     return result;
+  }
+
+  dynamic _sanitizeValue(dynamic value) {
+    if (value is String) {
+      // Never log values that look like tokens, emails, or UIDs even under
+      // non-sensitive keys.
+      if (_looksSensitive(value)) return '[REDACTED]';
+    }
+    if (value is Map) {
+      return _sanitize(Map<String, dynamic>.from(value));
+    }
+    if (value is List) {
+      return value.map(_sanitizeValue).toList();
+    }
+    return value;
   }
 
   bool _isSensitiveKey(String key) {
@@ -104,6 +124,30 @@ class ConsoleAppLogger implements AppLogger {
         key.contains('email') ||
         key.contains('phone') ||
         key.contains('uid') ||
-        key.contains('key');
+        key.contains('key') ||
+        key.contains('credential') ||
+        key.contains('authorization') ||
+        key.contains('cookie');
+  }
+
+  /// Heuristic: a string that looks like a token, email, UID, or secret.
+  bool _looksSensitive(String value) {
+    if (value.isEmpty) return false;
+    // Email-like.
+    if (value.contains('@') && value.contains('.')) return true;
+    // UID-like: short alphanumeric with underscores, e.g. vol_001, act_001.
+    if (RegExp(r'^[a-z]+_[0-9]+$').hasMatch(value)) return true;
+    // Token-like: long base64/hex strings.
+    if (value.length > 24 && RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(value)) {
+      return true;
+    }
+    return false;
+  }
+
+  bool get _isDebug {
+    // Avoid importing dart:io here; use kDebugMode from foundation.
+    bool debug = false;
+    assert(debug = true);
+    return debug;
   }
 }

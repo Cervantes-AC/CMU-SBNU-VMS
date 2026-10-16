@@ -13,7 +13,7 @@ class NSRCApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'CMU–SBNU Volunteer Management System',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
+        theme: AppTheme.light(),
         routerConfig: appRouter,
       ),
     );
