@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/announcement.dart';
 import '../view_models/announcements_view_model.dart';
 
-/// Announcements page — premium, fully functional.
+/// Announcements page - feed and publishing.
 class AnnouncementsPage extends StatefulWidget {
   const AnnouncementsPage({super.key});
 
@@ -16,199 +16,88 @@ class AnnouncementsPage extends StatefulWidget {
 class _AnnouncementsPageState extends State<AnnouncementsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _PageHeader()),
-          Consumer<AnnouncementsViewModel>(
-            builder: (context, viewModel, _) {
-              return SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: DesignTokens.lg),
-                    AppStateWrapper(
-                      status: viewModel.status,
-                      onRetry: viewModel.init,
-                      errorMessage: viewModel.error?.message,
-                      child: viewModel.published.isEmpty
-                          ? const PremiumEmptyState(
-                              icon: Icons.campaign_outlined,
-                              title: 'No announcements.',
-                              subtitle:
-                                  'Stay tuned for updates from the SBNU team.',
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.all(DesignTokens.lg),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: viewModel.published.length,
-                                itemBuilder: (context, index) {
-                                  final a = viewModel.published[index];
-                                  return _AnnouncementCard(announcement: a);
-                                },
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: DesignTokens.xxl),
-                  ],
-                ),
-              );
-            },
+    return Consumer<AnnouncementsViewModel>(
+      builder: (context, viewModel, _) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Announcements')),
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: viewModel.published.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.campaign_outlined,
+                    title: 'No announcements.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: viewModel.published.length,
+                    itemBuilder: (context, index) {
+                      final a = viewModel.published[index];
+                      return _AnnouncementCard(announcement: a);
+                    },
+                  ),
           ),
-        ],
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.all(DesignTokens.lg),
-        child: PremiumButton(
-          label: 'Publish Announcement',
-          onPressed: () => _showCreateDialog(context),
-          icon: Icons.add_circle_rounded,
-          isFullWidth: false,
-          variant: ButtonVariant.primary,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showCreateDialog(context, viewModel),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 
-  void _showCreateDialog(BuildContext context) {
+  void _showCreateDialog(
+    BuildContext context,
+    AnnouncementsViewModel viewModel,
+  ) {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: PremiumCard(
-          elevation: 3,
-          borderRadius: DesignTokens.radiusXl,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(DesignTokens.lg),
-                  child: Text(
-                    'Publish Announcement',
-                    style: DesignTokens.headline,
-                  ),
-                ),
-                PremiumDivider(),
-                Padding(
-                  padding: const EdgeInsets.all(DesignTokens.lg),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PremiumInputField(
-                        controller: titleController,
-                        label: 'Title',
-                        hint: 'e.g. Tree Planting This Saturday',
-                        icon: Icons.title_rounded,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      PremiumInputField(
-                        controller: bodyController,
-                        label: 'Message',
-                        hint: 'Write your announcement...',
-                        icon: Icons.message_rounded,
-                        maxLines: 4,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: PremiumChip(
-                              label: 'All Volunteers',
-                              color: DesignTokens.forest,
-                              size: ChipSize.md,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: DesignTokens.xl),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Cancel',
-                              onPressed: () => Navigator.of(context).pop(),
-                              variant: ButtonVariant.outline,
-                              isFullWidth: true,
-                            ),
-                          ),
-                          const SizedBox(width: DesignTokens.md),
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Publish',
-                              onPressed: () {
-                                if (titleController.text.isEmpty ||
-                                    bodyController.text.isEmpty) {
-                                  return;
-                                }
-                                Navigator.of(context).pop();
-                                context
-                                    .read<AnnouncementsViewModel>()
-                                    .createAnnouncement(
-                                      Announcement(
-                                        id: 'ann_${DateTime.now().millisecondsSinceEpoch}',
-                                        title: titleController.text.trim(),
-                                        body: bodyController.text.trim(),
-                                        audienceRule: 'all',
-                                        status: AnnouncementStatus.published,
-                                        authorUid: 'current_user',
-                                        publishAt: DateTime.now(),
-                                      ),
-                                    );
-                              },
-                              variant: ButtonVariant.primary,
-                              isFullWidth: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      builder: (context) => AlertDialog(
+        title: const Text('Create Announcement'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppInputField(
+              controller: titleController,
+              label: 'Title',
+              icon: Icons.title_outlined,
             ),
-          ),
+            const SizedBox(height: 12),
+            AppInputField(
+              controller: bodyController,
+              label: 'Message',
+              maxLines: 4,
+              icon: Icons.message_outlined,
+            ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class _PageHeader extends StatelessWidget {
-  const _PageHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        DesignTokens.xl,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Announcements',
-            style: DesignTokens.displayLarge.copyWith(
-              fontSize: 36,
-              color: DesignTokens.ink,
-            ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
           ),
-          const SizedBox(height: DesignTokens.sm),
-          Text(
-            'Stay informed with updates from the SBNU team.',
-            style: DesignTokens.body.copyWith(
-              fontSize: 15,
-              color: DesignTokens.muted,
-            ),
+          AppButton(
+            label: 'Publish',
+            onPressed: () {
+              if (titleController.text.isEmpty || bodyController.text.isEmpty) {
+                return;
+              }
+              Navigator.of(context).pop();
+              viewModel.createAnnouncement(
+                Announcement(
+                  id: 'ann_${DateTime.now().millisecondsSinceEpoch}',
+                  title: titleController.text.trim(),
+                  body: bodyController.text.trim(),
+                  audienceRule: 'all',
+                  status: AnnouncementStatus.published,
+                  authorUid: 'current_user',
+                  publishAt: DateTime.now(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -223,78 +112,79 @@ class _AnnouncementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isHigh = announcement.priority == 'high';
-    final statusColor = announcement.isPublished
-        ? DesignTokens.success
-        : DesignTokens.muted;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.md),
-      child: PremiumCard(
-        elevation: 2,
-        borderRadius: DesignTokens.radiusXl,
-        child: InkWell(
-          borderRadius: DesignTokens.radiusXl,
-          child: Padding(
-            padding: const EdgeInsets.all(DesignTokens.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    PremiumChip(
-                      label: announcement.statusLabel,
-                      color: statusColor,
-                      size: ChipSize.sm,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE5EFE7),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    announcement.statusLabel,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF196142),
                     ),
-                    if (isHigh) ...[
-                      const SizedBox(width: DesignTokens.sm),
-                      PremiumChip(
-                        label: 'HIGH PRIORITY',
-                        color: DesignTokens.error,
-                        size: ChipSize.sm,
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: DesignTokens.md),
-                Text(
-                  announcement.title,
-                  style: DesignTokens.title.copyWith(
-                    fontSize: 17,
-                    color: DesignTokens.ink,
                   ),
                 ),
-                const SizedBox(height: DesignTokens.sm),
-                Text(
-                  announcement.body,
-                  style: DesignTokens.body.copyWith(
-                    fontSize: 13,
-                    color: DesignTokens.muted,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: DesignTokens.lg),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_rounded,
-                      size: 14,
-                      color: DesignTokens.muted,
+                if (announcement.priority == 'high') ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    const SizedBox(width: DesignTokens.xs / 2),
-                    Text(
-                      '${announcement.publishAt.month}/${announcement.publishAt.day}/${announcement.publishAt.year}',
-                      style: DesignTokens.caption.copyWith(
-                        color: DesignTokens.muted,
-                        fontSize: 11,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFCECE9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'HIGH',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFB63D34),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ],
             ),
-          ),
+            const SizedBox(height: 10),
+            Text(
+              announcement.title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF17231C),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              announcement.body,
+              style: const TextStyle(
+                fontSize: 14,
+                height: 1.5,
+                color: Color(0xFF68766D),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '${announcement.publishAt.month}/${announcement.publishAt.day}/${announcement.publishAt.year}',
+              style: const TextStyle(fontSize: 11, color: Color(0xFF748078)),
+            ),
+          ],
         ),
       ),
     );

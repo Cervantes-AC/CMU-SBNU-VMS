@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/incident.dart';
 import '../view_models/incidents_view_model.dart';
 
-/// Incidents page — premium, fully functional.
+/// Incidents page - submit and review incident reports.
 class IncidentsPage extends StatefulWidget {
   const IncidentsPage({super.key});
 
@@ -16,279 +16,125 @@ class IncidentsPage extends StatefulWidget {
 class _IncidentsPageState extends State<IncidentsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _PageHeader()),
-          Consumer<IncidentsViewModel>(
-            builder: (context, viewModel, _) {
-              return SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: DesignTokens.lg),
-                    AppStateWrapper(
-                      status: viewModel.status,
-                      onRetry: viewModel.init,
-                      errorMessage: viewModel.error?.message,
-                      child: viewModel.myIncidents.isEmpty
-                          ? const PremiumEmptyState(
-                              icon: Icons.report_outlined,
-                              title: 'No incident reports.',
-                              subtitle:
-                                  'Submit a report if you observe a safety concern.',
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.all(DesignTokens.lg),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: viewModel.myIncidents.length,
-                                itemBuilder: (context, index) {
-                                  final inc = viewModel.myIncidents[index];
-                                  return _IncidentCard(
-                                    incident: inc,
-                                    onTap: () => viewModel.select(inc),
-                                  );
-                                },
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: DesignTokens.xxl),
-                  ],
-                ),
-              );
-            },
+    return Consumer<IncidentsViewModel>(
+      builder: (context, viewModel, _) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Incidents & Safety')),
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: viewModel.myIncidents.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.report_outlined,
+                    title: 'No incident reports.',
+                    subtitle:
+                        'Submit a report if you observe a safety concern.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: viewModel.myIncidents.length,
+                    itemBuilder: (context, index) {
+                      final inc = viewModel.myIncidents[index];
+                      return _IncidentCard(
+                        incident: inc,
+                        onTap: () => viewModel.select(inc),
+                      );
+                    },
+                  ),
           ),
-        ],
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.all(DesignTokens.lg),
-        child: PremiumButton(
-          label: 'Report Incident',
-          onPressed: () => _showSubmitDialog(context),
-          icon: Icons.add_circle_rounded,
-          isFullWidth: false,
-          variant: ButtonVariant.destructive,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showSubmitDialog(context, viewModel),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 
-  void _showSubmitDialog(BuildContext context) {
+  void _showSubmitDialog(BuildContext context, IncidentsViewModel viewModel) {
     final categoryController = TextEditingController();
     final narrativeController = TextEditingController();
     String severity = 'medium';
     bool shareLocation = false;
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: PremiumCard(
-          elevation: 3,
-          borderRadius: DesignTokens.radiusXl,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(DesignTokens.lg),
-                  child: Text('Report Incident', style: DesignTokens.headline),
-                ),
-                PremiumDivider(),
-                Padding(
-                  padding: const EdgeInsets.all(DesignTokens.lg),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PremiumInputField(
-                        controller: categoryController,
-                        label: 'Category',
-                        hint: 'e.g. Safety, Facility',
-                        icon: Icons.category_rounded,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      PremiumInputField(
-                        controller: narrativeController,
-                        label: 'What happened?',
-                        hint: 'Describe the incident',
-                        maxLines: 4,
-                        icon: Icons.description_rounded,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      DropdownButtonFormField<String>(
-                        initialValue: severity,
-                        decoration: InputDecoration(
-                          labelText: 'Severity',
-                          labelStyle: DesignTokens.captionBold.copyWith(
-                            color: DesignTokens.muted,
-                            fontSize: 12,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                            borderRadius: DesignTokens.radiusLg,
-                            borderSide: BorderSide(color: DesignTokens.line),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: DesignTokens.radiusLg,
-                            borderSide: BorderSide(color: DesignTokens.line),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: DesignTokens.radiusLg,
-                            borderSide: const BorderSide(
-                              color: DesignTokens.forest,
-                              width: 1.5,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 16,
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(value: 'low', child: Text('Low')),
-                          DropdownMenuItem(
-                            value: 'medium',
-                            child: Text('Medium'),
-                          ),
-                          DropdownMenuItem(value: 'high', child: Text('High')),
-                          DropdownMenuItem(
-                            value: 'critical',
-                            child: Text('Critical'),
-                          ),
-                        ],
-                        onChanged: (v) => severity = v ?? 'medium',
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      Container(
-                        padding: const EdgeInsets.all(DesignTokens.md),
-                        decoration: BoxDecoration(
-                          color: DesignTokens.canvas,
-                          borderRadius: DesignTokens.radiusLg,
-                        ),
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              value: shareLocation,
-                              onChanged: (v) => shareLocation = v ?? false,
-                              activeColor: DesignTokens.forest,
-                            ),
-                            const SizedBox(width: DesignTokens.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Share location',
-                                    style: DesignTokens.title.copyWith(
-                                      fontSize: 13,
-                                      color: DesignTokens.ink,
-                                    ),
-                                  ),
-                                  const SizedBox(height: DesignTokens.xs / 2),
-                                  Text(
-                                    'Optional - location helps responders',
-                                    style: DesignTokens.caption.copyWith(
-                                      color: DesignTokens.muted,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.xl),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Cancel',
-                              onPressed: () => Navigator.of(context).pop(),
-                              variant: ButtonVariant.outline,
-                              isFullWidth: true,
-                            ),
-                          ),
-                          const SizedBox(width: DesignTokens.md),
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Submit Report',
-                              onPressed: () {
-                                if (categoryController.text.isEmpty ||
-                                    narrativeController.text.isEmpty) {
-                                  return;
-                                }
-                                Navigator.of(context).pop();
-                                context.read<IncidentsViewModel>().submitIncident(
-                                  Incident(
-                                    id: 'inc_${DateTime.now().millisecondsSinceEpoch}',
-                                    reporterUid: 'current_user',
-                                    organizationId: 'org_001',
-                                    category: categoryController.text.trim(),
-                                    narrative: narrativeController.text.trim(),
-                                    severity: IncidentSeverity.values
-                                        .firstWhere(
-                                          (e) => e.name == severity,
-                                          orElse: () => IncidentSeverity.medium,
-                                        ),
-                                    status: IncidentStatus.submitted,
-                                    occurredAt: DateTime.now(),
-                                    reportedAt: DateTime.now(),
-                                    locationShared: shareLocation,
-                                  ),
-                                );
-                              },
-                              variant: ButtonVariant.destructive,
-                              isFullWidth: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+      builder: (context) => AlertDialog(
+        title: const Text('Report Incident'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppInputField(
+              controller: categoryController,
+              label: 'Category',
+              hint: 'e.g. Safety, Facility',
+              icon: Icons.category_outlined,
+            ),
+            const SizedBox(height: 12),
+            AppInputField(
+              controller: narrativeController,
+              label: 'What happened?',
+              hint: 'Describe the incident',
+              maxLines: 4,
+              icon: Icons.description_outlined,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: severity,
+              decoration: const InputDecoration(
+                labelText: 'Severity',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'low', child: Text('Low')),
+                DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                DropdownMenuItem(value: 'high', child: Text('High')),
+                DropdownMenuItem(value: 'critical', child: Text('Critical')),
               ],
+              onChanged: (v) => severity = v ?? 'medium',
             ),
-          ),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: Checkbox(
+                value: shareLocation,
+                onChanged: (v) => shareLocation = v ?? false,
+              ),
+              title: const Text('Share location'),
+              subtitle: const Text('Optional - location helps responders'),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class _PageHeader extends StatelessWidget {
-  const _PageHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        DesignTokens.xl,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Incidents & Safety',
-            style: DesignTokens.displayLarge.copyWith(
-              fontSize: 36,
-              color: DesignTokens.ink,
-            ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
           ),
-          const SizedBox(height: DesignTokens.sm),
-          Text(
-            'Report and track safety concerns across campus.',
-            style: DesignTokens.body.copyWith(
-              fontSize: 15,
-              color: DesignTokens.muted,
-            ),
+          AppButton(
+            label: 'Submit',
+            onPressed: () {
+              if (categoryController.text.isEmpty ||
+                  narrativeController.text.isEmpty) {
+                return;
+              }
+              Navigator.of(context).pop();
+              viewModel.submitIncident(
+                Incident(
+                  id: 'inc_${DateTime.now().millisecondsSinceEpoch}',
+                  reporterUid: 'current_user',
+                  organizationId: 'org_001',
+                  category: categoryController.text.trim(),
+                  narrative: narrativeController.text.trim(),
+                  severity: IncidentSeverity.values.firstWhere(
+                    (e) => e.name == severity,
+                    orElse: () => IncidentSeverity.medium,
+                  ),
+                  status: IncidentStatus.submitted,
+                  occurredAt: DateTime.now(),
+                  reportedAt: DateTime.now(),
+                  locationShared: shareLocation,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -305,109 +151,98 @@ class _IncidentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (incident.severity) {
-      IncidentSeverity.critical => DesignTokens.error,
-      IncidentSeverity.high => DesignTokens.gold,
-      IncidentSeverity.medium => DesignTokens.warning,
-      IncidentSeverity.low => DesignTokens.info,
+      IncidentSeverity.critical => const Color(0xFFB63D34),
+      IncidentSeverity.high => const Color(0xFFD58A2F),
+      IncidentSeverity.medium => const Color(0xFFD5A52F),
+      IncidentSeverity.low => const Color(0xFF4C735E),
     };
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.md),
-      child: PremiumCard(
-        elevation: 2,
-        borderRadius: DesignTokens.radiusXl,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: DesignTokens.radiusXl,
-          child: Padding(
-            padding: const EdgeInsets.all(DesignTokens.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 10,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 4,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(2),
+                    Text(
+                      incident.category,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF17231C),
                       ),
                     ),
-                    const SizedBox(width: DesignTokens.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            incident.category,
-                            style: DesignTokens.title.copyWith(
-                              fontSize: 16,
-                              color: DesignTokens.ink,
-                            ),
-                          ),
-                          const SizedBox(height: DesignTokens.sm),
-                          Text(
-                            incident.narrative,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: DesignTokens.body.copyWith(
-                              fontSize: 13,
-                              color: DesignTokens.muted,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 4),
+                    Text(
+                      incident.narrative,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF68766D),
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            incident.severityLabel,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5EFE7),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            incident.statusLabel,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF196142),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: DesignTokens.lg),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        incident.severityLabel,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: color,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: DesignTokens.md),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: DesignTokens.canvas,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        incident.statusLabel,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: DesignTokens.success,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
+            ],
           ),
         ),
       ),

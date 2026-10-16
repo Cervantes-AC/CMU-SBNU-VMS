@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/volunteer.dart';
 import '../view_models/volunteers_view_model.dart';
 
-/// Volunteers page — premium, fully functional.
+/// Volunteers page - roster and profiles.
 class VolunteersPage extends StatefulWidget {
   const VolunteersPage({super.key});
 
@@ -16,200 +16,49 @@ class VolunteersPage extends StatefulWidget {
 class _VolunteersPageState extends State<VolunteersPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _PageHeader()),
-          Consumer<VolunteersViewModel>(
-            builder: (context, viewModel, _) {
-              final colleges = viewModel.colleges;
-              final filtered = viewModel.filteredVolunteers;
+    return Consumer<VolunteersViewModel>(
+      builder: (context, viewModel, _) {
+        final colleges = viewModel.colleges;
+        final filtered = viewModel.filteredVolunteers;
 
-              return SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    _FilterBar(
-                      colleges: colleges,
-                      currentFilter: viewModel.collegeFilter,
-                      onChanged: viewModel.setCollegeFilter,
-                    ),
-                    const SizedBox(height: DesignTokens.lg),
-                    AppStateWrapper(
-                      status: viewModel.status,
-                      onRetry: viewModel.init,
-                      errorMessage: viewModel.error?.message,
-                      child: filtered.isEmpty
-                          ? const PremiumEmptyState(
-                              icon: Icons.people_outline_rounded,
-                              title: 'No volunteers found.',
-                              subtitle:
-                                  'Try adjusting your filter or check back later.',
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.all(DesignTokens.lg),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: filtered.length,
-                                itemBuilder: (context, index) {
-                                  final v = filtered[index];
-                                  return _VolunteerCard(
-                                    profile: v,
-                                    onTap: () => viewModel.select(v),
-                                  );
-                                },
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PageHeader extends StatelessWidget {
-  const _PageHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        DesignTokens.xl,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Volunteers',
-            style: DesignTokens.displayLarge.copyWith(
-              fontSize: 36,
-              color: DesignTokens.ink,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.sm),
-          Text(
-            'Explore the volunteer roster across CMU colleges.',
-            style: DesignTokens.body.copyWith(
-              fontSize: 15,
-              color: DesignTokens.muted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterBar extends StatelessWidget {
-  const _FilterBar({
-    required this.colleges,
-    required this.currentFilter,
-    required this.onChanged,
-  });
-
-  final List<String> colleges;
-  final String currentFilter;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        0,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Filter by college',
-                style: DesignTokens.captionBold.copyWith(
-                  color: DesignTokens.muted,
-                  fontSize: 12,
-                ),
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Volunteers'),
+            actions: [
+              DropdownButton<String>(
+                value: viewModel.collegeFilter,
+                items: colleges
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) viewModel.setCollegeFilter(value);
+                },
               ),
             ],
           ),
-          const SizedBox(height: DesignTokens.sm),
-          SizedBox(
-            height: 44,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _FilterChip(
-                  label: 'All',
-                  isSelected: currentFilter == 'All',
-                  onTap: () => onChanged('All'),
-                ),
-                const SizedBox(width: DesignTokens.sm),
-                for (final college in colleges)
-                  _FilterChip(
-                    label: college,
-                    isSelected: currentFilter == college,
-                    onTap: () => onChanged(college),
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: filtered.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.groups_outlined,
+                    title: 'No volunteers found.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final v = filtered[index];
+                      return _VolunteerCard(
+                        profile: v,
+                        onTap: () => viewModel.select(v),
+                      );
+                    },
                   ),
-              ],
-            ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? DesignTokens.forest : Colors.white,
-          borderRadius: DesignTokens.radiusXl,
-          border: Border.all(
-            color: isSelected ? DesignTokens.forest : DesignTokens.line,
-            width: 1.5,
-          ),
-          boxShadow: isSelected
-              ? DesignTokens.shadowSoft(
-                  color: DesignTokens.forest.withValues(alpha: 0.2),
-                  blur: 12,
-                  offset: const Offset(0, 4),
-                )
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : DesignTokens.muted,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -222,117 +71,83 @@ class _VolunteerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isActive = profile.isActive;
-    final statusColor = isActive ? DesignTokens.success : DesignTokens.error;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.md),
-      child: PremiumCard(
-        elevation: 2,
-        borderRadius: DesignTokens.radiusXl,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: DesignTokens.radiusXl,
-          child: Padding(
-            padding: const EdgeInsets.all(DesignTokens.lg),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: DesignTokens.canvas,
-                    borderRadius: DesignTokens.radiusXl,
-                    boxShadow: DesignTokens.shadowSoft(
-                      blur: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      profile.fullName.isNotEmpty
-                          ? profile.fullName.substring(0, 1).toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        fontSize: 18,
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5EFE7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.person_outlined,
+                  color: Color(0xFF134F35),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.fullName,
+                      style: const TextStyle(
+                        fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: DesignTokens.forest,
+                        color: Color(0xFF17231C),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: DesignTokens.lg),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profile.fullName,
-                        style: DesignTokens.title.copyWith(
-                          fontSize: 16,
-                          color: DesignTokens.ink,
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      profile.email,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF68766D),
                       ),
-                      const SizedBox(height: DesignTokens.xs / 2),
-                      Text(
-                        profile.email,
-                        style: DesignTokens.bodySmall.copyWith(
-                          color: DesignTokens.muted,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.sm),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              profile.status.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                                color: statusColor,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: DesignTokens.md),
-                          Text(
-                            '${profile.college ?? '-'} · ${profile.course ?? '-'}',
-                            style: DesignTokens.caption.copyWith(
-                              color: DesignTokens.muted,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: DesignTokens.card3D(
-                    color: DesignTokens.canvas,
-                    shadowLevel: 1,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.chevron_right_rounded,
-                      color: DesignTokens.muted,
-                      size: 20,
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${profile.college ?? '-'} · ${profile.course ?? '-'}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF748078),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: profile.isActive
+                            ? const Color(0xFFE5EFE7)
+                            : const Color(0xFFF5E5E5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        profile.status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: profile.isActive
+                              ? const Color(0xFF196142)
+                              : const Color(0xFFB63D34),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
+            ],
           ),
         ),
       ),

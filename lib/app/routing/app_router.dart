@@ -4,7 +4,6 @@ import '../../features/activities/presentation/pages/activities_page.dart';
 import '../../features/announcements/presentation/pages/announcements_page.dart';
 import '../../features/attendance/presentation/pages/attendance_page.dart';
 import '../../features/auth/presentation/pages/password_recovery_page.dart';
-
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/emergency/presentation/pages/emergency_page.dart';

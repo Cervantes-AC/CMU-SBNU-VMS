@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/activity.dart';
 import '../view_models/activities_view_model.dart';
 
-/// Activities page — premium, fully functional.
+/// Activities page - browse and manage activities.
 class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({super.key});
 
@@ -13,171 +13,61 @@ class ActivitiesPage extends StatefulWidget {
   State<ActivitiesPage> createState() => _ActivitiesPageState();
 }
 
-class _ActivitiesPageState extends State<ActivitiesPage>
-    with TickerProviderStateMixin {
-  final String _filter = 'All';
-
+class _ActivitiesPageState extends State<ActivitiesPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _PageHeader()),
-          SliverToBoxAdapter(child: _FilterBar()),
-          Consumer<ActivitiesViewModel>(
-            builder: (context, viewModel, _) {
-              final activities = viewModel.publishedActivities;
-              final filtered = _filter == 'All'
-                  ? activities
-                  : activities.where((a) => a.statusLabel == _filter).toList();
+    return Consumer<ActivitiesViewModel>(
+      builder: (context, viewModel, _) {
+        final activities = viewModel.publishedActivities;
 
-              return SliverToBoxAdapter(
-                child: AppStateWrapper(
-                  status: viewModel.status,
-                  onRetry: viewModel.init,
-                  errorMessage: viewModel.error?.message,
-                  child: filtered.isEmpty
-                      ? const PremiumEmptyState(
-                          icon: Icons.event_busy_rounded,
-                          title: 'No activities available.',
-                          subtitle:
-                              'Check back later for new service opportunities.',
-                          actionLabel: 'Explore all programs',
-                          action: PremiumCard(child: Text('Placeholder')),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(DesignTokens.lg),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: filtered.length,
-                          itemBuilder: (context, index) {
-                            final activity = filtered[index];
-                            return _ActivityCard(
-                              activity: activity,
-                              onTap: () => viewModel.selectActivity(activity),
-                              onJoin: () => viewModel.joinActivity(
-                                activity.id,
-                                'current_user',
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              );
-            },
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Activities'),
+            actions: [
+              IconButton(
+                tooltip: 'Create activity',
+                onPressed: () => _showCreateDialog(context, viewModel),
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.all(DesignTokens.lg),
-        child: PremiumButton(
-          label: 'Create Activity',
-          onPressed: () => _showCreateDialog(context),
-          icon: Icons.add_circle_rounded,
-          isFullWidth: false,
-          variant: ButtonVariant.primary,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: activities.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.event_outlined,
+                    title: 'No activities available.',
+                    subtitle: 'Check back later for new service opportunities.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: activities.length,
+                    itemBuilder: (context, index) {
+                      final activity = activities[index];
+                      return _ActivityCard(
+                        activity: activity,
+                        onTap: () => viewModel.selectActivity(activity),
+                        onJoin: () =>
+                            viewModel.joinActivity(activity.id, 'current_user'),
+                      );
+                    },
+                  ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showCreateDialog(context, viewModel),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 
-  void _showCreateDialog(BuildContext context) {
+  void _showCreateDialog(BuildContext context, ActivitiesViewModel viewModel) {
     showDialog(
       context: context,
       builder: (context) => const _CreateActivityDialog(),
-    );
-  }
-}
-
-class _PageHeader extends StatelessWidget {
-  const _PageHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        DesignTokens.xl,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Activities',
-            style: DesignTokens.displayLarge.copyWith(
-              fontSize: 36,
-              color: DesignTokens.ink,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.sm),
-          Text(
-            'Discover and join service opportunities across CMU.',
-            style: DesignTokens.body.copyWith(
-              fontSize: 15,
-              color: DesignTokens.muted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterBar extends StatelessWidget {
-  const _FilterBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        0,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: DesignTokens.radiusXl,
-                border: Border.all(color: DesignTokens.line, width: 1),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: DesignTokens.md),
-                  const Icon(
-                    Icons.tune_rounded,
-                    size: 20,
-                    color: DesignTokens.muted,
-                  ),
-                  const SizedBox(width: DesignTokens.sm),
-                  Expanded(
-                    child: Text(
-                      'Filter by status',
-                      style: DesignTokens.body.copyWith(
-                        fontSize: 14,
-                        color: DesignTokens.muted,
-                      ),
-                    ),
-                  ),
-                  const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 20,
-                    color: DesignTokens.muted,
-                  ),
-                  const SizedBox(width: DesignTokens.md),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -195,160 +85,78 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = switch (activity.status) {
-      ActivityStatus.published => DesignTokens.success,
-      ActivityStatus.ongoing => DesignTokens.gold,
-      ActivityStatus.completed => DesignTokens.muted,
-      ActivityStatus.cancelled => DesignTokens.error,
-      ActivityStatus.draft => DesignTokens.muted,
-    };
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.md),
-      child: PremiumCard(
-        elevation: 2,
-        borderRadius: DesignTokens.radiusXl,
-        padding: EdgeInsets.zero,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: DesignTokens.radiusXl,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              // Hero image area
               Container(
-                height: 160,
-                width: double.infinity,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: DesignTokens.canvas,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
+                  color: const Color(0xFFE5EFE7),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.event_rounded,
-                    size: 48,
-                    color: statusColor,
-                  ),
+                child: const Icon(
+                  Icons.event_outlined,
+                  color: Color(0xFF134F35),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(DesignTokens.lg),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            activity.title,
-                            style: DesignTokens.title.copyWith(
-                              fontSize: 17,
-                              color: DesignTokens.ink,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        PremiumChip(
-                          label: activity.statusLabel,
-                          color: statusColor,
-                          size: ChipSize.sm,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: DesignTokens.sm),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: DesignTokens.canvas,
-                            borderRadius: DesignTokens.radiusMd,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.access_time_rounded,
-                                size: 14,
-                                color: DesignTokens.muted,
-                              ),
-                              const SizedBox(width: DesignTokens.xs / 2),
-                              Text(
-                                activity.scheduleLabel,
-                                style: DesignTokens.captionBold.copyWith(
-                                  fontSize: 11,
-                                  color: DesignTokens.muted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: DesignTokens.md),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: DesignTokens.canvas,
-                            borderRadius: DesignTokens.radiusMd,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.location_on_rounded,
-                                size: 14,
-                                color: DesignTokens.muted,
-                              ),
-                              const SizedBox(width: DesignTokens.xs / 2),
-                              Text(
-                                activity.venue,
-                                style: DesignTokens.captionBold.copyWith(
-                                  fontSize: 11,
-                                  color: DesignTokens.muted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: DesignTokens.md),
                     Text(
-                      activity.description,
-                      style: DesignTokens.body.copyWith(
-                        fontSize: 13,
-                        color: DesignTokens.muted,
-                        height: 1.5,
+                      activity.title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF17231C),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: DesignTokens.lg),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: PremiumButton(
-                            label: 'Join Activity',
-                            onPressed: onJoin,
-                            variant: ButtonVariant.primary,
-                            isFullWidth: true,
-                            icon: Icons.person_add_rounded,
-                          ),
+                    const SizedBox(height: 6),
+                    Text(
+                      activity.scheduleLabel,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF68766D),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      activity.venue,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF68766D),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE5EFE7),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        activity.statusLabel,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF196142),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
+              AppButton(label: 'Join', onPressed: onJoin, isOutlined: true),
             ],
           ),
         ),
@@ -380,92 +188,61 @@ class _CreateActivityDialogState extends State<_CreateActivityDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: PremiumCard(
-        elevation: 3,
-        borderRadius: DesignTokens.radiusXl,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
+    return AlertDialog(
+      title: const Text('Create Activity'),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(DesignTokens.lg),
-                child: Text('Create Activity', style: DesignTokens.headline),
+              AppInputField(
+                controller: _titleController,
+                label: 'Title',
+                hint: 'e.g. Community Tree Planting',
+                icon: Icons.event_outlined,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Title is required'
+                    : null,
               ),
-              PremiumDivider(),
-              Padding(
-                padding: const EdgeInsets.all(DesignTokens.lg),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PremiumInputField(
-                        controller: _titleController,
-                        label: 'Title',
-                        hint: 'e.g. Community Tree Planting',
-                        icon: Icons.title_rounded,
-                        validator: (value) => (value == null || value.isEmpty)
-                            ? 'Title is required'
-                            : null,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      PremiumInputField(
-                        controller: _descriptionController,
-                        label: 'Description',
-                        hint: 'Describe the activity',
-                        icon: Icons.description_rounded,
-                        maxLines: 3,
-                        validator: (value) => (value == null || value.isEmpty)
-                            ? 'Description is required'
-                            : null,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      PremiumInputField(
-                        controller: _venueController,
-                        label: 'Venue',
-                        hint: 'e.g. Botanical Garden',
-                        icon: Icons.location_on_rounded,
-                        validator: (value) => (value == null || value.isEmpty)
-                            ? 'Venue is required'
-                            : null,
-                      ),
-                      const SizedBox(height: DesignTokens.xl),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Cancel',
-                              onPressed: () => Navigator.of(context).pop(),
-                              variant: ButtonVariant.outline,
-                              isFullWidth: true,
-                            ),
-                          ),
-                          const SizedBox(width: DesignTokens.md),
-                          Expanded(
-                            child: PremiumButton(
-                              label: 'Create',
-                              onPressed: () {
-                                if (!_formKey.currentState!.validate()) return;
-                                Navigator.of(context).pop();
-                              },
-                              variant: ButtonVariant.primary,
-                              isFullWidth: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+              const SizedBox(height: 12),
+              AppInputField(
+                controller: _descriptionController,
+                label: 'Description',
+                hint: 'Describe the activity',
+                icon: Icons.description_outlined,
+                maxLines: 3,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Description is required'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              AppInputField(
+                controller: _venueController,
+                label: 'Venue',
+                hint: 'e.g. Botanical Garden',
+                icon: Icons.location_on_outlined,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Venue is required'
+                    : null,
               ),
             ],
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        AppButton(
+          label: 'Create',
+          onPressed: () {
+            if (!_formKey.currentState!.validate()) return;
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }

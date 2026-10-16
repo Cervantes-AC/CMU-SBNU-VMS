@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/hotline_entry.dart';
 import '../view_models/hotlines_view_model.dart';
 
-/// Hotlines page — premium, fully functional.
+/// Hotlines page - verified emergency contacts with call handoff.
 class HotlinesPage extends StatefulWidget {
   const HotlinesPage({super.key});
 
@@ -17,12 +17,15 @@ class HotlinesPage extends StatefulWidget {
 class _HotlinesPageState extends State<HotlinesPage> {
   Future<void> _callNumber(String phone) async {
     final url = 'tel:$phone';
-    if (await canLaunchUrl(Uri.parse(url))) {
+    final canCall = await canLaunchUrl(Uri.parse(url));
+    if (!mounted) return;
+
+    if (canCall) {
       await launchUrl(Uri.parse(url));
-    } else if (mounted) {
-      showPremiumSnackbar(
+    } else {
+      showAppSnackbar(
         context,
-        message: 'Cannot initiate call on this device.',
+        'Cannot initiate call on this device.',
         isError: true,
       );
     }
@@ -30,122 +33,35 @@ class _HotlinesPageState extends State<HotlinesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _PageHeader()),
-          Consumer<HotlinesViewModel>(
-            builder: (context, viewModel, _) {
-              final verified = viewModel.verified;
-              final unverified = viewModel.hotlines
-                  .where((h) => !h.isVerified)
-                  .toList();
-
-              return SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: DesignTokens.lg),
-                    if (verified.isNotEmpty) ...[
-                      PremiumSectionHeading(
-                        title: 'Verified Emergency Contacts',
-                        subtitle: '${verified.length} verified number(s)',
-                        accentColor: DesignTokens.success,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      ...verified.map(
-                        (h) => Container(
-                          margin: const EdgeInsets.only(
-                            bottom: DesignTokens.md,
-                          ),
-                          child: _HotlineCard(
-                            entry: h,
-                            onCall: h.isCallEnabled
-                                ? () => _callNumber(h.phoneE164)
-                                : null,
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (unverified.isNotEmpty) ...[
-                      const SizedBox(height: DesignTokens.lg),
-                      PremiumSectionHeading(
-                        title: 'Unverified / Expired Contacts',
-                        subtitle: '${unverified.length} number(s) not callable',
-                        accentColor: DesignTokens.muted,
-                      ),
-                      const SizedBox(height: DesignTokens.lg),
-                      ...unverified.map(
-                        (h) => Container(
-                          margin: const EdgeInsets.only(
-                            bottom: DesignTokens.md,
-                          ),
-                          child: _HotlineCard(entry: h, onCall: null),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: DesignTokens.xxl),
-                  ],
-                ),
-              );
-            },
+    return Consumer<HotlinesViewModel>(
+      builder: (context, viewModel, _) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('Emergency Hotlines')),
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: viewModel.hotlines.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.phone_outlined,
+                    title: 'No hotlines available.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: viewModel.hotlines.length,
+                    itemBuilder: (context, index) {
+                      final h = viewModel.hotlines[index];
+                      return _HotlineCard(
+                        entry: h,
+                        onCall: h.isCallEnabled
+                            ? () => _callNumber(h.phoneE164)
+                            : null,
+                      );
+                    },
+                  ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PageHeader extends StatelessWidget {
-  const _PageHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        DesignTokens.lg,
-        DesignTokens.xl,
-        DesignTokens.lg,
-        DesignTokens.lg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: DesignTokens.error.withValues(alpha: 0.12),
-              borderRadius: DesignTokens.radiusLg,
-              boxShadow: DesignTokens.shadowSoft(
-                color: DesignTokens.error.withValues(alpha: 0.25),
-                blur: 16,
-                offset: const Offset(0, 4),
-              ),
-            ),
-            child: const Icon(
-              Icons.phone_rounded,
-              color: DesignTokens.error,
-              size: 26,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.md),
-          Text(
-            'Emergency Hotlines',
-            style: DesignTokens.displayLarge.copyWith(
-              fontSize: 36,
-              color: DesignTokens.ink,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.sm),
-          Text(
-            'Verified emergency contacts for the CMU community.',
-            style: DesignTokens.body.copyWith(
-              fontSize: 15,
-              color: DesignTokens.muted,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -158,123 +74,72 @@ class _HotlineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isVerified = entry.isVerified;
-    final color = entry.verificationColor;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: DesignTokens.md),
-      child: PremiumCard(
-        elevation: 2,
-        borderRadius: DesignTokens.radiusXl,
-        child: InkWell(
-          onTap: onCall,
-          borderRadius: DesignTokens.radiusXl,
-          child: Padding(
-            padding: const EdgeInsets.all(DesignTokens.lg),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: isVerified
-                        ? DesignTokens.success.withValues(alpha: 0.12)
-                        : DesignTokens.muted.withValues(alpha: 0.12),
-                    borderRadius: DesignTokens.radiusXl,
-                    boxShadow: DesignTokens.shadowSoft(
-                      color:
-                          (isVerified
-                                  ? DesignTokens.success
-                                  : DesignTokens.muted)
-                              .withValues(alpha: 0.2),
-                      blur: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ),
-                  child: Icon(
-                    isVerified
-                        ? Icons.phone_rounded
-                        : Icons.phone_disabled_rounded,
-                    color: color,
-                    size: 26,
-                  ),
-                ),
-                const SizedBox(width: DesignTokens.lg),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.label,
-                        style: DesignTokens.title.copyWith(
-                          fontSize: 16,
-                          color: DesignTokens.ink,
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.xs / 2),
-                      Text(
-                        entry.phoneE164,
-                        style: DesignTokens.body.copyWith(
-                          fontSize: 14,
-                          color: DesignTokens.muted,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: DesignTokens.sm),
-                      Text(
-                        '${entry.coverage} · ${entry.hours}',
-                        style: DesignTokens.caption.copyWith(
-                          color: DesignTokens.muted,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        entry.verificationLabel,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: color,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.md),
-                    if (onCall != null)
-                      PremiumButton(
-                        label: 'Call',
-                        onPressed: onCall,
-                        variant: ButtonVariant.outline,
-                        isFullWidth: false,
-                        icon: Icons.phone_rounded,
-                      )
-                    else
-                      const Text(
-                        'Not callable',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: DesignTokens.muted,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
+    return Card(
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: entry.isVerified
+              ? const Color(0xFFE5EFE7)
+              : const Color(0xFFF5E5E5),
+          child: Icon(
+            entry.isVerified ? Icons.phone : Icons.phone_disabled,
+            color: entry.verificationColor,
           ),
+        ),
+        title: Text(
+          entry.label,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF17231C),
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              entry.phoneE164,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF68766D)),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${entry.coverage} · ${entry.hours}',
+              style: const TextStyle(fontSize: 12, color: Color(0xFF748078)),
+            ),
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: entry.verificationColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                entry.verificationLabel,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  color: entry.verificationColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (onCall != null)
+              AppButton(
+                label: 'Call',
+                onPressed: onCall,
+                isOutlined: true,
+                icon: Icons.phone,
+              )
+            else
+              const Text(
+                'Not callable',
+                style: TextStyle(fontSize: 10, color: Color(0xFF748078)),
+              ),
+          ],
         ),
       ),
     );
