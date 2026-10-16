@@ -13,6 +13,7 @@
 - Activities use a feature-owned preview repository and ViewModel; the source can be replaced by an approved adapter without making the widget call Firestore.
 - Attendance roster status uses a feature-owned preview repository and ViewModel; QR session creation and server validation remain unavailable.
 - GoRouter handles the public landing and workspace routes.
+- Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
 - User-visible disclosure where records are synthetic or local-only and where a service action is not connected.
 
 ## Deliberately not connected

@@ -260,13 +260,21 @@ class _ActivityCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: OutlinedButton.icon(
-                onPressed: onJoin,
+                onPressed: activity.status == ActivityStatus.draft
+                    ? null
+                    : onJoin,
                 icon: Icon(
-                  activity.joinRequested ? Icons.check : Icons.arrow_forward,
+                  activity.status == ActivityStatus.draft
+                      ? Icons.edit_note_outlined
+                      : activity.joinRequested
+                      ? Icons.check
+                      : Icons.arrow_forward,
                   size: 16,
                 ),
                 label: Text(
-                  activity.joinRequested
+                  activity.status == ActivityStatus.draft
+                      ? 'Draft · not published'
+                      : activity.joinRequested
                       ? 'Join request in preview'
                       : 'Request to join',
                 ),

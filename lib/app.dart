@@ -6,6 +6,7 @@ import 'features/activities/data/activities_repository.dart';
 import 'features/activities/presentation/view_models/activities_view_model.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/attendance/presentation/view_models/attendance_view_model.dart';
+import 'features/auth/presentation/auth_page.dart';
 import 'features/landing/presentation/landing_page.dart';
 import 'features/overview/presentation/overview_page.dart';
 
@@ -15,6 +16,19 @@ class NSRCApp extends StatelessWidget {
   static final _router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (context, state) => const LandingPage()),
+      GoRoute(
+        path: '/account/sign-in',
+        builder: (context, state) => const AuthPage(mode: AuthPageMode.signIn),
+      ),
+      GoRoute(
+        path: '/account/register',
+        builder: (context, state) =>
+            const AuthPage(mode: AuthPageMode.register),
+      ),
+      GoRoute(
+        path: '/account/recover',
+        builder: (context, state) => const AuthPage(mode: AuthPageMode.recover),
+      ),
       GoRoute(
         path: '/workspace',
         builder: (context, state) => const OverviewPage(),

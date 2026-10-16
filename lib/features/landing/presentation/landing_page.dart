@@ -151,10 +151,29 @@ class _PreviewButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton.icon(
-      onPressed: () => context.go('/workspace'),
-      icon: const Icon(Icons.arrow_forward, size: 18),
-      label: const Text('Explore the volunteer workspace'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FilledButton.icon(
+          onPressed: () => context.go('/workspace'),
+          icon: const Icon(Icons.arrow_forward, size: 18),
+          label: const Text('Explore the volunteer workspace'),
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          children: [
+            TextButton.icon(
+              onPressed: () => context.go('/account/sign-in'),
+              icon: const Icon(Icons.login, size: 17),
+              label: const Text('Sign in'),
+            ),
+            TextButton(
+              onPressed: () => context.go('/account/register'),
+              child: const Text('Join the network'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
