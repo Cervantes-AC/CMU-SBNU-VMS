@@ -8,11 +8,11 @@
 - Application theme, SBNU logo, and public landing page following the `prototype/` palette and card styling.
 - Workspace navigation for Overview, Activities, Volunteers and Organizations, Attendance, Announcements, Emergency and Safety, Reports, and Access and Operations.
 - Responsive mobile-first layouts with an expandable navigation drawer on wider screens.
-- Synthetic sample content and local-only interactions for activity filters/drafts/details/join state, volunteer search, organization list, attendance status corrections with a session-only reason/actor/time history, audience-targeted announcement drafts, incident previews with occurrence time, and copying an illustrative CSV to the clipboard.
+- Synthetic sample content and local-only interactions for activity filters/drafts/details/join state, volunteer search, organization list, attendance status corrections with a session-only reason/actor/time history, audience-targeted announcement drafts with edit/archive/restore, incident previews with occurrence time, and copying an illustrative CSV to the clipboard.
 - Candidate-role and environment status reference screen, with no ability to grant roles or change account access.
 - Activities use a feature-owned preview repository and ViewModel; local drafts capture title, category, schedule, venue, description, and capacity, and sample records have a details view. The source can be replaced by an approved adapter without making the widget call Firestore.
 - Attendance uses a feature-owned preview repository and ViewModel; local status corrections require a reason and show a session-only history. QR session creation and server validation remain unavailable.
-- Announcement drafts capture title, message, and an example audience. Audience groups are proposed examples only; publishing and delivery are unavailable.
+- Announcement drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
 - GoRouter handles the public landing and workspace routes.
 - Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
 - Firebase Core initializes against the approved `cmu-sbnu-vms` project; app startup does not read or write project data.
