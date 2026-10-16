@@ -236,7 +236,7 @@ class ActivitiesPage extends StatelessWidget {
             onDetails: () => _showDetails(context, activity),
             onEditDraft: () => _createActivity(context, existing: activity),
             onDiscardDraft: () => _discardDraft(context, activity),
-            onJoin: () => viewModel.toggleJoinRequest(activity.id),
+            onJoin: () => _changeParticipation(context, viewModel, activity),
           ),
       ],
     ),
@@ -312,6 +312,52 @@ class ActivitiesPage extends StatelessWidget {
     if (confirmed == true && context.mounted) {
       context.read<ActivitiesViewModel>().discardDraft(activity.id);
     }
+  }
+
+  Future<void> _changeParticipation(
+    BuildContext context,
+    ActivitiesViewModel viewModel,
+    Activity activity,
+  ) async {
+    final withdrawing = activity.joinRequested;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          withdrawing ? 'Withdraw the local request?' : 'Request to join?',
+        ),
+        content: Text(
+          withdrawing
+              ? 'This removes the request from this preview session only.'
+              : 'This records a preview request on this device only. It is not sent to a coordinator and does not reserve a place.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              withdrawing ? 'Withdraw locally' : 'Mark request locally',
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    viewModel.toggleJoinRequest(activity.id);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            withdrawing
+                ? 'Local preview request withdrawn.'
+                : 'Local preview request added. No place was reserved.',
+          ),
+        ),
+      );
   }
 }
 
@@ -449,7 +495,7 @@ class _ActivityCard extends StatelessWidget {
                     activity.status == ActivityStatus.draft
                         ? Icons.edit_outlined
                         : activity.joinRequested
-                        ? Icons.check
+                        ? Icons.undo_outlined
                         : Icons.arrow_forward,
                     size: 16,
                   ),
@@ -457,7 +503,7 @@ class _ActivityCard extends StatelessWidget {
                     activity.status == ActivityStatus.draft
                         ? 'Edit local draft'
                         : activity.joinRequested
-                        ? 'Join request in preview'
+                        ? 'Withdraw request'
                         : 'Request to join',
                   ),
                 ),
