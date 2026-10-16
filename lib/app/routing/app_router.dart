@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/presentation/auth_page.dart';
-import '../../features/landing/presentation/landing_page.dart';
-import '../../features/overview/presentation/overview_page.dart';
+import 'package:cmu_sbnu_vms/features/auth/presentation/pages/auth_page.dart';
+import 'package:cmu_sbnu_vms/features/landing/presentation/pages/landing_page.dart';
+import 'package:cmu_sbnu_vms/features/overview/presentation/pages/overview_page.dart';
 
 final appRouter = GoRouter(
   routes: [

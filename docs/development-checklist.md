@@ -9,6 +9,7 @@
 - [ ] Read the relevant specification, `docs/architecture.md`, `docs/implementation-plan.md`, and prototype guidance before each feature change.
 - [ ] Keep the app compiling/analyzable after each slice; format Dart and record the exact verification run.
 - [x] Move app startup, routing, theme, and provider composition out of the app widget into `lib/app/`.
+- [x] Move current feature pages under `presentation/pages/` and reusable dialogs/panels under `presentation/widgets/`; remove tracked empty-folder placeholders.
 - [ ] Finish the staged migration in [`structure-redesign.md`](structure-redesign.md); remove obsolete/empty scaffold folders only after references are migrated.
 - [ ] Add environment-aware configuration for explicit local emulator and approved development backend use; fail visibly when required startup configuration is invalid.
 - [ ] Establish privacy-safe logging, shared typed failures, reusable loading/empty/error/offline states, and accessibility review for common components.

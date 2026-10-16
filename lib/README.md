@@ -12,13 +12,6 @@ lib/
 │   ├── dependencies/app_providers.dart
 │   ├── routing/app_router.dart
 │   └── theme/app_theme.dart
-├── core/
-│   ├── errors/
-│   ├── logging/
-│   ├── platform/                 # Shared low-level adapters, added when needed
-│   └── types/                    # Stable cross-feature primitives, if needed
-├── shared/
-│   └── presentation/             # Common forms, loading/error states, widgets
 └── features/
     ├── auth/                     # Identity and session
     ├── access_control/           # Account status, roles, scoped designations
@@ -31,16 +24,17 @@ lib/
     ├── sos/                      # Alert submission and responder workflow
     ├── hotlines/                 # Verified contacts and call handoff
     ├── reporting/                # Scoped analytics and export jobs
-    └── audit/                    # Restricted audit review
+    ├── audit/                    # Restricted audit review
+    ├── overview/                 # Dashboard composition
+    └── emergency/                # Safety section composition
 ```
 
-Create feature subfolders when real code needs them. A simple feature can use `presentation/` (pages, ViewModels, widgets) and `data/` (repository, external data sources, and DTOs when needed). Add `application/` or `domain/` only for complex lifecycle rules, reusable policy, or cross-repository orchestration. Likely candidates are attendance/QR, incidents, SOS, and access control. Avoid empty scaffolding and migrate in small compiling steps.
+Feature UI is organized under `presentation/pages/`, `presentation/view_models/`, and `presentation/widgets/`; keep a small feature limited to the folders it uses. Data models live under the owning feature's `data/models/`, with repository adapters in `data/`. Add `application/` or `domain/` only for complex lifecycle rules, reusable policy, or cross-repository orchestration. Likely candidates are attendance/QR, incidents, SOS, and access control. Avoid empty scaffolding and migrate in small compiling steps.
 
 ## Where shared code goes
 
 - `app/` wires the app and owns navigation, environment setup, theme, and dependency composition.
-- `core/` holds cross-cutting primitives and low-level platform adapters. Promote an adapter only when multiple features use it.
-- `shared/presentation/` holds reusable UI without business rules. Keep feature-specific screens/widgets in their feature.
+- Add `core/` for real cross-cutting primitives and low-level platform adapters, and `shared/presentation/` for real reusable UI without business rules. Neither is scaffolded until shared code exists.
 - Feature repositories own data and shared state, including the auth session. Feature sources own Firebase queries, callable contracts, and serialization.
 - Do not create a generic `FirebaseService` or `AppService`. Keep one-feature integrations local, such as QR scanning in attendance and phone handoff in hotlines.
 - Firestore Rules and trusted backend operations enforce access; route guards and UI visibility only guide navigation.
