@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
-import '../../data/sos_repository.dart';
 import '../../data/models/sos_alert.dart';
 import '../view_models/sos_view_model.dart';
 
@@ -58,7 +57,7 @@ class _SosPageState extends State<SosPage> {
     );
 
     final success = await viewModel.submitAlert(alert);
-    if (mounted) {
+    if (context.mounted) {
       if (success) {
         showPremiumSnackbar(
           context,

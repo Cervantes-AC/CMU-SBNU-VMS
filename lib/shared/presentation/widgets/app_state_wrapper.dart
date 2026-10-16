@@ -6,7 +6,6 @@ import 'app_empty_state.dart';
 import 'app_error_state.dart';
 import 'app_loading_state.dart';
 import 'app_offline_state.dart';
-import 'app_permission_denied_state.dart';
 
 /// Wraps content and shows loading, empty, error, offline, or permission-denied states.
 ///

@@ -1,5 +1,3 @@
-import 'package:equatable/equatable.dart';
-
 import '../errors/app_failure.dart';
 
 /// Stable cross-feature primitive types used across the app.

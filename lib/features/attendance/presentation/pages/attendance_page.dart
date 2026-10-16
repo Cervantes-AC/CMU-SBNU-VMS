@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
-import '../../data/attendance_repository.dart';
 import '../../data/models/attendance_record.dart';
 import '../view_models/attendance_view_model.dart';
 

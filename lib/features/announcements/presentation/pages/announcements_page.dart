@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
-import '../../data/announcements_repository.dart';
 import '../../data/models/announcement.dart';
 import '../view_models/announcements_view_model.dart';
 

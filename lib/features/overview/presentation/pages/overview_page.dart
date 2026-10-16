@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:cmu_sbnu_vms/features/activities/presentation/pages/activities_page.dart';
 import 'package:cmu_sbnu_vms/features/announcements/presentation/pages/announcements_page.dart';
@@ -8,7 +7,6 @@ import 'package:cmu_sbnu_vms/features/emergency/presentation/pages/emergency_pag
 import 'package:cmu_sbnu_vms/features/reporting/presentation/pages/reports_page.dart';
 import 'package:cmu_sbnu_vms/features/volunteers/presentation/pages/volunteers_page.dart';
 import 'package:cmu_sbnu_vms/features/access_control/presentation/pages/access_control_page.dart';
-import 'package:cmu_sbnu_vms/features/organizations/presentation/pages/organizations_page.dart';
 import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
 
 /// Overview dashboard — premium, fully functional.
