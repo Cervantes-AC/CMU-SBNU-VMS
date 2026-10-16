@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      IMPORTANT: Do NOT commit a Google Maps API key here or in any Dart file.
+      Add it securely at build time (e.g. via gradle manifest placeholders or
+      a local.properties-driven build step). See AGENTS.md security rules.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="cmu_sbnu_vms"
         android:name="${applicationName}"

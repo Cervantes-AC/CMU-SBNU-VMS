@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/attendance_record.dart';
 import '../view_models/attendance_view_model.dart';
+import '../widgets/attendance_qr_scanner.dart';
 
 /// Attendance page - record and correct attendance.
 class AttendancePage extends StatefulWidget {
@@ -38,9 +39,29 @@ class _AttendancePageState extends State<AttendancePage> {
                     },
                   ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _showRecordDialog(context, viewModel),
-            child: const Icon(Icons.add),
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () => _showRecordDialog(context, viewModel),
+                heroTag: 'record',
+                child: const Icon(Icons.add),
+              ),
+              const SizedBox(height: 12),
+              FloatingActionButton(
+                onPressed: () async {
+                  final code = await Navigator.of(context).push<String>(
+                    MaterialPageRoute(
+                      builder: (_) => const AttendanceQrScanner(),
+                    ),
+                  );
+                  if (!context.mounted || code == null || code.isEmpty) return;
+                  _showQrConfirmDialog(context, viewModel, code);
+                },
+                heroTag: 'qr',
+                child: const Icon(Icons.qr_code_scanner),
+              ),
+            ],
           ),
         );
       },
@@ -110,6 +131,110 @@ class _AttendancePageState extends State<AttendancePage> {
                       : AttendanceStatus.excused,
                   recordedBy: 'current_user',
                   recordedAt: DateTime.now(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQrConfirmDialog(
+    BuildContext context,
+    AttendanceViewModel viewModel,
+    String qrPayload,
+  ) {
+    final activityController = TextEditingController();
+    final uidController = TextEditingController();
+    String selectedStatus = 'present';
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm QR Attendance'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE5EFE7),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Scanned token: $qrPayload',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                  color: Color(0xFF134F35),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'A trusted server must validate this token before attendance '
+              'is accepted. Below is the local confirmation entry only.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF68766D),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            AppInputField(
+              controller: activityController,
+              label: 'Activity ID',
+              hint: 'e.g. act_001',
+              icon: Icons.event_outlined,
+            ),
+            const SizedBox(height: 12),
+            AppInputField(
+              controller: uidController,
+              label: 'Volunteer UID',
+              hint: 'e.g. vol_001',
+              icon: Icons.person_outlined,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: selectedStatus,
+              decoration: const InputDecoration(
+                labelText: 'Status',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'present', child: Text('Present')),
+                DropdownMenuItem(value: 'absent', child: Text('Absent')),
+                DropdownMenuItem(value: 'excused', child: Text('Excused')),
+              ],
+              onChanged: (v) => selectedStatus = v ?? 'present',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          AppButton(
+            label: 'Record Attendance',
+            onPressed: () {
+              if (activityController.text.isEmpty || uidController.text.isEmpty) {
+                return;
+              }
+              Navigator.of(context).pop();
+              viewModel.recordAttendance(
+                AttendanceRecord(
+                  activityId: activityController.text.trim(),
+                  uid: uidController.text.trim(),
+                  status: selectedStatus == 'present'
+                      ? AttendanceStatus.present
+                      : selectedStatus == 'absent'
+                      ? AttendanceStatus.absent
+                      : AttendanceStatus.excused,
+                  recordedBy: 'current_user',
+                  recordedAt: DateTime.now(),
+                  source: 'qr',
+                  qrPayload: qrPayload,
                 ),
               );
             },

@@ -150,13 +150,18 @@ class FirestoreSosRepository implements SosRepository {
       }
 
       final current = SosAlert.fromFirestore(doc);
-      await docRef.update({
+      final updateData = <String, dynamic>{
         'lifecycleStatus': lifecycleStatus.name,
-        if (deliveryState != null) 'deliveryState': deliveryState.name,
-        'assignedHandlerUid': ?assignedHandlerUid,
         'version': current.version + 1,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      };
+      if (deliveryState != null) {
+        updateData['deliveryState'] = deliveryState.name;
+      }
+      if (assignedHandlerUid != null) {
+        updateData['assignedHandlerUid'] = assignedHandlerUid;
+      }
+      await docRef.update(updateData);
 
       final updated = SosAlert.fromFirestore(await docRef.get());
       return AppResult.data(updated);

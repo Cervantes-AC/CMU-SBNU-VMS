@@ -10,6 +10,7 @@ class AttendanceRecord {
     required this.recordedBy,
     required this.recordedAt,
     this.source = 'manual',
+    this.qrPayload,
     this.correctionReason,
     this.correctedAt,
     this.correctedBy,
@@ -21,6 +22,7 @@ class AttendanceRecord {
   final String recordedBy;
   final DateTime recordedAt;
   final String source; // manual, qr
+  final String? qrPayload;
   final String? correctionReason;
   final DateTime? correctedAt;
   final String? correctedBy;
@@ -42,6 +44,7 @@ class AttendanceRecord {
       recordedBy: data['recordedBy'] as String? ?? '',
       recordedAt: _parseTimestamp(data['recordedAt']) ?? DateTime.now(),
       source: data['source'] as String? ?? 'manual',
+      qrPayload: data['qrPayload'] as String?,
       correctionReason: data['correctionReason'] as String?,
       correctedAt: _parseTimestamp(data['correctedAt']),
       correctedBy: data['correctedBy'] as String?,
@@ -56,6 +59,7 @@ class AttendanceRecord {
       'recordedBy': recordedBy,
       'recordedAt': recordedAt,
       'source': source,
+      if (qrPayload != null) 'qrPayload': qrPayload,
       if (correctionReason != null) 'correctionReason': correctionReason,
       if (correctedAt != null) 'correctedAt': correctedAt,
       if (correctedBy != null) 'correctedBy': correctedBy,

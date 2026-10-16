@@ -47,6 +47,8 @@
 ### Attendance (complete UI + preview repository)
 - Attendance record list (activity, UID, status, source)
 - Record attendance dialog (activity ID, volunteer UID, status)
+- QR code scan button using `mobile_scanner` — scan captures token; local confirmation entry only
+- `qrPayload` and `source: 'qr'` fields on `AttendanceRecord`
 - `AttendanceRepository` contract + preview + Firestore implementations
 - Personal attendance via collection-group query
 - Route: `/attendance`
@@ -61,6 +63,8 @@
 ### Incidents (complete UI + preview repository)
 - Incident submission (category, narrative, severity, optional location)
 - Incident list with status/severity badges
+- Incident map view (`google_maps_flutter`) showing `locationShared=true` incidents
+- Map markers show only category, severity, status — reporter identity and narrative are not on markers
 - Status transitions (submitted → under review → action in progress → resolved, etc.)
 - Append-only history events
 - `IncidentsRepository` contract + preview + Firestore implementations
@@ -68,6 +72,8 @@
 
 ### SOS (complete UI + preview repository, clearly labeled)
 - SOS alert creation with deliberate confirmation and emergency disclaimer
+- Responder queue tab showing all alerts with lifecycle/delivery badges
+- Responder actions: acknowledge, resolve
 - States: submitted, acknowledged, action in progress, resolved, cancelled, false alarm, closed
 - Delivery states: pending, sent, failed, unknown
 - Location sharing is optional
@@ -80,6 +86,7 @@
 - Verification states: verified, expired, rejected, disabled, pending
 - One-tap calling only for verified active entries (url_launcher)
 - Unverified/expired entries visibly non-callable
+- Admin verify/expire actions with confirmation dialogs
 - `HotlinesRepository` contract + preview + Firestore implementations
 - Route: `/hotlines`
 

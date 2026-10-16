@@ -31,6 +31,70 @@ class _HotlinesPageState extends State<HotlinesPage> {
     }
   }
 
+  Future<void> _verifyHotline(
+    BuildContext context,
+    HotlinesViewModel viewModel,
+    HotlineEntry entry,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Verify Hotline'),
+        content: Text(
+          'Mark "${entry.label}" as verified and active for one-tap calling? '
+          'Only institution-approved, current entries should be verified.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          AppButton(
+            label: 'Verify',
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      await viewModel.verifyHotline(entry.id, 'admin_current');
+      if (!context.mounted) return;
+      showAppSnackbar(context, 'Hotline verified.');
+    }
+  }
+
+  Future<void> _expireHotline(
+    BuildContext context,
+    HotlinesViewModel viewModel,
+    HotlineEntry entry,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Expire Hotline'),
+        content: Text(
+          'Mark "${entry.label}" as expired? Expired entries are not callable.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          AppButton(
+            label: 'Expire',
+            onPressed: () => Navigator.of(context).pop(true),
+            isDestructive: true,
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      await viewModel.expireHotline(entry.id);
+      if (!context.mounted) return;
+      showAppSnackbar(context, 'Hotline expired.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HotlinesViewModel>(
@@ -56,6 +120,12 @@ class _HotlinesPageState extends State<HotlinesPage> {
                         onCall: h.isCallEnabled
                             ? () => _callNumber(h.phoneE164)
                             : null,
+                        onVerify: h.verificationState != 'verified'
+                            ? () => _verifyHotline(context, viewModel, h)
+                            : null,
+                        onExpire: h.isCallEnabled
+                            ? () => _expireHotline(context, viewModel, h)
+                            : null,
                       );
                     },
                   ),
@@ -67,10 +137,17 @@ class _HotlinesPageState extends State<HotlinesPage> {
 }
 
 class _HotlineCard extends StatelessWidget {
-  const _HotlineCard({required this.entry, required this.onCall});
+  const _HotlineCard({
+    required this.entry,
+    this.onCall,
+    this.onVerify,
+    this.onExpire,
+  });
 
   final HotlineEntry entry;
   final VoidCallback? onCall;
+  final VoidCallback? onVerify;
+  final VoidCallback? onExpire;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +216,25 @@ class _HotlineCard extends StatelessWidget {
                 'Not callable',
                 style: TextStyle(fontSize: 10, color: Color(0xFF748078)),
               ),
+            if (onVerify != null) ...[
+              const SizedBox(height: 6),
+              AppButton(
+                label: 'Verify',
+                onPressed: onVerify,
+                isOutlined: true,
+                icon: Icons.verified,
+              ),
+            ],
+            if (onExpire != null) ...[
+              const SizedBox(height: 6),
+              AppButton(
+                label: 'Expire',
+                onPressed: onExpire,
+                isOutlined: true,
+                icon: Icons.event_busy,
+                isDestructive: true,
+              ),
+            ],
           ],
         ),
       ),

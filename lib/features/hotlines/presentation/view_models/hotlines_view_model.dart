@@ -54,6 +54,14 @@ class HotlinesViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> expireHotline(String id) async {
+    final result = await repository.expireHotline(id);
+    if (!result.success) {
+      _error = result.error;
+    }
+    notifyListeners();
+  }
 }
 
 HotlinesViewModel createHotlinesViewModel(HotlinesRepository repository) {

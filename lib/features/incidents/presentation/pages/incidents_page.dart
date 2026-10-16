@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/incident.dart';
 import '../view_models/incidents_view_model.dart';
+import 'incidents_map_page.dart';
 
 /// Incidents page - submit and review incident reports.
 class IncidentsPage extends StatefulWidget {
@@ -19,7 +20,18 @@ class _IncidentsPageState extends State<IncidentsPage> {
     return Consumer<IncidentsViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Incidents & Safety')),
+          appBar: AppBar(
+            title: const Text('Incidents & Safety'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.map),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const IncidentsMapPage()),
+                ),
+                tooltip: 'View incidents on map',
+              ),
+            ],
+          ),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,

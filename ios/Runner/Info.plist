@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location is optional and only used to show incidents on the map when you choose to share it.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location is optional and only used to show incidents on the map when you choose to share it.</string>
 </dict>
 </plist>
