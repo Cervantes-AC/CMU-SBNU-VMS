@@ -12,9 +12,9 @@ class ReportRecord {
   final String? unit;
 
   String get displayValue {
-    if (format == 'percent') return '${value}%';
-    if (format == 'hours') return '${value} hrs';
-    if (format == 'currency') return '₱${value}';
+    if (format == 'percent') return '$value%';
+    if (format == 'hours') return '$value hrs';
+    if (format == 'currency') return '₱$value';
     return value.toString();
   }
 }

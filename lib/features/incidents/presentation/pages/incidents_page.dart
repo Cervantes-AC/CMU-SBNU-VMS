@@ -119,7 +119,7 @@ class _IncidentsPageState extends State<IncidentsPage> {
                       ),
                       const SizedBox(height: DesignTokens.lg),
                       DropdownButtonFormField<String>(
-                        value: severity,
+                        initialValue: severity,
                         decoration: InputDecoration(
                           labelText: 'Severity',
                           labelStyle: DesignTokens.captionBold.copyWith(

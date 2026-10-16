@@ -16,11 +16,10 @@ class HotlinesPage extends StatefulWidget {
 
 class _HotlinesPageState extends State<HotlinesPage> {
   Future<void> _callNumber(String phone) async {
-    if (!context.mounted) return;
     final url = 'tel:$phone';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
-    } else if (context.mounted) {
+    } else if (mounted) {
       showPremiumSnackbar(
         context,
         message: 'Cannot initiate call on this device.',

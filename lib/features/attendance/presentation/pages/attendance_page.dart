@@ -102,7 +102,7 @@ class _AttendancePageState extends State<AttendancePage> {
                       const SizedBox(height: DesignTokens.lg),
                       // ignore: deprecated_member_use
                       DropdownButtonFormField<String>(
-                        value: selectedStatus,
+                        initialValue: selectedStatus,
                         decoration: InputDecoration(
                           labelText: 'Status',
                           labelStyle: DesignTokens.captionBold.copyWith(

@@ -319,7 +319,7 @@ class _NavDrawer extends StatelessWidget {
                       color: DesignTokens.ink,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'VOLUNTEER WORKSPACE',
                     style: TextStyle(
                       fontSize: 9.0,

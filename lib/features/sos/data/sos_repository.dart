@@ -153,8 +153,7 @@ class FirestoreSosRepository implements SosRepository {
       await docRef.update({
         'lifecycleStatus': lifecycleStatus.name,
         if (deliveryState != null) 'deliveryState': deliveryState.name,
-        if (assignedHandlerUid != null)
-          'assignedHandlerUid': assignedHandlerUid,
+        'assignedHandlerUid': ?assignedHandlerUid,
         'version': current.version + 1,
         'updatedAt': FieldValue.serverTimestamp(),
       });

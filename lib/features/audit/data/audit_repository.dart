@@ -112,7 +112,7 @@ class FirestoreAuditRepository implements AuditRepository {
         'recordId': recordId,
         'occurredAt': FieldValue.serverTimestamp(),
         'outcome': outcome,
-        if (changedFields != null) 'changedFields': changedFields,
+        'changedFields': ?changedFields,
       });
       _logger.security(
         'audit.write',
