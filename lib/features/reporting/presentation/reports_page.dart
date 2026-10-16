@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key});
@@ -78,23 +79,24 @@ class ReportsPage extends StatelessWidget {
       const _BarChart(),
       const SizedBox(height: 18),
       OutlinedButton.icon(
-        onPressed: () => showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Report export not connected'),
-            content: const Text(
-              'This preview does not export volunteer data. Report scope, field allowlists, access logging, and output expiry must be approved before export is implemented.',
+        onPressed: () async {
+          await Clipboard.setData(
+            const ClipboardData(
+              text:
+                  'Metric,Sample value\nParticipants,124\nService hours,386\nActivities,12\n',
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+          );
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text('Synthetic sample CSV copied to clipboard.'),
               ),
-            ],
-          ),
-        ),
-        icon: const Icon(Icons.file_download_outlined),
-        label: const Text('Review export requirements'),
+            );
+        },
+        icon: const Icon(Icons.copy_all_outlined),
+        label: const Text('Copy synthetic sample CSV'),
       ),
     ],
   );

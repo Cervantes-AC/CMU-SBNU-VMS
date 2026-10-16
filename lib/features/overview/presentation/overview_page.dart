@@ -47,12 +47,22 @@ class _OverviewPageState extends State<OverviewPage> {
         ),
         title: Row(
           children: [
-            const Icon(Icons.volunteer_activism, color: Color(0xFF134F35)),
+            Image.asset(
+              'assets/images/sbnu_app_icon.png',
+              width: 34,
+              height: 34,
+              semanticLabel: 'SBNU logo',
+            ),
             const SizedBox(width: 10),
             Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Return to landing page',
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.home_outlined),
+          ),
           const Padding(
             padding: EdgeInsets.only(right: 16),
             child: _PreviewBadge(),
@@ -68,17 +78,18 @@ class _OverviewPageState extends State<OverviewPage> {
           _scaffoldKey.currentState?.closeDrawer();
         },
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(28, 20, 16, 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
             child: Row(
               children: [
-                Icon(
-                  Icons.volunteer_activism,
-                  color: Color(0xFF134F35),
-                  size: 32,
+                Image.asset(
+                  'assets/images/sbnu_app_icon.png',
+                  width: 38,
+                  height: 38,
+                  semanticLabel: 'SBNU logo',
                 ),
-                SizedBox(width: 12),
-                Column(
+                const SizedBox(width: 12),
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(

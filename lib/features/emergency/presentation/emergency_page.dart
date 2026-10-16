@@ -57,7 +57,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'This entry stays in memory on this device and is not sent. No location is collected in this preview.',
+                  'Use fictional text only. This entry stays in memory on this device and is not sent. No location is collected in this preview.',
                   style: TextStyle(
                     fontSize: 11,
                     height: 1.4,

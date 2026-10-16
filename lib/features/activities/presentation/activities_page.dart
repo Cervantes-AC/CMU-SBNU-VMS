@@ -11,8 +11,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   String _filter = 'All';
   final Set<String> _joined = {};
 
-  static const _activities = [
-    _Activity(
+  final List<_Activity> _activities = [
+    const _Activity(
       'Campus preparedness workshop',
       'Safety',
       'Oct 22 · 9:00 AM',
@@ -20,7 +20,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       24,
       40,
     ),
-    _Activity(
+    const _Activity(
       'Community river clean-up',
       'Environment',
       'Oct 26 · 6:30 AM',
@@ -28,7 +28,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       18,
       30,
     ),
-    _Activity(
+    const _Activity(
       'First aid skills session',
       'Training',
       'Nov 02 · 1:00 PM',
@@ -36,7 +36,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       12,
       24,
     ),
-    _Activity(
+    const _Activity(
       'Community learning day',
       'Community',
       'Nov 08 · 8:00 AM',
@@ -45,6 +45,90 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       50,
     ),
   ];
+
+  Future<void> _createActivity() async {
+    final title = TextEditingController();
+    final venue = TextEditingController();
+    String category = 'Community';
+    final created = await showDialog<_Activity>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Activity draft'),
+          content: SizedBox(
+            width: 440,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: title,
+                  maxLength: 100,
+                  decoration: const InputDecoration(labelText: 'Activity name'),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  initialValue: category,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  items:
+                      const ['Environment', 'Safety', 'Training', 'Community']
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) =>
+                      setDialogState(() => category = value ?? category),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: venue,
+                  maxLength: 100,
+                  decoration: const InputDecoration(labelText: 'Venue'),
+                ),
+                const Text(
+                  'Saved only in this session. Publishing and participation are not connected.',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF748078)),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final name = title.text.trim();
+                final place = venue.text.trim();
+                if (name.isNotEmpty && place.isNotEmpty) {
+                  Navigator.pop(
+                    context,
+                    _Activity(
+                      name,
+                      category,
+                      'Schedule to be set',
+                      place,
+                      0,
+                      20,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save local draft'),
+            ),
+          ],
+        ),
+      ),
+    );
+    title.dispose();
+    venue.dispose();
+    if (created != null && mounted) {
+      setState(() => _activities.insert(0, created));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +140,24 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       children: [
-        Text(
-          'Discover and participate',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: const Color(0xFFAA7C10),
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Discover and participate',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: const Color(0xFFAA7C10),
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            IconButton.filledTonal(
+              tooltip: 'Create local activity draft',
+              onPressed: _createActivity,
+              icon: const Icon(Icons.add),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         Text(

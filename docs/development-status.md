@@ -5,10 +5,10 @@
 
 ## Implemented in the Flutter client
 
-- Application theme and public landing page following the `prototype/` palette and card styling.
+- Application theme, SBNU logo, and public landing page following the `prototype/` palette and card styling.
 - Workspace navigation for Overview, Activities, Volunteers and Organizations, Attendance, Announcements, Emergency and Safety, Reports, and Access and Operations.
 - Responsive mobile-first layouts with an expandable navigation drawer on wider screens.
-- Synthetic sample content and local-only interactions for activity filters/join state, volunteer search, attendance roster toggles, announcement drafts, and incident form previews.
+- Synthetic sample content and local-only interactions for activity filters/drafts/join state, volunteer search, organization list, attendance roster toggles, announcement drafts, incident form previews, and copying an illustrative CSV to the clipboard.
 - Candidate-role and environment status reference screen, with no ability to grant roles or change account access.
 - User-visible disclosure where records are synthetic or local-only and where a service action is not connected.
 
@@ -20,7 +20,7 @@
 - Incident location, map provider, live incident access, or production incident review.
 - SOS delivery, responder roster, acknowledgement, escalation, or push notification. The preview reports that no alert was sent.
 - Institution-verified hotline data or phone handoff.
-- Production analytics and report export.
+- Production analytics, authorization, and report export. The preview can copy a fixed synthetic CSV sample only.
 
 Firestore rules continue to deny all client access. Firebase project/environment, region, account lifecycle, role/action matrix, retention, location policy, hotline ownership, responder coverage, and operational procedures remain open decisions in the specification. Do not add real member or emergency data until their owners approve the relevant controls.
 

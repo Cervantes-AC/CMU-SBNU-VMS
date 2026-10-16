@@ -38,9 +38,13 @@ class _Header extends StatelessWidget {
               color: const Color(0xFFE5EFE7),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: const Icon(
-              Icons.volunteer_activism,
-              color: Color(0xFF134F35),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/sbnu_app_icon.png',
+                semanticLabel: 'SBNU logo',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(width: 12),
