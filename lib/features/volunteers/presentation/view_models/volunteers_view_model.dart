@@ -13,7 +13,6 @@ class VolunteersViewModel extends ChangeNotifier {
   String get query => _query;
   String get college => _college;
   List<VolunteerPreview> get volunteers => _repository.volunteers;
-  List<OrganizationPreview> get organizations => _repository.organizations;
   List<String> get colleges =>
       volunteers.map((person) => person.college).toSet().toList()..sort();
 
