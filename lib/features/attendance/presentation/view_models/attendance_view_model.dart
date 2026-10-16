@@ -12,6 +12,8 @@ class AttendanceViewModel extends ChangeNotifier {
   String get activityId => _activityId;
   List<PreviewAttendanceRecord> get roster =>
       _repository.rosterFor(_activityId);
+  List<PreviewAttendanceCorrection> get corrections =>
+      _repository.correctionsFor(_activityId);
   int get presentCount => roster
       .where((record) => record.status == AttendanceStatus.present)
       .length;
@@ -22,8 +24,12 @@ class AttendanceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setStatus(String participantName, AttendanceStatus status) {
-    _repository.setStatus(_activityId, participantName, status);
+  void setStatus(
+    String participantName,
+    AttendanceStatus status,
+    String reason,
+  ) {
+    _repository.setStatus(_activityId, participantName, status, reason);
     notifyListeners();
   }
 }

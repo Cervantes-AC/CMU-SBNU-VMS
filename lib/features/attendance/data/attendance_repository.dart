@@ -2,10 +2,12 @@ import 'models/attendance_record.dart';
 
 abstract interface class AttendanceRepository {
   List<PreviewAttendanceRecord> rosterFor(String activityId);
+  List<PreviewAttendanceCorrection> correctionsFor(String activityId);
   void setStatus(
     String activityId,
     String participantName,
     AttendanceStatus status,
+    String reason,
   );
 }
 
@@ -25,6 +27,7 @@ class PreviewAttendanceRepository implements AttendanceRepository {
       'Cathy Lim': AttendanceStatus.present,
     },
   };
+  final Map<String, List<PreviewAttendanceCorrection>> _corrections = {};
 
   @override
   List<PreviewAttendanceRecord> rosterFor(String activityId) => [
@@ -36,11 +39,32 @@ class PreviewAttendanceRepository implements AttendanceRepository {
   ];
 
   @override
+  List<PreviewAttendanceCorrection> correctionsFor(String activityId) =>
+      List.unmodifiable(_corrections[activityId] ?? const []);
+
+  @override
   void setStatus(
     String activityId,
     String participantName,
     AttendanceStatus status,
+    String reason,
   ) {
-    _statuses.putIfAbsent(activityId, () => {})[participantName] = status;
+    final statuses = _statuses.putIfAbsent(activityId, () => {});
+    final previous = statuses[participantName] ?? AttendanceStatus.absent;
+    if (previous == status) return;
+    statuses[participantName] = status;
+    _corrections
+        .putIfAbsent(activityId, () => [])
+        .insert(
+          0,
+          PreviewAttendanceCorrection(
+            participantName: participantName,
+            previousStatus: previous,
+            newStatus: status,
+            reason: reason,
+            actorLabel: 'Preview coordinator',
+            recordedAt: DateTime.now(),
+          ),
+        );
   }
 }

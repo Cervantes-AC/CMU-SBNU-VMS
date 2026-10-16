@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/attendance_record.dart';
@@ -6,6 +7,67 @@ import 'view_models/attendance_view_model.dart';
 
 class AttendancePage extends StatelessWidget {
   const AttendancePage({super.key});
+
+  Future<void> _correctStatus(
+    BuildContext context,
+    AttendanceViewModel viewModel,
+    PreviewAttendanceRecord record,
+    AttendanceStatus status,
+  ) async {
+    final reason = TextEditingController();
+    final acceptedReason = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Record attendance correction'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${record.displayName}: ${_statusLabel(record.status)} → ${_statusLabel(status)}',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reason,
+              autofocus: true,
+              maxLength: 160,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Reason for this preview correction',
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const Text(
+              'This entry stays in memory for this session. The required reason here is a workflow demonstration, not an approved production policy.',
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.4,
+                color: Color(0xFF748078),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = reason.text.trim();
+              if (value.isNotEmpty) Navigator.pop(dialogContext, value);
+            },
+            child: const Text('Save local correction'),
+          ),
+        ],
+      ),
+    );
+    reason.dispose();
+    if (acceptedReason != null && context.mounted) {
+      viewModel.setStatus(record.displayName, status, acceptedReason);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Consumer<AttendanceViewModel>(
@@ -106,7 +168,7 @@ class AttendancePage extends StatelessWidget {
                 underline: const SizedBox.shrink(),
                 onChanged: (status) {
                   if (status != null) {
-                    viewModel.setStatus(record.displayName, status);
+                    _correctStatus(context, viewModel, record, status);
                   }
                 },
                 items: [
@@ -119,6 +181,43 @@ class AttendancePage extends StatelessWidget {
               ),
             ),
           ),
+        const SizedBox(height: 18),
+        Text(
+          'Correction history',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        if (viewModel.corrections.isEmpty)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(14),
+              child: Text(
+                'No local corrections in this session.',
+                style: TextStyle(color: Color(0xFF748078)),
+              ),
+            ),
+          )
+        else
+          for (final correction in viewModel.corrections)
+            Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                dense: true,
+                leading: const Icon(Icons.history, color: Color(0xFF47745A)),
+                title: Text(
+                  '${correction.participantName}: ${_statusLabel(correction.previousStatus)} → ${_statusLabel(correction.newStatus)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                subtitle: Text(
+                  '${correction.reason}\n${correction.actorLabel} · ${DateFormat.MMMd().add_jm().format(correction.recordedAt)} · local preview',
+                ),
+              ),
+            ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () => showDialog<void>(
