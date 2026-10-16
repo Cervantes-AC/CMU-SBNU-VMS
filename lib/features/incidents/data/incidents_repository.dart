@@ -1,7 +1,7 @@
 import 'models/incident_draft.dart';
 import 'models/incident_preview_record.dart';
 
-abstract interface class EmergencyRepository {
+abstract interface class IncidentsRepository {
   List<IncidentDraft> get localIncidentDrafts;
   List<IncidentPreviewRecord> get sampleIncidentRecords;
   void saveLocalIncidentDraft(IncidentDraft draft);
@@ -10,7 +10,7 @@ abstract interface class EmergencyRepository {
 }
 
 /// Holds fictional incident preview text in memory for this app session only.
-class PreviewEmergencyRepository implements EmergencyRepository {
+class PreviewIncidentsRepository implements IncidentsRepository {
   static const _sampleIncidentRecords = [
     IncidentPreviewRecord(
       id: 'sample-incident-001',

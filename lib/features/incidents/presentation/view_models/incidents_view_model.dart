@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 
-import '../../data/emergency_repository.dart';
+import '../../data/incidents_repository.dart';
 import '../../data/models/incident_draft.dart';
 import '../../data/models/incident_preview_record.dart';
 
-class EmergencyViewModel extends ChangeNotifier {
-  EmergencyViewModel(this._repository);
+class IncidentsViewModel extends ChangeNotifier {
+  IncidentsViewModel(this._repository);
 
-  final EmergencyRepository _repository;
+  final IncidentsRepository _repository;
 
   List<IncidentDraft> get localIncidentDrafts =>
       _repository.localIncidentDrafts;

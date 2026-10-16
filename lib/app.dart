@@ -8,8 +8,8 @@ import 'features/attendance/data/attendance_repository.dart';
 import 'features/attendance/presentation/view_models/attendance_view_model.dart';
 import 'features/announcements/data/announcements_repository.dart';
 import 'features/announcements/presentation/view_models/announcements_view_model.dart';
-import 'features/emergency/data/emergency_repository.dart';
-import 'features/emergency/presentation/view_models/emergency_view_model.dart';
+import 'features/incidents/data/incidents_repository.dart';
+import 'features/incidents/presentation/view_models/incidents_view_model.dart';
 import 'features/volunteers/data/volunteers_repository.dart';
 import 'features/volunteers/presentation/view_models/volunteers_view_model.dart';
 import 'features/organizations/data/organizations_repository.dart';
@@ -72,7 +72,7 @@ class NSRCApp extends StatelessWidget {
               AnnouncementsViewModel(PreviewAnnouncementsRepository()),
         ),
         ChangeNotifierProvider(
-          create: (_) => EmergencyViewModel(PreviewEmergencyRepository()),
+          create: (_) => IncidentsViewModel(PreviewIncidentsRepository()),
         ),
         ChangeNotifierProvider(
           create: (_) => VolunteersViewModel(PreviewVolunteersRepository()),
