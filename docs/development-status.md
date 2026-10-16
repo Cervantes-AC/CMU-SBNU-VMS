@@ -16,6 +16,7 @@
 - Announcements use a feature-owned preview repository and ViewModel. Drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
 - Emergency incident drafts use a feature-owned in-memory preview repository and ViewModel. Fictional narrative can be added and deleted within the session; there is no location collection, remote submission, map, hotline, or SOS delivery.
 - Volunteers and organizations use a feature-owned preview repository and ViewModel for synthetic directory entries and volunteer search/college filtering. Contact details, membership records, and approved hierarchy remain unconfigured.
+- Reporting uses a feature-owned preview repository and ViewModel for synthetic sample rows, date/program filtering, calculated summaries, and the local CSV copy action. Production queries and export authorization remain unconfigured.
 - Reports calculate synthetic participation, hours, and activity totals from local sample rows, with program/date filters and matching CSV output.
 - GoRouter handles the public landing and workspace routes.
 - Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
