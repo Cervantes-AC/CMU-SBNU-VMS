@@ -116,14 +116,34 @@
 - Landing page with sign-in/register/CTA
 - Workspace shell with navigation drawer and responsive layout
 
-## Deliberately not connected (preview only)
+## Data connection status
+
+### Real data via Firebase Emulator (available now)
+All 10 feature repositories are wired to Firestore-backed implementations behind an explicit flag. To use real (emulator-local) data:
+
+1. Start the emulators:
+   ```
+   firebase emulators:start --only firestore,auth --project cmu-sbnu-vms
+   ```
+2. Run the app with real-data mode:
+   ```
+   flutter run --dart-define=USE_FIREBASE_EMULATORS=true
+   ```
+3. (Optional) Run the rules tests against the emulator:
+   ```
+   flutter test test/firestore_rules_test.dart
+   ```
+
+Ordinary builds (no `--dart-define`) keep preview/synthetic data — no silent redirect to production Firestore.
+
+### Production Firestore — not connected
+Firestore rules have stakeholder sign-off and rules tests, but require security/privacy reviewer approval before production deployment.
 
 - Firebase Auth sign-in — repository contract exists; provider and account lifecycle decisions pending
-- Firestore writes — preview repositories are local-only; Firestore implementations exist but require approved Security Rules
 - QR session issuance/scan validation — requires trusted server validation
 - Incident location collection / map — provider and precision decisions pending
 - SOS delivery — no real routing or push; clearly labeled as preview
-- Institution-verified hotline data — fictional entries only
+- Hotline directory loaded from institution-provided contacts; entries are pending verification and visibly non-callable until an admin verifies them
 - Production analytics/export — synthetic data only
 
 ## Current verification

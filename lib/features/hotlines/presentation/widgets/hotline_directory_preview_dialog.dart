@@ -24,7 +24,7 @@ class HotlineDirectoryPreviewDialog {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    'Fictional examples only. No real contacts or phone numbers were supplied. These entries cannot place calls.',
+                    'Illustrative cards only. Real hotline entries are loaded from the institution-configured source; only verified, active entries enable one-tap calling, and calling always requires confirmation before the device dialer opens.',
                     style: TextStyle(
                       fontSize: 11,
                       height: 1.45,
