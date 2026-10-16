@@ -79,4 +79,11 @@ class ActivitiesViewModel extends ChangeNotifier {
     );
     notifyListeners();
   }
+
+  void discardDraft(String activityId) {
+    final index = activities.indexWhere((item) => item.id == activityId);
+    if (index < 0 || activities[index].status != ActivityStatus.draft) return;
+    _repository.discardDraft(activityId);
+    notifyListeners();
+  }
 }

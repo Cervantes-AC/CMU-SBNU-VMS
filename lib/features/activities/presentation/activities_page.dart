@@ -235,6 +235,7 @@ class ActivitiesPage extends StatelessWidget {
             activity: activity,
             onDetails: () => _showDetails(context, activity),
             onEditDraft: () => _createActivity(context, existing: activity),
+            onDiscardDraft: () => _discardDraft(context, activity),
             onJoin: () => viewModel.toggleJoinRequest(activity.id),
           ),
       ],
@@ -287,6 +288,31 @@ class ActivitiesPage extends StatelessWidget {
       ],
     ),
   );
+
+  Future<void> _discardDraft(BuildContext context, Activity activity) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard local activity draft?'),
+        content: Text(
+          '“${activity.title}” will be removed from this session. Published samples are unaffected.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep draft'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Discard draft'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<ActivitiesViewModel>().discardDraft(activity.id);
+    }
+  }
 }
 
 String? _requiredField(String? value) =>
@@ -304,11 +330,13 @@ class _ActivityCard extends StatelessWidget {
     required this.activity,
     required this.onDetails,
     required this.onEditDraft,
+    required this.onDiscardDraft,
     required this.onJoin,
   });
   final Activity activity;
   final VoidCallback onDetails;
   final VoidCallback onEditDraft;
+  final VoidCallback onDiscardDraft;
   final VoidCallback onJoin;
 
   @override
@@ -433,6 +461,14 @@ class _ActivityCard extends StatelessWidget {
                         : 'Request to join',
                   ),
                 ),
+                if (activity.status == ActivityStatus.draft) ...[
+                  const SizedBox(width: 4),
+                  IconButton(
+                    tooltip: 'Discard local draft',
+                    onPressed: onDiscardDraft,
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ],
               ],
             ),
           ],
