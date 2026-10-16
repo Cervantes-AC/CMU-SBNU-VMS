@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../data/models/incident_draft.dart';
 import '../data/models/incident_preview_record.dart';
 import 'view_models/emergency_view_model.dart';
+import '../../sos/presentation/sos_preview_dialog.dart';
 
 class EmergencyPage extends StatefulWidget {
   const EmergencyPage({super.key});
@@ -161,75 +162,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
     }
   }
 
-  Future<void> _requestHelp() async {
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(
-          Icons.warning_amber_rounded,
-          color: Color(0xFFB63D34),
-          size: 40,
-        ),
-        title: const Text('SOS is not connected'),
-        content: const Text(
-          'This app has no alert service or approved responder roster configured. No alert can be sent. Follow your institution’s emergency procedures and contact local emergency services directly if needed.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showUnsentPreview();
-            },
-            child: const Text('Preview not-sent screen'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showUnsentPreview() => showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      icon: const Icon(
-        Icons.block_outlined,
-        color: Color(0xFFB63D34),
-        size: 40,
-      ),
-      title: const Text('NOT SENT · demonstration'),
-      content: const SizedBox(
-        width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'This is a simulated UI state. No server alert, responder notification, emergency call, or location collection occurred.',
-              style: TextStyle(height: 1.45),
-            ),
-            SizedBox(height: 14),
-            Text(
-              'No verified hotline numbers are configured. For immediate help, follow institution procedures and contact local emergency services directly.',
-              style: TextStyle(
-                fontSize: 12,
-                height: 1.45,
-                color: Color(0xFF6E581F),
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
-        ),
-      ],
-    ),
-  );
+  Future<void> _requestHelp() => SosPreviewDialog.show(context);
 
   @override
   Widget build(BuildContext context) => Consumer<EmergencyViewModel>(
