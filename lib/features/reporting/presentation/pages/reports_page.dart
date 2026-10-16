@@ -61,21 +61,6 @@ class _ReportsPageState extends State<ReportsPage> {
       ),
     );
   }
-
-  void _export(BuildContext context, ReportsViewModel viewModel) async {
-    await viewModel.generateExport(type: 'summary', filters: {});
-    if (mounted) {
-      if (viewModel.csvContent != null) {
-        showPremiumSnackbar(context, message: 'Report exported successfully.');
-      } else if (viewModel.error != null) {
-        showPremiumSnackbar(
-          context,
-          message: viewModel.error!.message,
-          isError: true,
-        );
-      }
-    }
-  }
 }
 
 class _PageHeader extends StatelessWidget {

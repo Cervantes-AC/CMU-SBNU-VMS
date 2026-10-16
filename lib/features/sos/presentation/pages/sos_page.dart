@@ -17,65 +17,9 @@ class SosPage extends StatefulWidget {
 }
 
 class _SosPageState extends State<SosPage> {
-  final _detailsController = TextEditingController();
-  bool _shareLocation = false;
-  bool _acknowledgeRisks = false;
-
   @override
   void dispose() {
-    _detailsController.dispose();
     super.dispose();
-  }
-
-  Future<void> _submitAlert(SosViewModel viewModel) async {
-    if (!_acknowledgeRisks) {
-      showPremiumSnackbar(
-        context,
-        message: 'Please acknowledge the emergency disclaimer.',
-        isError: true,
-      );
-      return;
-    }
-    if (_detailsController.text.isEmpty) {
-      showPremiumSnackbar(
-        context,
-        message: 'Please describe the emergency.',
-        isError: true,
-      );
-      return;
-    }
-
-    final alert = SosAlert(
-      id: 'sos_${DateTime.now().millisecondsSinceEpoch}',
-      reporterUid: 'current_user',
-      clientRequestId: 'req_${DateTime.now().millisecondsSinceEpoch}',
-      createdAt: DateTime.now(),
-      details: _detailsController.text.trim(),
-      locationShared: _shareLocation,
-      lifecycleStatus: SosLifecycleStatus.submitted,
-      deliveryState: SosDeliveryState.pending,
-    );
-
-    final success = await viewModel.submitAlert(alert);
-    if (context.mounted) {
-      if (success) {
-        showPremiumSnackbar(
-          context,
-          message: 'Alert submitted. Delivery state: pending.',
-        );
-        _detailsController.clear();
-        setState(() {
-          _shareLocation = false;
-          _acknowledgeRisks = false;
-        });
-      } else {
-        showPremiumSnackbar(
-          context,
-          message: viewModel.error?.message ?? 'Failed to submit alert.',
-          isError: true,
-        );
-      }
-    }
   }
 
   @override
@@ -352,7 +296,17 @@ class _AlertForm extends StatelessWidget {
             width: double.infinity,
             child: PremiumButton(
               label: 'Submit SOS Alert',
-              onPressed: () {},
+              onPressed: () {
+                // SOS submission requires approved responder coverage and
+                // operational procedures. This is a placeholder for the
+                // approved production workflow.
+                showPremiumSnackbar(
+                  context,
+                  message:
+                      'SOS submission requires approved responder coverage.',
+                  isError: true,
+                );
+              },
               variant: ButtonVariant.destructive,
               icon: Icons.warning_amber_rounded,
             ),

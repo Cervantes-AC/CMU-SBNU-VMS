@@ -14,8 +14,6 @@ class AppResult<T> {
   final AppFailure? error;
   final bool isLoading;
 
-  const AppResult._({this.data, this.error, this.isLoading = false});
-
   const AppResult.data(this.data) : error = null, isLoading = false;
 
   const AppResult.error(this.error) : data = null, isLoading = false;
@@ -31,8 +29,6 @@ class AppResult<T> {
 class CommandResult {
   final bool success;
   final AppFailure? error;
-
-  const CommandResult._({required this.success, this.error});
 
   const CommandResult.success() : success = true, error = null;
   const CommandResult.failure(this.error) : success = false;

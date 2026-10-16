@@ -44,12 +44,14 @@ class ConsoleAppLogger implements AppLogger {
   @override
   void info(String event, {Map<String, dynamic>? fields}) {
     final safeFields = _sanitize(fields);
+    // ignore: avoid_print
     print('[INFO] $event ${safeFields.isNotEmpty ? safeFields : ''}');
   }
 
   @override
   void warning(String event, {Map<String, dynamic>? fields}) {
     final safeFields = _sanitize(fields);
+    // ignore: avoid_print
     print('[WARN] $event ${safeFields.isNotEmpty ? safeFields : ''}');
   }
 
@@ -61,8 +63,10 @@ class ConsoleAppLogger implements AppLogger {
     Map<String, dynamic>? fields,
   }) {
     final safeFields = _sanitize(fields);
+    // ignore: avoid_print
     print('[ERROR] $event error=$error fields=$safeFields');
     if (stackTrace != null) {
+      // ignore: avoid_print
       print(stackTrace.toString());
     }
   }
@@ -70,6 +74,7 @@ class ConsoleAppLogger implements AppLogger {
   @override
   void security(String event, {Map<String, dynamic>? fields}) {
     final safeFields = _sanitize(fields);
+    // ignore: avoid_print
     print('[SECURITY] $event ${safeFields.isNotEmpty ? safeFields : ''}');
   }
 

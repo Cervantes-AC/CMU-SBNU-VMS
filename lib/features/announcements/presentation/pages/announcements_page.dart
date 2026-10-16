@@ -144,8 +144,9 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                               label: 'Publish',
                               onPressed: () {
                                 if (titleController.text.isEmpty ||
-                                    bodyController.text.isEmpty)
+                                    bodyController.text.isEmpty) {
                                   return;
+                                }
                                 Navigator.of(context).pop();
                                 context
                                     .read<AnnouncementsViewModel>()

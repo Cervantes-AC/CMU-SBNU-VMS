@@ -15,7 +15,7 @@ class ActivitiesPage extends StatefulWidget {
 
 class _ActivitiesPageState extends State<ActivitiesPage>
     with TickerProviderStateMixin {
-  String _filter = 'All';
+  final String _filter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class _ActivitiesPageState extends State<ActivitiesPage>
                           subtitle:
                               'Check back later for new service opportunities.',
                           actionLabel: 'Explore all programs',
-                          action: PremiumCard(child: const Text('Placeholder')),
+                          action: PremiumCard(child: Text('Placeholder')),
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.all(DesignTokens.lg),
@@ -88,14 +88,6 @@ class _ActivitiesPageState extends State<ActivitiesPage>
       builder: (context) => const _CreateActivityDialog(),
     );
   }
-
-  String _statusLabel(ActivityStatus status) => switch (status) {
-    ActivityStatus.draft => 'Draft',
-    ActivityStatus.published => 'Published',
-    ActivityStatus.ongoing => 'Ongoing',
-    ActivityStatus.completed => 'Completed',
-    ActivityStatus.cancelled => 'Cancelled',
-  };
 }
 
 class _PageHeader extends StatelessWidget {

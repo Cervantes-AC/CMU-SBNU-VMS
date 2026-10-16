@@ -219,8 +219,9 @@ class _IncidentsPageState extends State<IncidentsPage> {
                               label: 'Submit Report',
                               onPressed: () {
                                 if (categoryController.text.isEmpty ||
-                                    narrativeController.text.isEmpty)
+                                    narrativeController.text.isEmpty) {
                                   return;
+                                }
                                 Navigator.of(context).pop();
                                 context.read<IncidentsViewModel>().submitIncident(
                                   Incident(

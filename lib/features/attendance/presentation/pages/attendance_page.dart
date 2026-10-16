@@ -100,6 +100,7 @@ class _AttendancePageState extends State<AttendancePage> {
                         icon: Icons.person_rounded,
                       ),
                       const SizedBox(height: DesignTokens.lg),
+                      // ignore: deprecated_member_use
                       DropdownButtonFormField<String>(
                         value: selectedStatus,
                         decoration: InputDecoration(
@@ -163,8 +164,9 @@ class _AttendancePageState extends State<AttendancePage> {
                               label: 'Record',
                               onPressed: () {
                                 if (activityController.text.isEmpty ||
-                                    uidController.text.isEmpty)
+                                    uidController.text.isEmpty) {
                                   return;
+                                }
                                 Navigator.of(context).pop();
                                 context
                                     .read<AttendanceViewModel>()
@@ -406,11 +408,7 @@ class _StatsRow extends StatelessWidget {
 }
 
 class _RecordList extends StatelessWidget {
-  const _RecordList({
-    super.key,
-    required this.records,
-    required this.onRecordTap,
-  });
+  const _RecordList({required this.records, required this.onRecordTap});
 
   final List<AttendanceRecord> records;
   final ValueChanged<AttendanceRecord> onRecordTap;
@@ -591,7 +589,6 @@ class _ActionCard extends StatelessWidget {
 
 class _DetailRow extends StatelessWidget {
   const _DetailRow({
-    super.key,
     required this.label,
     required this.value,
     required this.icon,

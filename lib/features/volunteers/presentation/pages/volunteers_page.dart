@@ -31,9 +31,7 @@ class _VolunteersPageState extends State<VolunteersPage> {
                     _FilterBar(
                       colleges: colleges,
                       currentFilter: viewModel.collegeFilter,
-                      onChanged: (value) {
-                        if (value != null) viewModel.setCollegeFilter(value);
-                      },
+                      onChanged: viewModel.setCollegeFilter,
                     ),
                     const SizedBox(height: DesignTokens.lg),
                     AppStateWrapper(
