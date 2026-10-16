@@ -36,12 +36,12 @@ class Activity {
   final DateTime? updatedAt;
 
   String get statusLabel => switch (status) {
-        ActivityStatus.draft => 'Draft',
-        ActivityStatus.published => 'Published',
-        ActivityStatus.ongoing => 'Ongoing',
-        ActivityStatus.completed => 'Completed',
-        ActivityStatus.cancelled => 'Cancelled',
-      };
+    ActivityStatus.draft => 'Draft',
+    ActivityStatus.published => 'Published',
+    ActivityStatus.ongoing => 'Ongoing',
+    ActivityStatus.completed => 'Completed',
+    ActivityStatus.cancelled => 'Cancelled',
+  };
 
   String get scheduleLabel {
     final start = '${startAt.month}/${startAt.day} ${_formatTime(startAt)}';

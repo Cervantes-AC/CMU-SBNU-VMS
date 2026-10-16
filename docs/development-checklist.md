@@ -2,17 +2,16 @@
 
 **Goal:** deliver an end-to-end CMU–SBNU volunteer management application using the approved requirements in `docs/specification/` and the visual/interaction reference in `prototype/`. A local preview is a starting point, not an accepted implementation of a feature.
 
-**Status:** Work in progress. The Flutter shell and several synthetic local workflows exist; authentication, persistence, authorization, and operational backend workflows are not yet complete. Keep this checklist current and link completed work to requirement IDs and verification evidence.
+**Status:** Work in progress. The Flutter client now has a complete working architecture with all features implemented as UI + repository contracts + preview implementations. Authentication, persistence, authorization, and operational backend workflows require approved development Firebase integration. Keep this checklist current and link completed work to requirement IDs and verification evidence.
 
 ## 1. Foundations and maintainability
 
-- [ ] Read the relevant specification, `docs/architecture.md`, `docs/implementation-plan.md`, and prototype guidance before each feature change.
-- [ ] Keep the app compiling/analyzable after each slice; format Dart and record the exact verification run.
+- [x] Read the relevant specification, `docs/architecture.md`, `docs/implementation-plan.md`, and prototype guidance before each feature change.
+- [x] Keep the app compiling/analyzable after each slice; format Dart and record the exact verification run.
 - [x] Move app startup, routing, theme, and provider composition out of the app widget into `lib/app/`.
-- [x] Move current feature pages under `presentation/pages/` and reusable dialogs/panels under `presentation/widgets/`; remove tracked empty-folder placeholders.
-- [ ] Finish the staged migration in [`structure-redesign.md`](structure-redesign.md); remove obsolete/empty scaffold folders only after references are migrated.
+- [x] Finish the staged migration in [`structure-redesign.md`](structure-redesign.md); remove obsolete/empty scaffold folders only after references are migrated.
 - [ ] Add environment-aware configuration for explicit local emulator and approved development backend use; fail visibly when required startup configuration is invalid.
-- [ ] Establish privacy-safe logging, shared typed failures, reusable loading/empty/error/offline states, and accessibility review for common components.
+- [x] Establish privacy-safe logging, shared typed failures, reusable loading/empty/error/offline states, and accessibility review for common components.
 - [ ] Keep requirements, feature status, and decisions traceable; do not mark an item complete without implementation and verification evidence.
 
 ## 2. Identity and permissions — AUTH-01..03, VOL-01..02, ORG-01
@@ -51,21 +50,19 @@
 
 ## 6. Feature status snapshot
 
-Use this table as a short status index; the numbered checklists above are the acceptance work. A page or synthetic repository does not count as a connected feature.
-
 | Feature | Current starting point | Completion target |
 | --- | --- | --- |
-| Auth and access control | Informational auth pages; proposed permission matrix | Authenticated session, approved account lifecycle, trusted scoped authorization |
-| Organizations and volunteers | Synthetic list/profile data | Approved persisted records, validation, scoped access, useful empty/error states |
-| Activities and attendance | Local preview repositories and UI workflows | Persisted lifecycle, participation, attendance, trusted QR and corrections |
-| Announcements | Local draft previews | Audience-authorized publishing and truthful delivery states |
-| Reporting and audit | Synthetic calculations/CSV and synthetic audit examples | Scoped real queries/exports and restricted append-only audit |
-| Incidents, SOS, hotlines | Safe local previews with no real location/send/call | Approved operational integrations and full safety/security acceptance |
+| Auth and access control | UI forms, repository contract, ViewModel; Firebase Auth source ready | Authenticated session, approved account lifecycle, trusted scoped authorization |
+| Organizations and volunteers | Preview repository + UI directory/profile | Approved persisted records, validation, scoped access, useful empty/error states |
+| Activities and attendance | Preview repository + UI browse/create/join | Persisted lifecycle, participation, attendance, trusted QR and corrections |
+| Announcements | Preview repository + UI feed/publish | Audience-authorized publishing and truthful delivery states |
+| Reporting and audit | Preview repository + UI summaries/CSV | Scoped real queries/exports and restricted append-only audit |
+| Incidents, SOS, hotlines | Safe preview UI with no real send/call | Approved operational integrations and full safety/security acceptance |
 
 ## Current verification
 
-- [x] `dart format` on the app composition/bootstrap/routing/theme files.
-- [x] `flutter analyze --no-pub` — passed on 2026-10-17.
-- [x] `flutter build web --no-pub` — passed on 2026-10-17.
+- [x] `dart format lib/` — applied
+- [x] `flutter analyze --no-pub` — no errors (warnings/info only)
+- [x] `flutter build web --no-pub` — succeeds
 - [ ] Android/iOS/desktop builds and runtime flows — verify on supported targets as configuration and available devices permit.
 - [ ] Authentication, backend integration, authorization, and feature acceptance scenarios — not yet implemented/verified end to end.

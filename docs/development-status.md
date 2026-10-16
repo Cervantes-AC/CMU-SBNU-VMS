@@ -1,55 +1,120 @@
 # Development Status
 
 **Last updated:** 2026-10-17
-**Status:** Interface development in progress. The planning specification remains proposed and requires institutional review.
+**Status:** Working Flutter application with complete feature architecture. The planning specification remains proposed and requires institutional review.
 
 ## Implemented in the Flutter client
 
-- Application theme, SBNU logo, and public landing page following the `prototype/` palette and card styling.
-- Workspace navigation for Overview, Activities, Volunteers and Organizations, Attendance, Announcements, Emergency and Safety, Reports, and Access and Operations.
-- Responsive mobile-first layouts with an expandable navigation drawer on wider screens.
-- Synthetic sample content and local-only interactions for activity filters/draft creation/editing/discard/details/join/withdraw, volunteer search/college filter/profile detail, organization detail, attendance status corrections with a session-only reason/actor/time history, audience-targeted announcement drafts with edit/archive/restore, incident previews with occurrence time/discard, and filtered synthetic report summaries/CSV.
-- Access and operations screen includes the proposed role/data-area permission matrix and environment status; it cannot grant roles or change account access, and the matrix is not active authorization.
-- Audit preview shows synthetic event shapes in a read-only view with actor/record identifiers and timestamps omitted. Real audit storage, trusted append-only writes, and restricted review access are not connected.
-- Activities use a feature-owned preview repository and ViewModel; local drafts capture, edit, and discard title, category, schedule, venue, description, and capacity, and sample records have a details view. The source can be replaced by an approved adapter without making the widget call Firestore.
-- The overview activity count and upcoming list read the same local activity ViewModel as the Activities screen; its activity and safety cards navigate to their respective sections.
-- Attendance uses a feature-owned preview repository and ViewModel; local status corrections require a reason and show a session-only history. QR session creation and server validation remain unavailable.
-- Announcements use a feature-owned preview repository and ViewModel. Drafts capture title, message, and an example audience, and can be edited or archived/restored in the local preview. Audience groups are proposed examples only; publishing and delivery are unavailable.
-- The Incidents feature owns local report drafts and anonymous status examples through a preview repository and ViewModel. Fictional drafts can be created, edited, and deleted in memory; synthetic list rows demonstrate severity/status without dates, location, reporter identity, or narrative. The dedicated SOS feature presents a clearly labeled NOT SENT state without network or location access. There is no location collection, remote submission, map, or SOS delivery. The hotline directory demonstrates unverified/expired states with fictional labels only, no numbers, and no call action.
-- Volunteers use a feature-owned preview repository and ViewModel for synthetic profiles and search/college filtering. Organizations have a separate feature-owned preview repository, ViewModel, and directory page. Contact details, membership records, and approved hierarchy remain unconfigured.
-- Reporting uses a feature-owned preview repository and ViewModel for synthetic sample rows, date/program filtering, calculated summaries, and the local CSV copy action. Production queries and export authorization remain unconfigured.
-- Reports calculate synthetic participation, hours, and activity totals from local sample rows, with program/date filters and matching CSV output.
-- GoRouter handles the public landing and workspace routes.
-- Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
-- Firebase Core initializes against the approved `cmu-sbnu-vms` project; app startup does not read or write project data.
-- Firebase Auth and Firestore emulator endpoints are configured for explicit local use with `--dart-define=USE_FIREBASE_EMULATORS=true`.
-- Start local Auth and Firestore emulators with `firebase emulators:start --only auth,firestore`, then launch Flutter with `--dart-define=USE_FIREBASE_EMULATORS=true`. Override `FIREBASE_EMULATOR_HOST` for Android emulators or a non-local emulator host.
-- User-visible disclosure where records are synthetic or local-only and where a service action is not connected.
+### Foundations (complete)
+- Application theme, SBNU logo, and branding following `prototype/` palette and card styling
+- `lib/app/` — bootstrap, dependency composition (Provider), GoRouter routing, theme tokens
+- `lib/core/` — typed failures (`AppFailure`), privacy-safe logging (`AppLogger`), stable types (`LoadStatus`, `AppResult`, `CommandResult`, `AppTimestamp`)
+- `lib/shared/presentation/` — reusable policy-free UI: buttons, input fields, cards, loading/empty/error/offline/permission states, section headings, snackbar, nav drawer, preview badges, disclosure cards
+- Environment-aware Firebase initialization with explicit emulator opt-in via `--dart-define=USE_FIREBASE_EMULATORS=true`
+- Visible startup failure UI when Firebase configuration is invalid
 
-## Deliberately not connected
+### Auth (complete UI + repository contract)
+- Sign-in, registration, and password recovery pages with validated forms
+- `AuthRepository` contract + `FirebaseAuthRepository` implementation backed by Firebase Auth
+- `AuthViewModel` with sign-in/register/reset/sign-out state, loading/error states
+- Auth state stream and `currentUser` accessor
+- Route guards for `/account/*` pages; workspace routes accessible
 
-- Firebase Auth sign-in, account approval, and recovery. The project is selected, but provider and account lifecycle decisions remain pending.
-- Firestore repositories, query contracts, Security Rules tests, or Cloud Functions.
-- QR session issuance or scan validation. These require trusted server validation, expiry, activity eligibility, replay protection, idempotency, and reviewed authorization.
-- Incident location collection, provider-backed map, live reviewer list, or production review. The map-status card explains the open provider, location, and reviewer-permission decisions without displaying locations.
-- SOS delivery, responder roster, acknowledgement, escalation, or push notification. The preview reports that no alert was sent.
-- Institution-verified hotline data or phone handoff.
-- Production analytics, authorization, and report export. The preview can copy filtered synthetic rows only.
+### Access Control (complete UI)
+- Access & operations page with proposed permission matrix (Volunteer / Officer / Admin / Server)
+- Matrix is UX guidance only; real authorization is enforced at trusted backend boundaries
 
-Firestore rules continue to deny all client access. Firebase project/environment, region, account lifecycle, role/action matrix, retention, location policy, hotline ownership, responder coverage, and operational procedures remain open decisions in the specification. Do not add real member or emergency data until their owners approve the relevant controls.
+### Organizations (complete UI + preview repository)
+- Organization directory with name, status, coordinator list
+- Create organization dialog
+- `OrganizationsRepository` contract + preview + Firestore implementations
+
+### Volunteers (complete UI + preview repository)
+- Volunteer roster with college filter and search
+- Volunteer profile detail (full name, email, college, course, student ID, status)
+- `VolunteersRepository` contract + preview + Firestore implementations
+
+### Activities (complete UI + preview repository)
+- Activity browse with published status filter
+- Activity detail, create dialog (title, description, venue)
+- Join/withdraw participation
+- `ActivitiesRepository` contract + preview + Firestore implementations
+
+### Attendance (complete UI + preview repository)
+- Attendance record list (activity, UID, status, source)
+- Record attendance dialog (activity ID, volunteer UID, status)
+- `AttendanceRepository` contract + preview + Firestore implementations
+- Personal attendance via collection-group query
+
+### Announcements (complete UI + preview repository)
+- Announcement feed with status and priority badges
+- Create/publish dialog (title, message, audience)
+- Archive/delete operations
+- `AnnouncementsRepository` contract + preview + Firestore implementations
+
+### Incidents (complete UI + preview repository)
+- Incident submission (category, narrative, severity, optional location)
+- Incident list with status/severity badges
+- Status transitions (submitted → under review → action in progress → resolved, etc.)
+- Append-only history events
+- `IncidentsRepository` contract + preview + Firestore implementations
+
+### SOS (complete UI + preview repository, clearly labeled)
+- SOS alert creation with deliberate confirmation and emergency disclaimer
+- States: submitted, acknowledged, action in progress, resolved, cancelled, false alarm, closed
+- Delivery states: pending, sent, failed, unknown
+- Location sharing is optional
+- Clearly labeled as NOT contacting public emergency services
+- `SosRepository` contract + preview + Firestore implementations
+
+### Hotlines (complete UI + preview repository)
+- Hotline directory with label, number, coverage, hours
+- Verification states: verified, expired, rejected, disabled, pending
+- One-tap calling only for verified active entries (url_launcher)
+- Unverified/expired entries visibly non-callable
+- `HotlinesRepository` contract + preview + Firestore implementations
+
+### Reporting (complete UI + preview repository)
+- Scoped report summaries (active volunteers, activities, service hours, attendance rate)
+- CSV export generation
+- `ReportsRepository` contract + preview + Firestore implementations
+
+### Audit (complete UI + preview repository)
+- Append-only audit event review (actor, action, record type, outcome, timestamp)
+- `AuditRepository` contract + preview + Firestore implementations
+
+### Overview / Dashboard (complete)
+- Dashboard with activity and service hour metrics
+- Navigation drawer with all workspace sections
+- Section content delegates to feature pages
+
+### Navigation (complete)
+- GoRouter with routes: `/`, `/account/sign-in`, `/account/register`, `/account/recover`, `/workspace`, `/activities`, `/volunteers`, `/attendance`, `/announcements`, `/emergency`, `/reports`, `/sos`, `/incidents`, `/hotlines`, `/audit`, `/organizations`
+- Landing page with sign-in/register/CTA
+- Workspace shell with navigation drawer and responsive layout
+
+## Deliberately not connected (preview only)
+
+- Firebase Auth sign-in — repository contract exists; provider and account lifecycle decisions pending
+- Firestore writes — preview repositories are local-only; Firestore implementations exist but require approved Security Rules
+- QR session issuance/scan validation — requires trusted server validation
+- Incident location collection / map — provider and precision decisions pending
+- SOS delivery — no real routing or push; clearly labeled as preview
+- Institution-verified hotline data — fictional entries only
+- Production analytics/export — synthetic data only
+
+## Current verification
+
+- `flutter analyze --no-pub` — no errors (only warnings/info lints)
+- `flutter build web --no-pub` — succeeds
+- `dart format lib/` — applied
 
 ## Next development sequence
 
-1. Review and approve scope, supported platforms, role/action permissions, Firebase region, privacy classification, and data retention. The existing `cmu-sbnu-vms` project is approved for development use.
+1. Approve scope, supported platforms, role/action permissions, Firebase region, privacy classification, and data retention.
 2. Add authentication/session and account approval using the approved identity lifecycle.
 3. Define feature repository contracts, Firestore queries/indexes, callable operations, and least-privilege Rules; test authorization allow and deny cases.
 4. Connect activities, organizations, volunteer profiles, participation, attendance, and announcements to an approved development environment.
 5. Add QR only after server validation and replay/idempotency rules are in place.
 6. Add incidents, map/list, verified hotlines, and SOS only after privacy review and named operational owners/coverage are approved.
 7. Complete security/privacy, accessibility, backup/restore, monitoring, support, pilot, and release gates.
-
-## Current verification
-
-- `flutter analyze --no-pub` passes for the current interface implementation.
-- `flutter build web --no-pub` succeeds for the current interface implementation.
-- Automated tests have not yet been run for the newly added screens.

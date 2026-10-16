@@ -34,16 +34,19 @@ class VolunteersViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.volunteers.listen((vols) {
-      _volunteers = vols;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.volunteers.listen(
+      (vols) {
+        _volunteers = vols;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {

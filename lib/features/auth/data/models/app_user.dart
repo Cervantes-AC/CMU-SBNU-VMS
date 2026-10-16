@@ -92,7 +92,8 @@ class AppUser {
   }
 
   @override
-  String toString() => 'AppUser(uid: $uid, email: $email, status: $accountStatus)';
+  String toString() =>
+      'AppUser(uid: $uid, email: $email, status: $accountStatus)';
 
   static DateTime? _parseTimestamp(dynamic value) {
     if (value == null) return null;

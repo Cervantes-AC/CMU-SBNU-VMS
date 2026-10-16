@@ -12,8 +12,14 @@ abstract class VolunteersRepository {
   Stream<List<VolunteerProfile>> get volunteers;
   Stream<VolunteerProfile?> getVolunteerByUid(String uid);
   Stream<List<VolunteerProfile>> getVolunteersByOrganization(String orgId);
-  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(VolunteerProfile profile);
-  Future<AppResult<void>> updateProfileField(String uid, String field, dynamic value);
+  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(
+    VolunteerProfile profile,
+  );
+  Future<AppResult<void>> updateProfileField(
+    String uid,
+    String field,
+    dynamic value,
+  );
 }
 
 /// Preview implementation for development.
@@ -54,15 +60,23 @@ class PreviewVolunteersRepository implements VolunteersRepository {
   Stream<List<VolunteerProfile>> get volunteers => Stream.value(_volunteers);
 
   @override
-  Stream<VolunteerProfile?> getVolunteerByUid(String uid) =>
-      Stream.value(_volunteers.firstWhere((v) => v.uid == uid, orElse: () => _volunteers.first));
+  Stream<VolunteerProfile?> getVolunteerByUid(String uid) => Stream.value(
+    _volunteers.firstWhere(
+      (v) => v.uid == uid,
+      orElse: () => _volunteers.first,
+    ),
+  );
 
   @override
   Stream<List<VolunteerProfile>> getVolunteersByOrganization(String orgId) =>
-      Stream.value(_volunteers.where((v) => v.organizationIds.contains(orgId)).toList());
+      Stream.value(
+        _volunteers.where((v) => v.organizationIds.contains(orgId)).toList(),
+      );
 
   @override
-  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(VolunteerProfile profile) async {
+  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(
+    VolunteerProfile profile,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final idx = _volunteers.indexWhere((v) => v.uid == profile.uid);
     if (idx >= 0) {
@@ -74,7 +88,11 @@ class PreviewVolunteersRepository implements VolunteersRepository {
   }
 
   @override
-  Future<AppResult<void>> updateProfileField(String uid, String field, dynamic value) async {
+  Future<AppResult<void>> updateProfileField(
+    String uid,
+    String field,
+    dynamic value,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return const AppResult.data(null);
   }
@@ -91,11 +109,13 @@ class FirestoreVolunteersRepository implements VolunteersRepository {
   final FirebaseFirestore _firestore;
   final AppLogger _logger;
 
-  CollectionReference<Map<String, dynamic>> get _vols => _firestore.collection('volunteers');
+  CollectionReference<Map<String, dynamic>> get _vols =>
+      _firestore.collection('volunteers');
 
   @override
-  Stream<List<VolunteerProfile>> get volunteers =>
-      _vols.snapshots().map((s) => s.docs.map((d) => VolunteerProfile.fromFirestore(d)).toList());
+  Stream<List<VolunteerProfile>> get volunteers => _vols.snapshots().map(
+    (s) => s.docs.map((d) => VolunteerProfile.fromFirestore(d)).toList(),
+  );
 
   @override
   Stream<VolunteerProfile?> getVolunteerByUid(String uid) =>
@@ -106,14 +126,22 @@ class FirestoreVolunteersRepository implements VolunteersRepository {
 
   @override
   Stream<List<VolunteerProfile>> getVolunteersByOrganization(String orgId) =>
-      _vols.where('organizationIds', arrayContains: orgId).snapshots().map(
-        (s) => s.docs.map((d) => VolunteerProfile.fromFirestore(d)).toList(),
-      );
+      _vols
+          .where('organizationIds', arrayContains: orgId)
+          .snapshots()
+          .map(
+            (s) =>
+                s.docs.map((d) => VolunteerProfile.fromFirestore(d)).toList(),
+          );
 
   @override
-  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(VolunteerProfile profile) async {
+  Future<AppResult<VolunteerProfile>> createOrUpdateProfile(
+    VolunteerProfile profile,
+  ) async {
     try {
-      await _vols.doc(profile.uid).set(profile.toFirestore(), SetOptions(merge: true));
+      await _vols
+          .doc(profile.uid)
+          .set(profile.toFirestore(), SetOptions(merge: true));
       _logger.info('volunteer.profile_updated', fields: {'uid': profile.uid});
       return AppResult.data(profile);
     } on AppFailure catch (e) {
@@ -125,9 +153,16 @@ class FirestoreVolunteersRepository implements VolunteersRepository {
   }
 
   @override
-  Future<AppResult<void>> updateProfileField(String uid, String field, dynamic value) async {
+  Future<AppResult<void>> updateProfileField(
+    String uid,
+    String field,
+    dynamic value,
+  ) async {
     try {
-      await _vols.doc(uid).update({field: value, 'updatedAt': FieldValue.serverTimestamp()});
+      await _vols.doc(uid).update({
+        field: value,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);

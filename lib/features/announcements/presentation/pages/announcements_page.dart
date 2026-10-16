@@ -20,9 +20,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
     return Consumer<AnnouncementsViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Announcements'),
-          ),
+          appBar: AppBar(title: const Text('Announcements')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -50,7 +48,10 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
     );
   }
 
-  void _showCreateDialog(BuildContext context, AnnouncementsViewModel viewModel) {
+  void _showCreateDialog(
+    BuildContext context,
+    AnnouncementsViewModel viewModel,
+  ) {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
     showDialog(
@@ -82,17 +83,20 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
           AppButton(
             label: 'Publish',
             onPressed: () {
-              if (titleController.text.isEmpty || bodyController.text.isEmpty) return;
+              if (titleController.text.isEmpty || bodyController.text.isEmpty)
+                return;
               Navigator.of(context).pop();
-              viewModel.createAnnouncement(Announcement(
-                id: 'ann_${DateTime.now().millisecondsSinceEpoch}',
-                title: titleController.text.trim(),
-                body: bodyController.text.trim(),
-                audienceRule: 'all',
-                status: AnnouncementStatus.published,
-                authorUid: 'current_user',
-                publishAt: DateTime.now(),
-              ));
+              viewModel.createAnnouncement(
+                Announcement(
+                  id: 'ann_${DateTime.now().millisecondsSinceEpoch}',
+                  title: titleController.text.trim(),
+                  body: bodyController.text.trim(),
+                  audienceRule: 'all',
+                  status: AnnouncementStatus.published,
+                  authorUid: 'current_user',
+                  publishAt: DateTime.now(),
+                ),
+              );
             },
           ),
         ],
@@ -117,7 +121,10 @@ class _AnnouncementCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFE5EFE7),
                     borderRadius: BorderRadius.circular(6),
@@ -134,7 +141,10 @@ class _AnnouncementCard extends StatelessWidget {
                 if (announcement.priority == 'high') ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFCECE9),
                       borderRadius: BorderRadius.circular(6),
@@ -172,10 +182,7 @@ class _AnnouncementCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               '${announcement.publishAt.month}/${announcement.publishAt.day}/${announcement.publishAt.year}',
-              style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFF748078),
-              ),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF748078)),
             ),
           ],
         ),

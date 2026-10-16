@@ -26,15 +26,19 @@ class _ReportsPageState extends State<ReportsPage> {
               IconButton(
                 tooltip: 'Export CSV',
                 onPressed: () async {
-                  await viewModel.generateExport(
-                    type: 'summary',
-                    filters: {},
-                  );
+                  await viewModel.generateExport(type: 'summary', filters: {});
                   if (mounted) {
                     if (viewModel.csvContent != null) {
-                      showAppSnackbar(context, 'Report exported (CSV preview copied).');
+                      showAppSnackbar(
+                        context,
+                        'Report exported (CSV preview copied).',
+                      );
                     } else if (viewModel.error != null) {
-                      showAppSnackbar(context, viewModel.error!.message, isError: true);
+                      showAppSnackbar(
+                        context,
+                        viewModel.error!.message,
+                        isError: true,
+                      );
                     }
                   }
                 },
@@ -92,10 +96,7 @@ class _MetricRow extends StatelessWidget {
         ),
         subtitle: Text(
           record.unit ?? '',
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF748078),
-          ),
+          style: const TextStyle(fontSize: 12, color: Color(0xFF748078)),
         ),
       ),
     );

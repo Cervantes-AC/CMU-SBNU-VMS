@@ -5,20 +5,10 @@ import '../errors/app_failure.dart';
 /// Stable cross-feature primitive types used across the app.
 
 /// The status of a data-loading operation.
-enum LoadStatus {
-  initial,
-  loading,
-  loaded,
-  error,
-  offline,
-}
+enum LoadStatus { initial, loading, loaded, error, offline }
 
 /// The availability of a feature or service.
-enum FeatureAvailability {
-  available,
-  previewOnly,
-  unavailable,
-}
+enum FeatureAvailability { available, previewOnly, unavailable }
 
 /// Result wrapper for repository operations.
 class AppResult<T> {

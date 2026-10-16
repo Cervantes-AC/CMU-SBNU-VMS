@@ -1,6 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum SosLifecycleStatus { submitted, acknowledged, actionInProgress, resolved, cancelled, falseAlarm, closed }
+enum SosLifecycleStatus {
+  submitted,
+  acknowledged,
+  actionInProgress,
+  resolved,
+  cancelled,
+  falseAlarm,
+  closed,
+}
+
 enum SosDeliveryState { pending, sent, failed, unknown }
 
 class SosAlert {
@@ -41,21 +50,21 @@ class SosAlert {
   final DateTime? updatedAt;
 
   String get lifecycleLabel => switch (lifecycleStatus) {
-        SosLifecycleStatus.submitted => 'Submitted',
-        SosLifecycleStatus.acknowledged => 'Acknowledged',
-        SosLifecycleStatus.actionInProgress => 'Action in Progress',
-        SosLifecycleStatus.resolved => 'Resolved',
-        SosLifecycleStatus.cancelled => 'Cancelled',
-        SosLifecycleStatus.falseAlarm => 'False Alarm',
-        SosLifecycleStatus.closed => 'Closed',
-      };
+    SosLifecycleStatus.submitted => 'Submitted',
+    SosLifecycleStatus.acknowledged => 'Acknowledged',
+    SosLifecycleStatus.actionInProgress => 'Action in Progress',
+    SosLifecycleStatus.resolved => 'Resolved',
+    SosLifecycleStatus.cancelled => 'Cancelled',
+    SosLifecycleStatus.falseAlarm => 'False Alarm',
+    SosLifecycleStatus.closed => 'Closed',
+  };
 
   String get deliveryLabel => switch (deliveryState) {
-        SosDeliveryState.pending => 'Pending',
-        SosDeliveryState.sent => 'Sent',
-        SosDeliveryState.failed => 'Failed',
-        SosDeliveryState.unknown => 'Unknown',
-      };
+    SosDeliveryState.pending => 'Pending',
+    SosDeliveryState.sent => 'Sent',
+    SosDeliveryState.failed => 'Failed',
+    SosDeliveryState.unknown => 'Unknown',
+  };
 
   factory SosAlert.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

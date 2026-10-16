@@ -29,7 +29,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
     Activity(
       id: 'act_001',
       title: 'Community Tree Planting',
-      description: 'Help plant native trees around campus to support reforestation.',
+      description:
+          'Help plant native trees around campus to support reforestation.',
       status: ActivityStatus.published,
       category: ActivityCategory.service,
       startAt: DateTime(2026, 11, 5, 8, 0),
@@ -55,7 +56,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
     Activity(
       id: 'act_003',
       title: 'Food Drive for Barangay Partners',
-      description: 'Collect and distribute relief goods to partner communities.',
+      description:
+          'Collect and distribute relief goods to partner communities.',
       status: ActivityStatus.published,
       category: ActivityCategory.outreach,
       startAt: DateTime(2026, 11, 20, 8, 0),
@@ -75,8 +77,9 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       Stream.value(_activities.where((a) => a.isPublished).toList());
 
   @override
-  Stream<Activity?> getActivityById(String id) =>
-      Stream.value(_activities.firstWhere((a) => a.id == id, orElse: () => _activities.first));
+  Stream<Activity?> getActivityById(String id) => Stream.value(
+    _activities.firstWhere((a) => a.id == id, orElse: () => _activities.first),
+  );
 
   @override
   Future<AppResult<Activity>> createActivity(Activity activity) async {
@@ -93,7 +96,9 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       _activities[idx] = activity;
       return AppResult.data(activity);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Activity not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Activity not found.'),
+    );
   }
 
   @override
@@ -110,7 +115,10 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
   }
 
   @override
-  Future<AppResult<void>> withdrawParticipation(String activityId, String uid) async {
+  Future<AppResult<void>> withdrawParticipation(
+    String activityId,
+    String uid,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return const AppResult.data(null);
   }
@@ -138,14 +146,18 @@ class FirestoreActivitiesRepository implements ActivitiesRepository {
       _firestore.collection('activities');
 
   @override
-  Stream<List<Activity>> get activities =>
-      _activities.snapshots().map((snapshot) =>
-          snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList());
+  Stream<List<Activity>> get activities => _activities.snapshots().map(
+    (snapshot) =>
+        snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList(),
+  );
 
   @override
-  Stream<List<Activity>> get publishedActivities =>
-      _activities.where('status', isEqualTo: 'published').snapshots().map(
-        (snapshot) => snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList(),
+  Stream<List<Activity>> get publishedActivities => _activities
+      .where('status', isEqualTo: 'published')
+      .snapshots()
+      .map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList(),
       );
 
   @override
@@ -198,12 +210,16 @@ class FirestoreActivitiesRepository implements ActivitiesRepository {
   @override
   Future<AppResult<void>> participate(String activityId, String uid) async {
     try {
-      await _activities.doc(activityId).collection('participation').doc(uid).set({
-        'activityId': activityId,
-        'uid': uid,
-        'state': 'requested',
-        'requestedAt': FieldValue.serverTimestamp(),
-      });
+      await _activities
+          .doc(activityId)
+          .collection('participation')
+          .doc(uid)
+          .set({
+            'activityId': activityId,
+            'uid': uid,
+            'state': 'requested',
+            'requestedAt': FieldValue.serverTimestamp(),
+          });
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -214,9 +230,16 @@ class FirestoreActivitiesRepository implements ActivitiesRepository {
   }
 
   @override
-  Future<AppResult<void>> withdrawParticipation(String activityId, String uid) async {
+  Future<AppResult<void>> withdrawParticipation(
+    String activityId,
+    String uid,
+  ) async {
     try {
-      await _activities.doc(activityId).collection('participation').doc(uid).delete();
+      await _activities
+          .doc(activityId)
+          .collection('participation')
+          .doc(uid)
+          .delete();
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -228,14 +251,23 @@ class FirestoreActivitiesRepository implements ActivitiesRepository {
 
   @override
   Stream<List<Participation>> getParticipationForActivity(String activityId) =>
-      _activities.doc(activityId).collection('participation').snapshots().map(
-        (snapshot) => snapshot.docs.map((doc) => Participation.fromFirestore(doc)).toList(),
-      );
+      _activities
+          .doc(activityId)
+          .collection('participation')
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs
+                .map((doc) => Participation.fromFirestore(doc))
+                .toList(),
+          );
 
   @override
-  Stream<List<Activity>> getMyActivities(String uid) =>
-      _activities.where('ownerUid', isEqualTo: uid).snapshots().map(
-        (snapshot) => snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList(),
+  Stream<List<Activity>> getMyActivities(String uid) => _activities
+      .where('ownerUid', isEqualTo: uid)
+      .snapshots()
+      .map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => Activity.fromFirestore(doc)).toList(),
       );
 }
 

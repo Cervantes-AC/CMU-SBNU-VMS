@@ -30,13 +30,14 @@ class Announcement {
   final DateTime? updatedAt;
 
   String get statusLabel => switch (status) {
-        AnnouncementStatus.draft => 'Draft',
-        AnnouncementStatus.published => 'Published',
-        AnnouncementStatus.archived => 'Archived',
-      };
+    AnnouncementStatus.draft => 'Draft',
+    AnnouncementStatus.published => 'Published',
+    AnnouncementStatus.archived => 'Archived',
+  };
 
   bool get isPublished => status == AnnouncementStatus.published;
-  bool get isExpired => expiresAt != null && expiresAt!.isBefore(DateTime.now());
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
 
   factory Announcement.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

@@ -25,16 +25,19 @@ class AuditViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.events.listen((events) {
-      _events = events;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.events.listen(
+      (events) {
+        _events = events;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {

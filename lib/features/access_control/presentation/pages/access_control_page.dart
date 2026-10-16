@@ -81,9 +81,7 @@ class _AccessControlPageState extends State<AccessControlPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Access & Operations'),
-      ),
+      appBar: AppBar(title: const Text('Access & Operations')),
       body: SafeArea(
         child: Column(
           children: [
@@ -106,10 +104,7 @@ class _AccessControlPageState extends State<AccessControlPage> {
                   Text(
                     'This matrix is UX guidance only. Real authorization is enforced at trusted backend boundaries. '
                     'No roles can be changed from this screen.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF68766D),
-                    ),
+                    style: TextStyle(fontSize: 12, color: Color(0xFF68766D)),
                   ),
                 ],
               ),
@@ -155,10 +150,34 @@ class _MatrixRow extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: _Cell(label: 'Volunteer', text: entry.volunteer, color: entry.volunteerColor)),
-                Expanded(child: _Cell(label: 'Officer', text: entry.officer, color: entry.officerColor)),
-                Expanded(child: _Cell(label: 'Admin', text: entry.admin, color: entry.adminColor)),
-                Expanded(child: _Cell(label: 'Server', text: entry.server, color: entry.serverColor)),
+                Expanded(
+                  child: _Cell(
+                    label: 'Volunteer',
+                    text: entry.volunteer,
+                    color: entry.volunteerColor,
+                  ),
+                ),
+                Expanded(
+                  child: _Cell(
+                    label: 'Officer',
+                    text: entry.officer,
+                    color: entry.officerColor,
+                  ),
+                ),
+                Expanded(
+                  child: _Cell(
+                    label: 'Admin',
+                    text: entry.admin,
+                    color: entry.adminColor,
+                  ),
+                ),
+                Expanded(
+                  child: _Cell(
+                    label: 'Server',
+                    text: entry.server,
+                    color: entry.serverColor,
+                  ),
+                ),
               ],
             ),
           ],

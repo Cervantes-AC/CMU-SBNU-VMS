@@ -27,9 +27,9 @@ class AppDisclosureCard extends StatelessWidget {
               child: Text(
                 message,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.45,
-                      color: const Color(0xFF59685E),
-                    ),
+                  height: 1.45,
+                  color: const Color(0xFF59685E),
+                ),
               ),
             ),
           ],

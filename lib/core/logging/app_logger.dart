@@ -6,7 +6,12 @@
 abstract class AppLogger {
   void info(String event, {Map<String, dynamic>? fields});
   void warning(String event, {Map<String, dynamic>? fields});
-  void error(String event, {Object? error, StackTrace? stackTrace, Map<String, dynamic>? fields});
+  void error(
+    String event, {
+    Object? error,
+    StackTrace? stackTrace,
+    Map<String, dynamic>? fields,
+  });
   void security(String event, {Map<String, dynamic>? fields});
 }
 
@@ -21,7 +26,12 @@ class NoOpAppLogger implements AppLogger {
   void warning(String event, {Map<String, dynamic>? fields}) {}
 
   @override
-  void error(String event, {Object? error, StackTrace? stackTrace, Map<String, dynamic>? fields}) {}
+  void error(
+    String event, {
+    Object? error,
+    StackTrace? stackTrace,
+    Map<String, dynamic>? fields,
+  }) {}
 
   @override
   void security(String event, {Map<String, dynamic>? fields}) {}
@@ -44,7 +54,12 @@ class ConsoleAppLogger implements AppLogger {
   }
 
   @override
-  void error(String event, {Object? error, StackTrace? stackTrace, Map<String, dynamic>? fields}) {
+  void error(
+    String event, {
+    Object? error,
+    StackTrace? stackTrace,
+    Map<String, dynamic>? fields,
+  }) {
     final safeFields = _sanitize(fields);
     print('[ERROR] $event error=$error fields=$safeFields');
     if (stackTrace != null) {

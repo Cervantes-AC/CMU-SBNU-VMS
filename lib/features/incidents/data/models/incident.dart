@@ -1,6 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum IncidentStatus { submitted, underReview, actionInProgress, resolved, reopened, closed, rejected, duplicate }
+enum IncidentStatus {
+  submitted,
+  underReview,
+  actionInProgress,
+  resolved,
+  reopened,
+  closed,
+  rejected,
+  duplicate,
+}
 
 enum IncidentSeverity { low, medium, high, critical }
 
@@ -48,22 +57,22 @@ class Incident {
   final DateTime? updatedAt;
 
   String get statusLabel => switch (status) {
-        IncidentStatus.submitted => 'Submitted',
-        IncidentStatus.underReview => 'Under Review',
-        IncidentStatus.actionInProgress => 'Action in Progress',
-        IncidentStatus.resolved => 'Resolved',
-        IncidentStatus.reopened => 'Reopened',
-        IncidentStatus.closed => 'Closed',
-        IncidentStatus.rejected => 'Rejected',
-        IncidentStatus.duplicate => 'Duplicate',
-      };
+    IncidentStatus.submitted => 'Submitted',
+    IncidentStatus.underReview => 'Under Review',
+    IncidentStatus.actionInProgress => 'Action in Progress',
+    IncidentStatus.resolved => 'Resolved',
+    IncidentStatus.reopened => 'Reopened',
+    IncidentStatus.closed => 'Closed',
+    IncidentStatus.rejected => 'Rejected',
+    IncidentStatus.duplicate => 'Duplicate',
+  };
 
   String get severityLabel => switch (severity) {
-        IncidentSeverity.low => 'Low',
-        IncidentSeverity.medium => 'Medium',
-        IncidentSeverity.high => 'High',
-        IncidentSeverity.critical => 'Critical',
-      };
+    IncidentSeverity.low => 'Low',
+    IncidentSeverity.medium => 'Medium',
+    IncidentSeverity.high => 'High',
+    IncidentSeverity.critical => 'Critical',
+  };
 
   factory Incident.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

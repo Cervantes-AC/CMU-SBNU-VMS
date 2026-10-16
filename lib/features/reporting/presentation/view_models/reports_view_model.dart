@@ -27,16 +27,19 @@ class ReportsViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.summaryRecords.listen((records) {
-      _records = records;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.summaryRecords.listen(
+      (records) {
+        _records = records;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {
@@ -44,11 +47,17 @@ class ReportsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> generateExport({required String type, required Map<String, dynamic> filters}) async {
+  Future<void> generateExport({
+    required String type,
+    required Map<String, dynamic> filters,
+  }) async {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    final result = await repository.generateCsvExport(type: type, filters: filters);
+    final result = await repository.generateCsvExport(
+      type: type,
+      filters: filters,
+    );
     if (result.hasData) {
       _csvContent = result.data;
       _status = LoadStatus.loaded;

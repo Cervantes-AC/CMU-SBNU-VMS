@@ -29,17 +29,20 @@ class ActivitiesViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.activities.listen((activities) {
-      _activities = activities;
-      _publishedActivities = activities.where((a) => a.isPublished).toList();
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.activities.listen(
+      (activities) {
+        _activities = activities;
+        _publishedActivities = activities.where((a) => a.isPublished).toList();
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {

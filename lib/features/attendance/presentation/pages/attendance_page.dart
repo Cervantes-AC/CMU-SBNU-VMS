@@ -20,9 +20,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return Consumer<AttendanceViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Attendance'),
-          ),
+          appBar: AppBar(title: const Text('Attendance')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -98,19 +96,22 @@ class _AttendancePageState extends State<AttendancePage> {
           AppButton(
             label: 'Record',
             onPressed: () {
-              if (activityController.text.isEmpty || uidController.text.isEmpty) return;
+              if (activityController.text.isEmpty || uidController.text.isEmpty)
+                return;
               Navigator.of(context).pop();
-              viewModel.recordAttendance(AttendanceRecord(
-                activityId: activityController.text.trim(),
-                uid: uidController.text.trim(),
-                status: selectedStatus == 'present'
-                    ? AttendanceStatus.present
-                    : selectedStatus == 'absent'
-                        ? AttendanceStatus.absent
-                        : AttendanceStatus.excused,
-                recordedBy: 'current_user',
-                recordedAt: DateTime.now(),
-              ));
+              viewModel.recordAttendance(
+                AttendanceRecord(
+                  activityId: activityController.text.trim(),
+                  uid: uidController.text.trim(),
+                  status: selectedStatus == 'present'
+                      ? AttendanceStatus.present
+                      : selectedStatus == 'absent'
+                      ? AttendanceStatus.absent
+                      : AttendanceStatus.excused,
+                  recordedBy: 'current_user',
+                  recordedAt: DateTime.now(),
+                ),
+              );
             },
           ),
         ],

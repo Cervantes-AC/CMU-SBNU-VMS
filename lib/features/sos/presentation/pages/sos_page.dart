@@ -27,7 +27,11 @@ class _SosPageState extends State<SosPage> {
 
   Future<void> _submitAlert(SosViewModel viewModel) async {
     if (!_acknowledgeRisks) {
-      showAppSnackbar(context, 'Please acknowledge the emergency disclaimer.', isError: true);
+      showAppSnackbar(
+        context,
+        'Please acknowledge the emergency disclaimer.',
+        isError: true,
+      );
       return;
     }
     if (_detailsController.text.isEmpty) {
@@ -56,7 +60,11 @@ class _SosPageState extends State<SosPage> {
           _acknowledgeRisks = false;
         });
       } else {
-        showAppSnackbar(context, viewModel.error?.message ?? 'Failed to submit alert.', isError: true);
+        showAppSnackbar(
+          context,
+          viewModel.error?.message ?? 'Failed to submit alert.',
+          isError: true,
+        );
       }
     }
   }
@@ -66,9 +74,7 @@ class _SosPageState extends State<SosPage> {
     return Consumer<SosViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Emergency SOS'),
-          ),
+          appBar: AppBar(title: const Text('Emergency SOS')),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(22),
@@ -88,7 +94,10 @@ class _SosPageState extends State<SosPage> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.warning_amber_outlined, color: Color(0xFFB63D34)),
+                            Icon(
+                              Icons.warning_amber_outlined,
+                              color: Color(0xFFB63D34),
+                            ),
                             SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -137,18 +146,24 @@ class _SosPageState extends State<SosPage> {
                   ListTile(
                     leading: Checkbox(
                       value: _shareLocation,
-                      onChanged: (v) => setState(() => _shareLocation = v ?? false),
+                      onChanged: (v) =>
+                          setState(() => _shareLocation = v ?? false),
                     ),
                     title: const Text('Share location'),
-                    subtitle: const Text('Optional - helps responders find you'),
+                    subtitle: const Text(
+                      'Optional - helps responders find you',
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ListTile(
                     leading: Checkbox(
                       value: _acknowledgeRisks,
-                      onChanged: (v) => setState(() => _acknowledgeRisks = v ?? false),
+                      onChanged: (v) =>
+                          setState(() => _acknowledgeRisks = v ?? false),
                     ),
-                    title: const Text('I understand this alert does not contact emergency services'),
+                    title: const Text(
+                      'I understand this alert does not contact emergency services',
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -173,7 +188,9 @@ class _SosPageState extends State<SosPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ...viewModel.myAlerts.take(3).map((a) => _AlertCard(alert: a)),
+                    ...viewModel.myAlerts
+                        .take(3)
+                        .map((a) => _AlertCard(alert: a)),
                   ],
                 ],
               ),

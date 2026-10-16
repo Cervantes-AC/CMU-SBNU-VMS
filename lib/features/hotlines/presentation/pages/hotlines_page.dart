@@ -21,7 +21,11 @@ class _HotlinesPageState extends State<HotlinesPage> {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
-      showAppSnackbar(context, 'Cannot initiate call on this device.', isError: true);
+      showAppSnackbar(
+        context,
+        'Cannot initiate call on this device.',
+        isError: true,
+      );
     }
   }
 
@@ -30,9 +34,7 @@ class _HotlinesPageState extends State<HotlinesPage> {
     return Consumer<HotlinesViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Emergency Hotlines'),
-          ),
+          appBar: AppBar(title: const Text('Emergency Hotlines')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -49,7 +51,9 @@ class _HotlinesPageState extends State<HotlinesPage> {
                       final h = viewModel.hotlines[index];
                       return _HotlineCard(
                         entry: h,
-                        onCall: h.isCallEnabled ? () => _callNumber(h.phoneE164) : null,
+                        onCall: h.isCallEnabled
+                            ? () => _callNumber(h.phoneE164)
+                            : null,
                       );
                     },
                   ),
@@ -93,18 +97,12 @@ class _HotlineCard extends StatelessWidget {
           children: [
             Text(
               entry.phoneE164,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF68766D),
-              ),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF68766D)),
             ),
             const SizedBox(height: 4),
             Text(
               '${entry.coverage} · ${entry.hours}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF748078),
-              ),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF748078)),
             ),
           ],
         ),
@@ -137,10 +135,7 @@ class _HotlineCard extends StatelessWidget {
             else
               const Text(
                 'Not callable',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFF748078),
-                ),
+                style: TextStyle(fontSize: 10, color: Color(0xFF748078)),
               ),
           ],
         ),

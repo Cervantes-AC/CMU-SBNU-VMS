@@ -56,12 +56,17 @@ class AppInputField extends StatelessWidget {
           style: const TextStyle(fontSize: 15, color: Color(0xFF17231C)),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon != null ? Icon(icon, size: 20, color: const Color(0xFF748078)) : null,
+            prefixIcon: icon != null
+                ? Icon(icon, size: 20, color: const Color(0xFF748078))
+                : null,
             prefixText: prefixText,
             suffixText: suffixText,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFE1E6DF)),
@@ -72,7 +77,10 @@ class AppInputField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF134F35), width: 1.5),
+              borderSide: const BorderSide(
+                color: Color(0xFF134F35),
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -80,7 +88,10 @@ class AppInputField extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFB63D34), width: 1.5),
+              borderSide: const BorderSide(
+                color: Color(0xFFB63D34),
+                width: 1.5,
+              ),
             ),
           ),
         ),

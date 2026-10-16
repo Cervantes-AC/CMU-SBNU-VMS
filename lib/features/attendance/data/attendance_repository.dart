@@ -12,8 +12,13 @@ abstract class AttendanceRepository {
   Stream<List<AttendanceRecord>> getAttendanceForActivity(String activityId);
   Stream<List<AttendanceRecord>> getMyAttendance(String uid);
   Future<AppResult<void>> recordAttendance(AttendanceRecord record);
-  Future<AppResult<void>> correctAttendance(String activityId, String uid,
-      {required String newStatus, required String reason, required String correctedBy});
+  Future<AppResult<void>> correctAttendance(
+    String activityId,
+    String uid, {
+    required String newStatus,
+    required String reason,
+    required String correctedBy,
+  });
   Stream<List<AttendanceRecord>> getAllAttendance();
 }
 
@@ -56,8 +61,13 @@ class PreviewAttendanceRepository implements AttendanceRepository {
   }
 
   @override
-  Future<AppResult<void>> correctAttendance(String activityId, String uid,
-      {required String newStatus, required String reason, required String correctedBy}) async {
+  Future<AppResult<void>> correctAttendance(
+    String activityId,
+    String uid, {
+    required String newStatus,
+    required String reason,
+    required String correctedBy,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final idx = _records.indexWhere(
       (r) => r.activityId == activityId && r.uid == uid,
@@ -67,7 +77,9 @@ class PreviewAttendanceRepository implements AttendanceRepository {
       _records[idx] = AttendanceRecord(
         activityId: old.activityId,
         uid: old.uid,
-        status: newStatus == 'present' ? AttendanceStatus.present : AttendanceStatus.absent,
+        status: newStatus == 'present'
+            ? AttendanceStatus.present
+            : AttendanceStatus.absent,
         recordedBy: old.recordedBy,
         recordedAt: old.recordedAt,
         source: old.source,
@@ -77,7 +89,9 @@ class PreviewAttendanceRepository implements AttendanceRepository {
       );
       return const AppResult.data(null);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Attendance record not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Attendance record not found.'),
+    );
   }
 
   @override
@@ -102,16 +116,20 @@ class FirestoreAttendanceRepository implements AttendanceRepository {
           .doc(activityId)
           .collection('attendance')
           .snapshots()
-          .map((s) => s.docs.map((d) => AttendanceRecord.fromFirestore(d)).toList());
+          .map(
+            (s) =>
+                s.docs.map((d) => AttendanceRecord.fromFirestore(d)).toList(),
+          );
 
   @override
-  Stream<List<AttendanceRecord>> getMyAttendance(String uid) =>
-      _firestore
-          .collectionGroup('attendance')
-          .where('uid', isEqualTo: uid)
-          .orderBy('recordedAt', descending: true)
-          .snapshots()
-          .map((s) => s.docs.map((d) => AttendanceRecord.fromFirestore(d)).toList());
+  Stream<List<AttendanceRecord>> getMyAttendance(String uid) => _firestore
+      .collectionGroup('attendance')
+      .where('uid', isEqualTo: uid)
+      .orderBy('recordedAt', descending: true)
+      .snapshots()
+      .map(
+        (s) => s.docs.map((d) => AttendanceRecord.fromFirestore(d)).toList(),
+      );
 
   @override
   Future<AppResult<void>> recordAttendance(AttendanceRecord record) async {
@@ -122,10 +140,10 @@ class FirestoreAttendanceRepository implements AttendanceRepository {
           .collection('attendance')
           .doc(record.uid)
           .set(record.toFirestore());
-      _logger.info('attendance.recorded', fields: {
-        'activityId': record.activityId,
-        'uid': record.uid,
-      });
+      _logger.info(
+        'attendance.recorded',
+        fields: {'activityId': record.activityId, 'uid': record.uid},
+      );
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -136,8 +154,13 @@ class FirestoreAttendanceRepository implements AttendanceRepository {
   }
 
   @override
-  Future<AppResult<void>> correctAttendance(String activityId, String uid,
-      {required String newStatus, required String reason, required String correctedBy}) async {
+  Future<AppResult<void>> correctAttendance(
+    String activityId,
+    String uid, {
+    required String newStatus,
+    required String reason,
+    required String correctedBy,
+  }) async {
     try {
       final ref = _firestore
           .collection('activities')
@@ -160,8 +183,10 @@ class FirestoreAttendanceRepository implements AttendanceRepository {
   }
 
   @override
-  Stream<List<AttendanceRecord>> getAllAttendance() =>
-      _firestore.collectionGroup('attendance').snapshots().map(
+  Stream<List<AttendanceRecord>> getAllAttendance() => _firestore
+      .collectionGroup('attendance')
+      .snapshots()
+      .map(
         (s) => s.docs.map((d) => AttendanceRecord.fromFirestore(d)).toList(),
       );
 }

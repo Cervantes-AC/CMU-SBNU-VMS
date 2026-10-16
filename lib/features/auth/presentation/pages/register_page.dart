@@ -173,7 +173,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             onPressed: () {
                               // Navigate to sign in
                             },
-                            child: const Text('Already have an account? Sign in'),
+                            child: const Text(
+                              'Already have an account? Sign in',
+                            ),
                           ),
                         ),
                       ],

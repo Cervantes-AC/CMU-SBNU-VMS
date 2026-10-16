@@ -31,16 +31,19 @@ class SosViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.alerts.listen((alerts) {
-      _alerts = alerts;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.alerts.listen(
+      (alerts) {
+        _alerts = alerts;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
 
     repository.getMyAlerts('current_user').listen((myAlerts) {
       _myAlerts = myAlerts;
@@ -77,7 +80,8 @@ class SosViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateAlertStatus(String id, {
+  Future<void> updateAlertStatus(
+    String id, {
     required SosLifecycleStatus lifecycleStatus,
     SosDeliveryState? deliveryState,
     String? assignedHandlerUid,

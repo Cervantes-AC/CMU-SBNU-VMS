@@ -51,7 +51,10 @@ class _VolunteersPageState extends State<VolunteersPage> {
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       final v = filtered[index];
-                      return _VolunteerCard(profile: v, onTap: () => viewModel.select(v));
+                      return _VolunteerCard(
+                        profile: v,
+                        onTap: () => viewModel.select(v),
+                      );
                     },
                   ),
           ),
@@ -84,7 +87,10 @@ class _VolunteerCard extends StatelessWidget {
                   color: const Color(0xFFE5EFE7),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.person_outlined, color: Color(0xFF134F35)),
+                child: const Icon(
+                  Icons.person_outlined,
+                  color: Color(0xFF134F35),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -102,16 +108,25 @@ class _VolunteerCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       profile.email,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF68766D)),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF68766D),
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       '${profile.college ?? '-'} · ${profile.course ?? '-'}',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF748078)),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF748078),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: profile.isActive
                             ? const Color(0xFFE5EFE7)

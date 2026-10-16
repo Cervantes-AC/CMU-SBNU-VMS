@@ -47,11 +47,12 @@ class PreviewOrganizationsRepository implements OrganizationsRepository {
   Stream<List<Organization>> get organizations => Stream.value(_organizations);
 
   @override
-  Stream<Organization?> getOrganizationById(String id) =>
-      Stream.value(_organizations.firstWhere(
-        (o) => o.id == id,
-        orElse: () => _organizations.first,
-      ));
+  Stream<Organization?> getOrganizationById(String id) => Stream.value(
+    _organizations.firstWhere(
+      (o) => o.id == id,
+      orElse: () => _organizations.first,
+    ),
+  );
 
   @override
   Future<AppResult<Organization>> createOrganization(Organization org) async {
@@ -68,7 +69,9 @@ class PreviewOrganizationsRepository implements OrganizationsRepository {
       _organizations[idx] = org;
       return AppResult.data(org);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Organization not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Organization not found.'),
+    );
   }
 
   @override
@@ -94,8 +97,9 @@ class FirestoreOrganizationsRepository implements OrganizationsRepository {
       _firestore.collection('organizations');
 
   @override
-  Stream<List<Organization>> get organizations =>
-      _orgs.snapshots().map((s) => s.docs.map((d) => Organization.fromFirestore(d)).toList());
+  Stream<List<Organization>> get organizations => _orgs.snapshots().map(
+    (s) => s.docs.map((d) => Organization.fromFirestore(d)).toList(),
+  );
 
   @override
   Stream<Organization?> getOrganizationById(String id) =>
@@ -151,7 +155,10 @@ OrganizationsRepository createOrganizationsRepository({
   required AppLogger logger,
 }) {
   if (useFirestore && firestore != null) {
-    return FirestoreOrganizationsRepository(firestore: firestore, logger: logger);
+    return FirestoreOrganizationsRepository(
+      firestore: firestore,
+      logger: logger,
+    );
   }
   return PreviewOrganizationsRepository();
 }

@@ -27,16 +27,19 @@ class OrganizationsViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.organizations.listen((orgs) {
-      _organizations = orgs;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.organizations.listen(
+      (orgs) {
+        _organizations = orgs;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {
@@ -66,7 +69,9 @@ class OrganizationsViewModel extends ChangeNotifier {
   }
 }
 
-OrganizationsViewModel createOrganizationsViewModel(OrganizationsRepository repository) {
+OrganizationsViewModel createOrganizationsViewModel(
+  OrganizationsRepository repository,
+) {
   return OrganizationsViewModel(repository: repository);
 }
 

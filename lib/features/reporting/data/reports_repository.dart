@@ -57,8 +57,10 @@ class FirestoreReportsRepository implements ReportsRepository {
   final AppLogger _logger;
 
   @override
-  Stream<List<ReportRecord>> get summaryRecords =>
-      _firestore.collection('reportSummary').snapshots().map(
+  Stream<List<ReportRecord>> get summaryRecords => _firestore
+      .collection('reportSummary')
+      .snapshots()
+      .map(
         (s) => s.docs.map((d) {
           final data = d.data();
           return ReportRecord(

@@ -24,11 +24,7 @@ class EmergencyPage extends StatelessWidget {
           ),
         ),
         body: const TabBarView(
-          children: [
-            SosPage(),
-            IncidentsPage(),
-            HotlinesPage(),
-          ],
+          children: [SosPage(), IncidentsPage(), HotlinesPage()],
         ),
       ),
     );

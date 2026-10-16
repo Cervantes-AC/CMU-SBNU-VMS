@@ -20,9 +20,7 @@ class _AuditPageState extends State<AuditPage> {
     return Consumer<AuditViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Audit Log'),
-          ),
+          appBar: AppBar(title: const Text('Audit Log')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -58,10 +56,14 @@ class _AuditRow extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: isSuccess ? const Color(0xFFE5EFE7) : const Color(0xFFF5E5E5),
+          backgroundColor: isSuccess
+              ? const Color(0xFFE5EFE7)
+              : const Color(0xFFF5E5E5),
           child: Icon(
             isSuccess ? Icons.check_circle : Icons.error_outline,
-            color: isSuccess ? const Color(0xFF196142) : const Color(0xFFB63D34),
+            color: isSuccess
+                ? const Color(0xFF196142)
+                : const Color(0xFFB63D34),
           ),
         ),
         title: Text(
@@ -91,7 +93,9 @@ class _AuditRow extends StatelessWidget {
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w700,
-            color: isSuccess ? const Color(0xFF196142) : const Color(0xFFB63D34),
+            color: isSuccess
+                ? const Color(0xFF196142)
+                : const Color(0xFFB63D34),
           ),
         ),
       ),

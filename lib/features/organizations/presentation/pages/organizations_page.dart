@@ -20,9 +20,7 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
     return Consumer<OrganizationsViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Organizations'),
-          ),
+          appBar: AppBar(title: const Text('Organizations')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -37,7 +35,10 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
                     itemCount: viewModel.organizations.length,
                     itemBuilder: (context, index) {
                       final org = viewModel.organizations[index];
-                      return _OrgCard(organization: org, onTap: () => viewModel.select(org));
+                      return _OrgCard(
+                        organization: org,
+                        onTap: () => viewModel.select(org),
+                      );
                     },
                   ),
           ),
@@ -50,7 +51,10 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
     );
   }
 
-  void _showCreateDialog(BuildContext context, OrganizationsViewModel viewModel) {
+  void _showCreateDialog(
+    BuildContext context,
+    OrganizationsViewModel viewModel,
+  ) {
     final controller = TextEditingController();
     showDialog(
       context: context,
@@ -72,12 +76,14 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
             onPressed: () {
               if (controller.text.trim().isEmpty) return;
               Navigator.of(context).pop();
-              viewModel.createOrganization(Organization(
-                id: 'org_${DateTime.now().millisecondsSinceEpoch}',
-                name: controller.text.trim(),
-                status: 'active',
-                coordinatorUids: [],
-              ));
+              viewModel.createOrganization(
+                Organization(
+                  id: 'org_${DateTime.now().millisecondsSinceEpoch}',
+                  name: controller.text.trim(),
+                  status: 'active',
+                  coordinatorUids: [],
+                ),
+              );
             },
           ),
         ],
@@ -109,7 +115,10 @@ class _OrgCard extends StatelessWidget {
                   color: const Color(0xFFE5EFE7),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.groups_outlined, color: Color(0xFF134F35)),
+                child: const Icon(
+                  Icons.groups_outlined,
+                  color: Color(0xFF134F35),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -129,7 +138,9 @@ class _OrgCard extends StatelessWidget {
                       organization.isActive ? 'Active' : 'Inactive',
                       style: TextStyle(
                         fontSize: 12,
-                        color: organization.isActive ? const Color(0xFF196142) : const Color(0xFFB63D34),
+                        color: organization.isActive
+                            ? const Color(0xFF196142)
+                            : const Color(0xFFB63D34),
                         fontWeight: FontWeight.w700,
                       ),
                     ),

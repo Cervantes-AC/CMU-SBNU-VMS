@@ -93,16 +93,16 @@ class FirestoreHotlinesRepository implements HotlinesRepository {
       _firestore.collection('hotlines');
 
   @override
-  Stream<List<HotlineEntry>> get hotlines =>
-      _hotlines.snapshots().map((s) => s.docs.map((d) => _fromFirestore(d)).toList());
+  Stream<List<HotlineEntry>> get hotlines => _hotlines.snapshots().map(
+    (s) => s.docs.map((d) => _fromFirestore(d)).toList(),
+  );
 
   @override
-  Stream<List<HotlineEntry>> getVerifiedActiveHotlines() =>
-      _hotlines
-          .where('verificationState', isEqualTo: 'verified')
-          .where('active', isEqualTo: true)
-          .snapshots()
-          .map((s) => s.docs.map((d) => _fromFirestore(d)).toList());
+  Stream<List<HotlineEntry>> getVerifiedActiveHotlines() => _hotlines
+      .where('verificationState', isEqualTo: 'verified')
+      .where('active', isEqualTo: true)
+      .snapshots()
+      .map((s) => s.docs.map((d) => _fromFirestore(d)).toList());
 
   HotlineEntry _fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

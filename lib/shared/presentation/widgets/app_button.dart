@@ -21,18 +21,34 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveOnPressed = isLoading || onPressed == null ? null : onPressed;
+    final effectiveOnPressed = isLoading || onPressed == null
+        ? null
+        : onPressed;
 
     if (isOutlined) {
       return OutlinedButton.icon(
         onPressed: effectiveOnPressed,
         icon: icon != null ? Icon(icon, size: 18) : null,
-        label: isLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : Text(label),
+        label: isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Text(label),
         style: OutlinedButton.styleFrom(
-          foregroundColor: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
-          side: BorderSide(color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary),
+          foregroundColor: isDestructive
+              ? Theme.of(context).colorScheme.error
+              : Theme.of(context).colorScheme.primary,
+          side: BorderSide(
+            color: isDestructive
+                ? Theme.of(context).colorScheme.error
+                : Theme.of(context).colorScheme.primary,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }
@@ -40,9 +56,17 @@ class AppButton extends StatelessWidget {
     return FilledButton.icon(
       onPressed: effectiveOnPressed,
       icon: icon != null ? Icon(icon, size: 18) : null,
-      label: isLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : Text(label),
+      label: isLoading
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Text(label),
       style: FilledButton.styleFrom(
-        backgroundColor: isDestructive ? Theme.of(context).colorScheme.error : null,
+        backgroundColor: isDestructive
+            ? Theme.of(context).colorScheme.error
+            : null,
         foregroundColor: isDestructive ? Colors.white : null,
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

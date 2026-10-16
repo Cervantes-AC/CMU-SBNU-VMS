@@ -27,16 +27,19 @@ class AttendanceViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.getAllAttendance().listen((records) {
-      _records = records;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.getAllAttendance().listen(
+      (records) {
+        _records = records;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
 
     repository.getMyAttendance('current_user').listen((records) {
       _myRecords = records;
@@ -65,8 +68,13 @@ class AttendanceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> correctAttendance(String activityId, String uid,
-      {required String newStatus, required String reason, required String correctedBy}) async {
+  Future<void> correctAttendance(
+    String activityId,
+    String uid, {
+    required String newStatus,
+    required String reason,
+    required String correctedBy,
+  }) async {
     _status = LoadStatus.loading;
     notifyListeners();
 

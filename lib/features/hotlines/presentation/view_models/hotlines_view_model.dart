@@ -27,17 +27,20 @@ class HotlinesViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.hotlines.listen((hotlines) {
-      _hotlines = hotlines;
-      _verified = hotlines.where((h) => h.isVerified).toList();
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.hotlines.listen(
+      (hotlines) {
+        _hotlines = hotlines;
+        _verified = hotlines.where((h) => h.isVerified).toList();
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {

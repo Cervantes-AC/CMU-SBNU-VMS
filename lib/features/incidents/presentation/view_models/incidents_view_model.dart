@@ -29,16 +29,19 @@ class IncidentsViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.incidents.listen((incidents) {
-      _incidents = incidents;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.incidents.listen(
+      (incidents) {
+        _incidents = incidents;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
 
     repository.getMyIncidents('current_user').listen((myIncidents) {
       _myIncidents = myIncidents;
@@ -72,7 +75,8 @@ class IncidentsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateStatus(String id, {
+  Future<void> updateStatus(
+    String id, {
     required IncidentStatus newStatus,
     required String actorUid,
     String? note,

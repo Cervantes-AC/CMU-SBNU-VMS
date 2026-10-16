@@ -4,7 +4,8 @@ import '../../../../core/errors/app_failure.dart';
 
 /// Data source for Firebase Auth operations.
 class AuthRemoteSource {
-  AuthRemoteSource({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
+  AuthRemoteSource({FirebaseAuth? auth})
+    : _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _auth;
 
@@ -20,7 +21,10 @@ class AuthRemoteSource {
     required String password,
   }) async {
     try {
-      return await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
     } on FirebaseAuthException catch (e) {
       throw _mapAuthException(e);
     }
@@ -32,7 +36,10 @@ class AuthRemoteSource {
     required String password,
   }) async {
     try {
-      return await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      return await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
     } on FirebaseAuthException catch (e) {
       throw _mapAuthException(e);
     }
@@ -73,19 +80,27 @@ class AuthRemoteSource {
       case 'user-disabled':
         return UnauthenticatedFailure(message: 'Invalid email or password.');
       case 'email-already-in-use':
-        return InvalidRequestFailure(message: 'An account with this email already exists.');
+        return InvalidRequestFailure(
+          message: 'An account with this email already exists.',
+        );
       case 'weak-password':
         return InvalidRequestFailure(message: 'Password is too weak.');
       case 'operation-not-allowed':
-        return InvalidRequestFailure(message: 'Email/password accounts are not enabled.');
+        return InvalidRequestFailure(
+          message: 'Email/password accounts are not enabled.',
+        );
       case 'too-many-requests':
-        return NetworkFailure(message: 'Too many attempts. Please try again later.');
+        return NetworkFailure(
+          message: 'Too many attempts. Please try again later.',
+        );
       case 'network-request-failed':
         return NetworkFailure();
       case 'permission-denied':
         return PermissionDeniedFailure();
       default:
-        return UnknownFailure(message: 'Authentication error: ${e.message ?? e.code}');
+        return UnknownFailure(
+          message: 'Authentication error: ${e.message ?? e.code}',
+        );
     }
   }
 }

@@ -27,17 +27,20 @@ class AnnouncementsViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.announcements.listen((anns) {
-      _announcements = anns;
-      _published = anns.where((a) => a.isPublished && !a.isExpired).toList();
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.announcements.listen(
+      (anns) {
+        _announcements = anns;
+        _published = anns.where((a) => a.isPublished && !a.isExpired).toList();
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void clearError() {
@@ -74,7 +77,9 @@ class AnnouncementsViewModel extends ChangeNotifier {
   }
 }
 
-AnnouncementsViewModel createAnnouncementsViewModel(AnnouncementsRepository repository) {
+AnnouncementsViewModel createAnnouncementsViewModel(
+  AnnouncementsRepository repository,
+) {
   return AnnouncementsViewModel(repository: repository);
 }
 

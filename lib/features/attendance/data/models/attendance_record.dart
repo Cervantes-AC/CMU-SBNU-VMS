@@ -26,10 +26,10 @@ class AttendanceRecord {
   final String? correctedBy;
 
   String get statusLabel => switch (status) {
-        AttendanceStatus.present => 'Present',
-        AttendanceStatus.absent => 'Absent',
-        AttendanceStatus.excused => 'Excused',
-      };
+    AttendanceStatus.present => 'Present',
+    AttendanceStatus.absent => 'Absent',
+    AttendanceStatus.excused => 'Excused',
+  };
 
   bool get isCorrected => correctedAt != null;
 

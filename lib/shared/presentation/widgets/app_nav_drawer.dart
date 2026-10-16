@@ -64,10 +64,7 @@ class AppNavDrawer extends StatelessWidget {
                 children: [
                   Text(
                     'SBNu',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     'VOLUNTEER WORKSPACE',
@@ -92,7 +89,10 @@ class AppNavDrawer extends StatelessWidget {
               leading: const Icon(Icons.logout, color: Color(0xFFB63D34)),
               title: const Text(
                 'Sign out',
-                style: TextStyle(color: Color(0xFFB63D34), fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: Color(0xFFB63D34),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               onTap: onSignOut,
             ),

@@ -20,9 +20,7 @@ class _IncidentsPageState extends State<IncidentsPage> {
     return Consumer<IncidentsViewModel>(
       builder: (context, viewModel, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Incidents & Safety'),
-          ),
+          appBar: AppBar(title: const Text('Incidents & Safety')),
           body: AppStateWrapper(
             status: viewModel.status,
             onRetry: viewModel.init,
@@ -31,14 +29,18 @@ class _IncidentsPageState extends State<IncidentsPage> {
                 ? const AppEmptyState(
                     icon: Icons.report_outlined,
                     title: 'No incident reports.',
-                    subtitle: 'Submit a report if you observe a safety concern.',
+                    subtitle:
+                        'Submit a report if you observe a safety concern.',
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: viewModel.myIncidents.length,
                     itemBuilder: (context, index) {
                       final inc = viewModel.myIncidents[index];
-                      return _IncidentCard(incident: inc, onTap: () => viewModel.select(inc));
+                      return _IncidentCard(
+                        incident: inc,
+                        onTap: () => viewModel.select(inc),
+                      );
                     },
                   ),
           ),
@@ -111,23 +113,27 @@ class _IncidentsPageState extends State<IncidentsPage> {
           AppButton(
             label: 'Submit',
             onPressed: () {
-              if (categoryController.text.isEmpty || narrativeController.text.isEmpty) return;
+              if (categoryController.text.isEmpty ||
+                  narrativeController.text.isEmpty)
+                return;
               Navigator.of(context).pop();
-              viewModel.submitIncident(Incident(
-                id: 'inc_${DateTime.now().millisecondsSinceEpoch}',
-                reporterUid: 'current_user',
-                organizationId: 'org_001',
-                category: categoryController.text.trim(),
-                narrative: narrativeController.text.trim(),
-                severity: IncidentSeverity.values.firstWhere(
-                  (e) => e.name == severity,
-                  orElse: () => IncidentSeverity.medium,
+              viewModel.submitIncident(
+                Incident(
+                  id: 'inc_${DateTime.now().millisecondsSinceEpoch}',
+                  reporterUid: 'current_user',
+                  organizationId: 'org_001',
+                  category: categoryController.text.trim(),
+                  narrative: narrativeController.text.trim(),
+                  severity: IncidentSeverity.values.firstWhere(
+                    (e) => e.name == severity,
+                    orElse: () => IncidentSeverity.medium,
+                  ),
+                  status: IncidentStatus.submitted,
+                  occurredAt: DateTime.now(),
+                  reportedAt: DateTime.now(),
+                  locationShared: shareLocation,
                 ),
-                status: IncidentStatus.submitted,
-                occurredAt: DateTime.now(),
-                reportedAt: DateTime.now(),
-                locationShared: shareLocation,
-              ));
+              );
             },
           ),
         ],
@@ -194,7 +200,10 @@ class _IncidentCard extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
@@ -210,7 +219,10 @@ class _IncidentCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFE5EFE7),
                             borderRadius: BorderRadius.circular(6),

@@ -14,13 +14,18 @@ abstract class IncidentsRepository {
   Stream<Incident?> getIncidentById(String id);
   Stream<List<IncidentHistoryEvent>> getHistory(String incidentId);
   Future<AppResult<Incident>> submitIncident(Incident incident);
-  Future<AppResult<Incident>> updateIncidentStatus(String id, {
+  Future<AppResult<Incident>> updateIncidentStatus(
+    String id, {
     required IncidentStatus newStatus,
     required String actorUid,
     String? note,
     String? actionType,
   });
-  Future<AppResult<void>> assignIncident(String id, String assignedUid, String actorUid);
+  Future<AppResult<void>> assignIncident(
+    String id,
+    String assignedUid,
+    String actorUid,
+  );
 }
 
 /// Preview implementation for development.
@@ -65,14 +70,13 @@ class PreviewIncidentsRepository implements IncidentsRepository {
       Stream.value(_incidents.where((i) => i.reporterUid == uid).toList());
 
   @override
-  Stream<Incident?> getIncidentById(String id) =>
-      Stream.value(_incidents.firstWhere(
-        (i) => i.id == id,
-        orElse: () => _incidents.first,
-      ));
+  Stream<Incident?> getIncidentById(String id) => Stream.value(
+    _incidents.firstWhere((i) => i.id == id, orElse: () => _incidents.first),
+  );
 
   @override
-  Stream<List<IncidentHistoryEvent>> getHistory(String incidentId) => Stream.value([]);
+  Stream<List<IncidentHistoryEvent>> getHistory(String incidentId) =>
+      Stream.value([]);
 
   @override
   Future<AppResult<Incident>> submitIncident(Incident incident) async {
@@ -82,7 +86,8 @@ class PreviewIncidentsRepository implements IncidentsRepository {
   }
 
   @override
-  Future<AppResult<Incident>> updateIncidentStatus(String id, {
+  Future<AppResult<Incident>> updateIncidentStatus(
+    String id, {
     required IncidentStatus newStatus,
     required String actorUid,
     String? note,
@@ -113,11 +118,17 @@ class PreviewIncidentsRepository implements IncidentsRepository {
       );
       return AppResult.data(_incidents[idx]);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Incident not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Incident not found.'),
+    );
   }
 
   @override
-  Future<AppResult<void>> assignIncident(String id, String assignedUid, String actorUid) async {
+  Future<AppResult<void>> assignIncident(
+    String id,
+    String assignedUid,
+    String actorUid,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return const AppResult.data(null);
   }
@@ -138,14 +149,15 @@ class FirestoreIncidentsRepository implements IncidentsRepository {
       _firestore.collection('incidents');
 
   @override
-  Stream<List<Incident>> get incidents =>
-      _incidents.snapshots().map((s) => s.docs.map((d) => Incident.fromFirestore(d)).toList());
+  Stream<List<Incident>> get incidents => _incidents.snapshots().map(
+    (s) => s.docs.map((d) => Incident.fromFirestore(d)).toList(),
+  );
 
   @override
-  Stream<List<Incident>> getMyIncidents(String uid) =>
-      _incidents.where('reporterUid', isEqualTo: uid).snapshots().map(
-        (s) => s.docs.map((d) => Incident.fromFirestore(d)).toList(),
-      );
+  Stream<List<Incident>> getMyIncidents(String uid) => _incidents
+      .where('reporterUid', isEqualTo: uid)
+      .snapshots()
+      .map((s) => s.docs.map((d) => Incident.fromFirestore(d)).toList());
 
   @override
   Stream<Incident?> getIncidentById(String id) =>
@@ -155,19 +167,26 @@ class FirestoreIncidentsRepository implements IncidentsRepository {
       });
 
   @override
-  Stream<List<IncidentHistoryEvent>> getHistory(String incidentId) =>
-      _incidents.doc(incidentId).collection('history').snapshots().map(
-        (s) => s.docs.map((d) => IncidentHistoryEvent.fromFirestore(d)).toList(),
+  Stream<List<IncidentHistoryEvent>> getHistory(String incidentId) => _incidents
+      .doc(incidentId)
+      .collection('history')
+      .snapshots()
+      .map(
+        (s) =>
+            s.docs.map((d) => IncidentHistoryEvent.fromFirestore(d)).toList(),
       );
 
   @override
   Future<AppResult<Incident>> submitIncident(Incident incident) async {
     try {
       await _incidents.doc(incident.id).set(incident.toFirestore());
-      _logger.info('incident.submit', fields: {
-        'incidentId': incident.id,
-        'reporterUid': incident.reporterUid,
-      });
+      _logger.info(
+        'incident.submit',
+        fields: {
+          'incidentId': incident.id,
+          'reporterUid': incident.reporterUid,
+        },
+      );
       return AppResult.data(incident);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -178,7 +197,8 @@ class FirestoreIncidentsRepository implements IncidentsRepository {
   }
 
   @override
-  Future<AppResult<Incident>> updateIncidentStatus(String id, {
+  Future<AppResult<Incident>> updateIncidentStatus(
+    String id, {
     required IncidentStatus newStatus,
     required String actorUid,
     String? note,
@@ -188,7 +208,9 @@ class FirestoreIncidentsRepository implements IncidentsRepository {
       final docRef = _incidents.doc(id);
       final doc = await docRef.get();
       if (!doc.exists) {
-        return AppResult.error(const NotFoundFailure(message: 'Incident not found.'));
+        return AppResult.error(
+          const NotFoundFailure(message: 'Incident not found.'),
+        );
       }
 
       final current = Incident.fromFirestore(doc);
@@ -220,7 +242,11 @@ class FirestoreIncidentsRepository implements IncidentsRepository {
   }
 
   @override
-  Future<AppResult<void>> assignIncident(String id, String assignedUid, String actorUid) async {
+  Future<AppResult<void>> assignIncident(
+    String id,
+    String assignedUid,
+    String actorUid,
+  ) async {
     try {
       await _incidents.doc(id).update({
         'assignedUid': assignedUid,

@@ -25,7 +25,8 @@ class PreviewAnnouncementsRepository implements AnnouncementsRepository {
     Announcement(
       id: 'ann_001',
       title: 'Welcome to SBNu Volunteer Network',
-      body: 'Welcome to the volunteer management system. Explore activities and log your service hours.',
+      body:
+          'Welcome to the volunteer management system. Explore activities and log your service hours.',
       audienceRule: 'all',
       status: AnnouncementStatus.published,
       authorUid: 'staff_001',
@@ -35,7 +36,8 @@ class PreviewAnnouncementsRepository implements AnnouncementsRepository {
     Announcement(
       id: 'ann_002',
       title: 'Tree Planting This Saturday',
-      body: 'Join us for community tree planting at the Botanical Garden. Sign up now!',
+      body:
+          'Join us for community tree planting at the Botanical Garden. Sign up now!',
       audienceRule: 'all',
       status: AnnouncementStatus.published,
       authorUid: 'staff_002',
@@ -49,26 +51,38 @@ class PreviewAnnouncementsRepository implements AnnouncementsRepository {
 
   @override
   Stream<List<Announcement>> getPublishedAnnouncements(String audience) =>
-      Stream.value(_announcements.where(
-        (a) => a.isPublished && (a.audienceRule == 'all' || a.audienceRule == audience),
-      ).toList());
+      Stream.value(
+        _announcements
+            .where(
+              (a) =>
+                  a.isPublished &&
+                  (a.audienceRule == 'all' || a.audienceRule == audience),
+            )
+            .toList(),
+      );
 
   @override
-  Future<AppResult<Announcement>> createAnnouncement(Announcement announcement) async {
+  Future<AppResult<Announcement>> createAnnouncement(
+    Announcement announcement,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     _announcements.add(announcement);
     return AppResult.data(announcement);
   }
 
   @override
-  Future<AppResult<Announcement>> updateAnnouncement(Announcement announcement) async {
+  Future<AppResult<Announcement>> updateAnnouncement(
+    Announcement announcement,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final idx = _announcements.indexWhere((a) => a.id == announcement.id);
     if (idx >= 0) {
       _announcements[idx] = announcement;
       return AppResult.data(announcement);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Announcement not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Announcement not found.'),
+    );
   }
 
   @override
@@ -76,10 +90,14 @@ class PreviewAnnouncementsRepository implements AnnouncementsRepository {
     await Future.delayed(const Duration(milliseconds: 500));
     final idx = _announcements.indexWhere((a) => a.id == id);
     if (idx >= 0) {
-      _announcements[idx] = _announcements[idx].copyWith(status: AnnouncementStatus.archived);
+      _announcements[idx] = _announcements[idx].copyWith(
+        status: AnnouncementStatus.archived,
+      );
       return const AppResult.data(null);
     }
-    return AppResult.error(const NotFoundFailure(message: 'Announcement not found.'));
+    return AppResult.error(
+      const NotFoundFailure(message: 'Announcement not found.'),
+    );
   }
 
   @override
@@ -105,24 +123,31 @@ class FirestoreAnnouncementsRepository implements AnnouncementsRepository {
       _firestore.collection('announcements');
 
   @override
-  Stream<List<Announcement>> get announcements =>
-      _anns.snapshots().map((s) => s.docs.map((d) => Announcement.fromFirestore(d)).toList());
+  Stream<List<Announcement>> get announcements => _anns.snapshots().map(
+    (s) => s.docs.map((d) => Announcement.fromFirestore(d)).toList(),
+  );
 
   @override
-  Stream<List<Announcement>> getPublishedAnnouncements(String audience) =>
-      _anns
-          .where('status', isEqualTo: 'published')
-          .snapshots()
-          .map((s) => s.docs
-              .map((d) => Announcement.fromFirestore(d))
-              .where((a) => a.audienceRule == 'all' || a.audienceRule == audience)
-              .toList());
+  Stream<List<Announcement>> getPublishedAnnouncements(String audience) => _anns
+      .where('status', isEqualTo: 'published')
+      .snapshots()
+      .map(
+        (s) => s.docs
+            .map((d) => Announcement.fromFirestore(d))
+            .where((a) => a.audienceRule == 'all' || a.audienceRule == audience)
+            .toList(),
+      );
 
   @override
-  Future<AppResult<Announcement>> createAnnouncement(Announcement announcement) async {
+  Future<AppResult<Announcement>> createAnnouncement(
+    Announcement announcement,
+  ) async {
     try {
       await _anns.doc(announcement.id).set(announcement.toFirestore());
-      _logger.info('announcement.create', fields: {'announcementId': announcement.id});
+      _logger.info(
+        'announcement.create',
+        fields: {'announcementId': announcement.id},
+      );
       return AppResult.data(announcement);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -133,7 +158,9 @@ class FirestoreAnnouncementsRepository implements AnnouncementsRepository {
   }
 
   @override
-  Future<AppResult<Announcement>> updateAnnouncement(Announcement announcement) async {
+  Future<AppResult<Announcement>> updateAnnouncement(
+    Announcement announcement,
+  ) async {
     try {
       await _anns.doc(announcement.id).update(announcement.toFirestore());
       return AppResult.data(announcement);
@@ -148,7 +175,10 @@ class FirestoreAnnouncementsRepository implements AnnouncementsRepository {
   @override
   Future<AppResult<void>> archiveAnnouncement(String id) async {
     try {
-      await _anns.doc(id).update({'status': 'archived', 'updatedAt': FieldValue.serverTimestamp()});
+      await _anns.doc(id).update({
+        'status': 'archived',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -178,7 +208,10 @@ AnnouncementsRepository createAnnouncementsRepository({
   required AppLogger logger,
 }) {
   if (useFirestore && firestore != null) {
-    return FirestoreAnnouncementsRepository(firestore: firestore, logger: logger);
+    return FirestoreAnnouncementsRepository(
+      firestore: firestore,
+      logger: logger,
+    );
   }
   return PreviewAnnouncementsRepository();
 }

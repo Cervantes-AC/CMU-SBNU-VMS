@@ -12,10 +12,7 @@ abstract class AppFailure extends Equatable {
   /// Whether this failure is safe to retry automatically.
   final bool isRetryable;
 
-  const AppFailure({
-    required this.message,
-    this.isRetryable = false,
-  });
+  const AppFailure({required this.message, this.isRetryable = false});
 
   @override
   List<Object?> get props => [message, isRetryable];
@@ -23,7 +20,10 @@ abstract class AppFailure extends Equatable {
 
 /// The app could not connect to its configured backend services.
 class ServiceUnavailableFailure extends AppFailure {
-  const ServiceUnavailableFailure({super.message = 'Service unavailable.', super.isRetryable = true});
+  const ServiceUnavailableFailure({
+    super.message = 'Service unavailable.',
+    super.isRetryable = true,
+  });
 }
 
 /// The requested resource was not found.
@@ -38,17 +38,25 @@ class UnauthenticatedFailure extends AppFailure {
 
 /// The user does not have permission for this action.
 class PermissionDeniedFailure extends AppFailure {
-  const PermissionDeniedFailure({super.message = 'You are not authorized to do this.'});
+  const PermissionDeniedFailure({
+    super.message = 'You are not authorized to do this.',
+  });
 }
 
 /// The request was invalid (bad input, conflict, precondition failed).
 class InvalidRequestFailure extends AppFailure {
-  const InvalidRequestFailure({super.message = 'Invalid request.', super.isRetryable = false});
+  const InvalidRequestFailure({
+    super.message = 'Invalid request.',
+    super.isRetryable = false,
+  });
 }
 
 /// A network or connectivity problem occurred.
 class NetworkFailure extends AppFailure {
-  const NetworkFailure({super.message = 'Network error. Please check your connection.', super.isRetryable = true});
+  const NetworkFailure({
+    super.message = 'Network error. Please check your connection.',
+    super.isRetryable = true,
+  });
 }
 
 /// A Firebase-specific error translated into a safe typed failure.
@@ -65,5 +73,8 @@ class FirebaseFailure extends AppFailure {
 
 /// A generic unexpected failure.
 class UnknownFailure extends AppFailure {
-  const UnknownFailure({super.message = 'An unexpected error occurred.', super.isRetryable = true});
+  const UnknownFailure({
+    super.message = 'An unexpected error occurred.',
+    super.isRetryable = true,
+  });
 }

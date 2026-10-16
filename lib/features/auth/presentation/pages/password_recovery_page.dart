@@ -28,7 +28,10 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
     // Note: Password reset flows through the auth ViewModel/repository.
     if (mounted) {
       setState(() => _isSubmitting = false);
-      showAppSnackbar(context, 'If an account exists, a reset link has been sent.');
+      showAppSnackbar(
+        context,
+        'If an account exists, a reset link has been sent.',
+      );
     }
   }
 

@@ -21,10 +21,10 @@ class PermissionEntry {
   Color get serverColor => _colorFor(server);
 
   Color _colorFor(String level) => switch (level.toLowerCase()) {
-        'none' => const Color(0xFF748078),
-        'read' => const Color(0xFF4C735E),
-        'write' => const Color(0xFFD5A52F),
-        'manage' => const Color(0xFF134F35),
-        _ => const Color(0xFF748078),
-      };
+    'none' => const Color(0xFF748078),
+    'read' => const Color(0xFF4C735E),
+    'write' => const Color(0xFFD5A52F),
+    'manage' => const Color(0xFF134F35),
+    _ => const Color(0xFF748078),
+  };
 }

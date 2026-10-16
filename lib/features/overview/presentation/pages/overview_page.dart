@@ -55,7 +55,10 @@ class _OverviewPageState extends State<OverviewPage> {
               semanticLabel: 'SBNU logo',
             ),
             const SizedBox(width: 10),
-            Text(_activeSection, style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(
+              _activeSection,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
           ],
         ),
         actions: [
@@ -68,7 +71,9 @@ class _OverviewPageState extends State<OverviewPage> {
       ),
       drawer: _NavDrawer(
         destinations: _destinations,
-        selectedIndex: _destinations.indexWhere((d) => d.label == _activeSection),
+        selectedIndex: _destinations.indexWhere(
+          (d) => d.label == _activeSection,
+        ),
         onDestinationSelected: (index) {
           setState(() => _activeSection = _destinations[index].label);
           Navigator.of(context).pop();
@@ -135,10 +140,7 @@ class _NavDrawer extends StatelessWidget {
                 children: [
                   Text(
                     'SBNu',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     'VOLUNTEER WORKSPACE',
@@ -255,10 +257,7 @@ class _DashboardContent extends StatelessWidget {
           },
         ),
         const SizedBox(height: 22),
-        const AppSectionHeading(
-          title: 'Coming up',
-          actionLabel: 'View all',
-        ),
+        const AppSectionHeading(title: 'Coming up', actionLabel: 'View all'),
         const SizedBox(height: 10),
         Card(
           child: InkWell(

@@ -59,16 +59,18 @@ class SampleAuditPreviewRepository implements AuditRepository {
     Map<String, dynamic>? changedFields,
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    _events.add(AuditEvent(
-      id: 'audit_${DateTime.now().millisecondsSinceEpoch}',
-      actorUid: actorUid,
-      action: action,
-      recordType: recordType,
-      recordId: recordId,
-      occurredAt: DateTime.now(),
-      outcome: outcome,
-      changedFields: changedFields,
-    ));
+    _events.add(
+      AuditEvent(
+        id: 'audit_${DateTime.now().millisecondsSinceEpoch}',
+        actorUid: actorUid,
+        action: action,
+        recordType: recordType,
+        recordId: recordId,
+        occurredAt: DateTime.now(),
+        outcome: outcome,
+        changedFields: changedFields,
+      ),
+    );
     return const AppResult.data(null);
   }
 }
@@ -88,10 +90,10 @@ class FirestoreAuditRepository implements AuditRepository {
       _firestore.collection('auditEvents');
 
   @override
-  Stream<List<AuditEvent>> get events =>
-      _events.orderBy('occurredAt', descending: true).snapshots().map(
-        (s) => s.docs.map((d) => AuditEvent.fromFirestore(d)).toList(),
-      );
+  Stream<List<AuditEvent>> get events => _events
+      .orderBy('occurredAt', descending: true)
+      .snapshots()
+      .map((s) => s.docs.map((d) => AuditEvent.fromFirestore(d)).toList());
 
   @override
   Future<AppResult<void>> writeEvent({
@@ -112,11 +114,14 @@ class FirestoreAuditRepository implements AuditRepository {
         'outcome': outcome,
         if (changedFields != null) 'changedFields': changedFields,
       });
-      _logger.security('audit.write', fields: {
-        'action': action,
-        'recordType': recordType,
-        'outcome': outcome,
-      });
+      _logger.security(
+        'audit.write',
+        fields: {
+          'action': action,
+          'recordType': recordType,
+          'outcome': outcome,
+        },
+      );
       return const AppResult.data(null);
     } on AppFailure catch (e) {
       return AppResult.error(e);

@@ -53,7 +53,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       return _ActivityCard(
                         activity: activity,
                         onTap: () => viewModel.selectActivity(activity),
-                        onJoin: () => viewModel.joinActivity(activity.id, 'current_user'),
+                        onJoin: () =>
+                            viewModel.joinActivity(activity.id, 'current_user'),
                       );
                     },
                   ),
@@ -103,7 +104,10 @@ class _ActivityCard extends StatelessWidget {
                   color: const Color(0xFFE5EFE7),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.event_outlined, color: Color(0xFF134F35)),
+                child: const Icon(
+                  Icons.event_outlined,
+                  color: Color(0xFF134F35),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -136,7 +140,10 @@ class _ActivityCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE5EFE7),
                         borderRadius: BorderRadius.circular(20),
@@ -153,11 +160,7 @@ class _ActivityCard extends StatelessWidget {
                   ],
                 ),
               ),
-              AppButton(
-                label: 'Join',
-                onPressed: onJoin,
-                isOutlined: true,
-              ),
+              AppButton(label: 'Join', onPressed: onJoin, isOutlined: true),
             ],
           ),
         ),
@@ -202,8 +205,9 @@ class _CreateActivityDialogState extends State<_CreateActivityDialog> {
                 label: 'Title',
                 hint: 'e.g. Community Tree Planting',
                 icon: Icons.event_outlined,
-                validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Title is required' : null,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Title is required'
+                    : null,
               ),
               const SizedBox(height: 12),
               AppInputField(
@@ -212,8 +216,9 @@ class _CreateActivityDialogState extends State<_CreateActivityDialog> {
                 hint: 'Describe the activity',
                 icon: Icons.description_outlined,
                 maxLines: 3,
-                validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Description is required' : null,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Description is required'
+                    : null,
               ),
               const SizedBox(height: 12),
               AppInputField(
@@ -221,8 +226,9 @@ class _CreateActivityDialogState extends State<_CreateActivityDialog> {
                 label: 'Venue',
                 hint: 'e.g. Botanical Garden',
                 icon: Icons.location_on_outlined,
-                validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Venue is required' : null,
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Venue is required'
+                    : null,
               ),
             ],
           ),

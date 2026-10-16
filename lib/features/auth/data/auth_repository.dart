@@ -24,10 +24,17 @@ abstract class AuthRepository {
   bool get isAuthenticated;
 
   /// Sign in with email and password.
-  Future<AppResult<AppUser>> signIn({required String email, required String password});
+  Future<AppResult<AppUser>> signIn({
+    required String email,
+    required String password,
+  });
 
   /// Register a new account with email and password.
-  Future<AppResult<AppUser>> register({required String email, required String password, String? displayName});
+  Future<AppResult<AppUser>> register({
+    required String email,
+    required String password,
+    String? displayName,
+  });
 
   /// Send a password reset email.
   Future<CommandResult> sendPasswordReset({required String email});
@@ -54,15 +61,16 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Stream<AppUser?> get userStream => _remote.authStateChanges.map((user) {
-        _currentUser = user != null ? AppUser.fromFirebaseAuthUser(user) : null;
-        return _currentUser;
-      });
+    _currentUser = user != null ? AppUser.fromFirebaseAuthUser(user) : null;
+    return _currentUser;
+  });
 
   @override
   AppUser? get currentUser => _currentUser;
 
   @override
-  bool get isAuthenticated => _currentUser != null && _currentUser!.isAuthenticated;
+  bool get isAuthenticated =>
+      _currentUser != null && _currentUser!.isAuthenticated;
 
   @override
   Future<AppResult<AppUser>> signIn({
@@ -70,7 +78,10 @@ class FirebaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     try {
-      final credential = await _remote.signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _remote.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = AppUser.fromFirebaseAuthUser(credential.user!);
       _currentUser = user;
       _logger.info('auth.sign_in', fields: {'uid': user.uid});
@@ -91,7 +102,10 @@ class FirebaseAuthRepository implements AuthRepository {
     String? displayName,
   }) async {
     try {
-      final credential = await _remote.createUserWithEmailAndPassword(email: email, password: password);
+      final credential = await _remote.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = AppUser.fromFirebaseAuthUser(credential.user!);
       if (displayName != null && displayName.isNotEmpty) {
         await _remote.updateDisplayName(displayName: displayName);
@@ -152,7 +166,10 @@ class FirebaseAuthRepository implements AuthRepository {
 }
 
 /// Provider registration helper for the auth repository.
-AuthRepository createAuthRepository(AuthRemoteSource remoteSource, AppLogger logger) {
+AuthRepository createAuthRepository(
+  AuthRemoteSource remoteSource,
+  AppLogger logger,
+) {
   return FirebaseAuthRepository(remoteSource: remoteSource, logger: logger);
 }
 

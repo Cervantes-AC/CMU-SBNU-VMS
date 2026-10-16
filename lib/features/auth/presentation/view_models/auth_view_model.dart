@@ -33,16 +33,19 @@ class AuthViewModel extends ChangeNotifier {
     _status = LoadStatus.loading;
     notifyListeners();
 
-    repository.userStream.listen((user) {
-      _user = user;
-      _status = LoadStatus.loaded;
-      _error = null;
-      notifyListeners();
-    }, onError: (e) {
-      _status = LoadStatus.error;
-      _error = e is AppFailure ? e : UnknownFailure();
-      notifyListeners();
-    });
+    repository.userStream.listen(
+      (user) {
+        _user = user;
+        _status = LoadStatus.loaded;
+        _error = null;
+        notifyListeners();
+      },
+      onError: (e) {
+        _status = LoadStatus.error;
+        _error = e is AppFailure ? e : UnknownFailure();
+        notifyListeners();
+      },
+    );
   }
 
   void togglePasswordVisibility() {
@@ -72,7 +75,11 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> register({required String email, required String password, String? displayName}) async {
+  Future<void> register({
+    required String email,
+    required String password,
+    String? displayName,
+  }) async {
     _status = LoadStatus.loading;
     _error = null;
     notifyListeners();

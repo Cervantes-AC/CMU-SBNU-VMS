@@ -13,7 +13,8 @@ abstract class SosRepository {
   Stream<List<SosAlert>> getMyAlerts(String uid);
   Stream<SosAlert?> getAlertById(String id);
   Future<AppResult<SosAlert>> createAlert(SosAlert alert);
-  Future<AppResult<SosAlert>> updateAlertStatus(String id, {
+  Future<AppResult<SosAlert>> updateAlertStatus(
+    String id, {
     required SosLifecycleStatus lifecycleStatus,
     SosDeliveryState? deliveryState,
     String? assignedHandlerUid,
@@ -35,11 +36,9 @@ class PreviewSosRepository implements SosRepository {
       Stream.value(_alerts.where((a) => a.reporterUid == uid).toList());
 
   @override
-  Stream<SosAlert?> getAlertById(String id) =>
-      Stream.value(_alerts.firstWhere(
-        (a) => a.id == id,
-        orElse: () => _alerts.first,
-      ));
+  Stream<SosAlert?> getAlertById(String id) => Stream.value(
+    _alerts.firstWhere((a) => a.id == id, orElse: () => _alerts.first),
+  );
 
   @override
   Future<AppResult<SosAlert>> createAlert(SosAlert alert) async {
@@ -49,7 +48,8 @@ class PreviewSosRepository implements SosRepository {
   }
 
   @override
-  Future<AppResult<SosAlert>> updateAlertStatus(String id, {
+  Future<AppResult<SosAlert>> updateAlertStatus(
+    String id, {
     required SosLifecycleStatus lifecycleStatus,
     SosDeliveryState? deliveryState,
     String? assignedHandlerUid,
@@ -98,14 +98,15 @@ class FirestoreSosRepository implements SosRepository {
       _firestore.collection('sosAlerts');
 
   @override
-  Stream<List<SosAlert>> get alerts =>
-      _alerts.snapshots().map((s) => s.docs.map((d) => SosAlert.fromFirestore(d)).toList());
+  Stream<List<SosAlert>> get alerts => _alerts.snapshots().map(
+    (s) => s.docs.map((d) => SosAlert.fromFirestore(d)).toList(),
+  );
 
   @override
-  Stream<List<SosAlert>> getMyAlerts(String uid) =>
-      _alerts.where('reporterUid', isEqualTo: uid).snapshots().map(
-        (s) => s.docs.map((d) => SosAlert.fromFirestore(d)).toList(),
-      );
+  Stream<List<SosAlert>> getMyAlerts(String uid) => _alerts
+      .where('reporterUid', isEqualTo: uid)
+      .snapshots()
+      .map((s) => s.docs.map((d) => SosAlert.fromFirestore(d)).toList());
 
   @override
   Stream<SosAlert?> getAlertById(String id) =>
@@ -118,10 +119,10 @@ class FirestoreSosRepository implements SosRepository {
   Future<AppResult<SosAlert>> createAlert(SosAlert alert) async {
     try {
       await _alerts.doc(alert.id).set(alert.toFirestore());
-      _logger.security('sos.create', fields: {
-        'alertId': alert.id,
-        'reporterUid': alert.reporterUid,
-      });
+      _logger.security(
+        'sos.create',
+        fields: {'alertId': alert.id, 'reporterUid': alert.reporterUid},
+      );
       return AppResult.data(alert);
     } on AppFailure catch (e) {
       return AppResult.error(e);
@@ -132,7 +133,8 @@ class FirestoreSosRepository implements SosRepository {
   }
 
   @override
-  Future<AppResult<SosAlert>> updateAlertStatus(String id, {
+  Future<AppResult<SosAlert>> updateAlertStatus(
+    String id, {
     required SosLifecycleStatus lifecycleStatus,
     SosDeliveryState? deliveryState,
     String? assignedHandlerUid,
@@ -142,14 +144,17 @@ class FirestoreSosRepository implements SosRepository {
       final docRef = _alerts.doc(id);
       final doc = await docRef.get();
       if (!doc.exists) {
-        return AppResult.error(const NotFoundFailure(message: 'Alert not found.'));
+        return AppResult.error(
+          const NotFoundFailure(message: 'Alert not found.'),
+        );
       }
 
       final current = SosAlert.fromFirestore(doc);
       await docRef.update({
         'lifecycleStatus': lifecycleStatus.name,
         if (deliveryState != null) 'deliveryState': deliveryState.name,
-        if (assignedHandlerUid != null) 'assignedHandlerUid': assignedHandlerUid,
+        if (assignedHandlerUid != null)
+          'assignedHandlerUid': assignedHandlerUid,
         'version': current.version + 1,
         'updatedAt': FieldValue.serverTimestamp(),
       });
