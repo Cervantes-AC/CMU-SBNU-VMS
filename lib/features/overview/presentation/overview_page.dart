@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../access_control/presentation/access_control_page.dart';
+import '../../activities/data/models/activity.dart';
 import '../../activities/presentation/activities_page.dart';
+import '../../activities/presentation/view_models/activities_view_model.dart';
 import '../../announcements/presentation/announcements_page.dart';
 import '../../attendance/presentation/attendance_page.dart';
 import '../../emergency/presentation/emergency_page.dart';
@@ -125,15 +128,20 @@ class _OverviewPageState extends State<OverviewPage> {
               index: _destinations.indexWhere(
                 (item) => item.$2 == _activeSection,
               ),
-              children: const [
-                _OverviewContent(),
-                ActivitiesPage(),
-                VolunteersPage(),
-                AttendancePage(),
-                AnnouncementsPage(),
-                EmergencyPage(),
-                ReportsPage(),
-                AccessControlPage(),
+              children: [
+                _OverviewContent(
+                  onViewActivities: () =>
+                      setState(() => _activeSection = 'Activities'),
+                  onViewEmergency: () =>
+                      setState(() => _activeSection = 'Emergency & safety'),
+                ),
+                const ActivitiesPage(),
+                const VolunteersPage(),
+                const AttendancePage(),
+                const AnnouncementsPage(),
+                const EmergencyPage(),
+                const ReportsPage(),
+                const AccessControlPage(),
               ],
             ),
           ),
@@ -166,129 +174,151 @@ class _PreviewBadge extends StatelessWidget {
 }
 
 class _OverviewContent extends StatelessWidget {
-  const _OverviewContent();
+  const _OverviewContent({
+    required this.onViewActivities,
+    required this.onViewEmergency,
+  });
+
+  final VoidCallback onViewActivities;
+  final VoidCallback onViewEmergency;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFBF0D7),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.science_outlined, color: Color(0xFF895F00)),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Design preview · All figures and activity details are sample data.',
-                  style: TextStyle(color: Color(0xFF6E581F), height: 1.4),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 22),
-        Text(
-          'Your service at a glance',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.7,
-          ),
-        ),
-        const SizedBox(height: 14),
-        const Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _MetricCard(
-              icon: Icons.event_available,
-              value: '08',
-              label: 'UPCOMING ACTIVITIES',
-              tint: Color(0xFFE5EFE7),
-              ink: Color(0xFF196142),
+  Widget build(BuildContext context) => Consumer<ActivitiesViewModel>(
+    builder: (context, viewModel, _) {
+      final upcoming = viewModel.activities
+          .where((activity) => activity.status == ActivityStatus.published)
+          .toList();
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFBF0D7),
+              borderRadius: BorderRadius.circular(14),
             ),
-            _MetricCard(
-              icon: Icons.schedule,
-              value: '24 hrs',
-              label: 'SERVICE HOURS',
-              tint: Color(0xFFFBF0D7),
-              ink: Color(0xFFA9790D),
-            ),
-          ],
-        ),
-        const SizedBox(height: 22),
-        const _SectionHeading(title: 'Coming up', action: 'View all'),
-        const SizedBox(height: 10),
-        const _ActivityCard(
-          day: '22',
-          month: 'OCT',
-          title: 'Community preparedness workshop',
-          details: 'CMU Campus · Sample activity',
-          color: Color(0xFFE1EEE4),
-        ),
-        const SizedBox(height: 10),
-        const _ActivityCard(
-          day: '26',
-          month: 'OCT',
-          title: 'Campus greening day',
-          details: 'University grounds · Sample activity',
-          color: Color(0xFFE4EDF0),
-        ),
-        const SizedBox(height: 18),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(17),
-            child: Row(
+            child: const Row(
               children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFCECE9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.shield_outlined,
-                    color: Color(0xFFB63D34),
+                Icon(Icons.science_outlined, color: Color(0xFF895F00)),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Design preview · All figures and activity details are sample data.',
+                    style: TextStyle(color: Color(0xFF6E581F), height: 1.4),
                   ),
                 ),
-                const SizedBox(width: 13),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Safety center',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      SizedBox(height: 3),
-                      Text(
-                        'Emergency tools are not connected in this preview.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF748078),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: Color(0xFF89948C)),
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
+          const SizedBox(height: 22),
+          Text(
+            'Your service at a glance',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.7,
+            ),
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = (constraints.maxWidth - 12) / 2;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _MetricCard(
+                    width: width,
+                    icon: Icons.event_available,
+                    value: upcoming.length.toString().padLeft(2, '0'),
+                    label: 'SAMPLE ACTIVITIES',
+                    tint: const Color(0xFFE5EFE7),
+                    ink: const Color(0xFF196142),
+                  ),
+                  _MetricCard(
+                    width: width,
+                    icon: Icons.schedule,
+                    value: '24 hrs',
+                    label: 'SAMPLE SERVICE HOURS',
+                    tint: const Color(0xFFFBF0D7),
+                    ink: const Color(0xFFA9790D),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 22),
+          _SectionHeading(
+            title: 'Coming up',
+            action: 'View all',
+            onAction: onViewActivities,
+          ),
+          const SizedBox(height: 10),
+          if (upcoming.isEmpty)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('No sample activities are available.'),
+              ),
+            )
+          else
+            for (final activity in upcoming.take(3))
+              _ActivityCard(activity: activity, onTap: onViewActivities),
+          const SizedBox(height: 18),
+          Card(
+            child: InkWell(
+              onTap: onViewEmergency,
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.all(17),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFCECE9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        color: Color(0xFFB63D34),
+                      ),
+                    ),
+                    const SizedBox(width: 13),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Safety center',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'Emergency tools are not connected in this preview.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF748078),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: Color(0xFF89948C)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class _MetricCard extends StatelessWidget {
   const _MetricCard({
+    required this.width,
     required this.icon,
     required this.value,
     required this.label,
@@ -296,6 +326,7 @@ class _MetricCard extends StatelessWidget {
     required this.ink,
   });
 
+  final double width;
   final IconData icon;
   final String value;
   final String label;
@@ -305,7 +336,7 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: (MediaQuery.sizeOf(context).width - 52) / 2,
+      width: width,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(15),
@@ -348,10 +379,15 @@ class _MetricCard extends StatelessWidget {
 }
 
 class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({required this.title, required this.action});
+  const _SectionHeading({
+    required this.title,
+    required this.action,
+    required this.onAction,
+  });
 
   final String title;
   final String action;
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -363,12 +399,15 @@ class _SectionHeading extends StatelessWidget {
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
           ),
         ),
-        Text(
-          action,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF4C735E),
-            fontWeight: FontWeight.w700,
+        TextButton(
+          onPressed: onAction,
+          child: Text(
+            action,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF4C735E),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
@@ -377,82 +416,61 @@ class _SectionHeading extends StatelessWidget {
 }
 
 class _ActivityCard extends StatelessWidget {
-  const _ActivityCard({
-    required this.day,
-    required this.month,
-    required this.title,
-    required this.details,
-    required this.color,
-  });
+  const _ActivityCard({required this.activity, required this.onTap});
 
-  final String day;
-  final String month;
-  final String title;
-  final String details;
-  final Color color;
+  final Activity activity;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(13),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 52,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5EFE7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.event_outlined,
+                  color: Color(0xFF196142),
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    day,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activity.title,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    month,
-                    style: const TextStyle(
-                      fontSize: 8,
-                      letterSpacing: 0.7,
-                      fontWeight: FontWeight.w700,
+                    const SizedBox(height: 5),
+                    Text(
+                      '${activity.scheduleLabel} · ${activity.venue} · sample',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF748078),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    details,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF748078),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
-          ],
+              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
+            ],
+          ),
         ),
       ),
     );
