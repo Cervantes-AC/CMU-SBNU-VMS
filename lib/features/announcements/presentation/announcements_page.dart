@@ -35,61 +35,104 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
   Future<void> _compose() async {
     final titleController = TextEditingController();
     final messageController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    const audiences = [
+      'All volunteers',
+      'Activity participants',
+      'Coordinators',
+    ];
+    var audience = audiences.first;
     final result = await showDialog<_Announcement>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Draft announcement'),
-        content: SizedBox(
-          width: 420,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Draft announcement'),
+          content: SizedBox(
+            width: 420,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * .65,
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: messageController,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Message',
-                  alignLabelWithHint: true,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: titleController,
+                        maxLength: 100,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: messageController,
+                        maxLength: 800,
+                        maxLines: 4,
+                        decoration: const InputDecoration(
+                          labelText: 'Message',
+                          alignLabelWithHint: true,
+                        ),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        initialValue: audience,
+                        decoration: const InputDecoration(
+                          labelText: 'Sample audience',
+                          helperText:
+                              'Audience groups are examples for this draft.',
+                        ),
+                        items: audiences
+                            .map(
+                              (value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(value),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) =>
+                            setDialogState(() => audience = value ?? audience),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Saved to this screen only. No audience receives a message; publishing, permissions, and delivery are not connected.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF748078),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'This saves to this screen only. Audience delivery is not connected.',
-                style: TextStyle(fontSize: 11, color: Color(0xFF748078)),
-              ),
-            ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (!(formKey.currentState?.validate() ?? false)) return;
+                Navigator.pop(
+                  context,
+                  _Announcement(
+                    titleController.text.trim(),
+                    messageController.text.trim(),
+                    audience,
+                    'Local preview',
+                    Icons.campaign_outlined,
+                    isDraft: true,
+                  ),
+                );
+              },
+              child: const Text('Save local draft'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (titleController.text.trim().isEmpty ||
-                  messageController.text.trim().isEmpty) {
-                return;
-              }
-              Navigator.pop(
-                context,
-                _Announcement(
-                  titleController.text.trim(),
-                  messageController.text.trim(),
-                  'Draft',
-                  'Local preview',
-                  Icons.campaign_outlined,
-                ),
-              );
-            },
-            child: const Text('Save draft'),
-          ),
-        ],
       ),
     );
     titleController.dispose();
@@ -168,7 +211,10 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                         style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
                     ),
-                    const Icon(Icons.more_horiz, color: Color(0xFF89948C)),
+                    if (item.isDraft)
+                      const _DraftBadge()
+                    else
+                      const Icon(Icons.more_horiz, color: Color(0xFF89948C)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -219,11 +265,38 @@ class _Announcement {
     this.message,
     this.audience,
     this.date,
-    this.icon,
-  );
+    this.icon, {
+    this.isDraft = false,
+  });
   final String title;
   final String message;
   final String audience;
   final String date;
   final IconData icon;
+  final bool isDraft;
+}
+
+String? _requiredField(String? value) =>
+    value == null || value.trim().isEmpty ? 'This field is required.' : null;
+
+class _DraftBadge extends StatelessWidget {
+  const _DraftBadge();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFBF0D7),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: const Text(
+      'LOCAL DRAFT',
+      style: TextStyle(
+        color: Color(0xFF6E581F),
+        fontSize: 9,
+        fontWeight: FontWeight.w800,
+        letterSpacing: .4,
+      ),
+    ),
+  );
 }
