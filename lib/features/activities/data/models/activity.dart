@@ -11,6 +11,7 @@ class Activity {
     required this.venue,
     required this.joinedCount,
     required this.capacity,
+    this.description = '',
     this.status = ActivityStatus.published,
     this.joinRequested = false,
   });
@@ -22,11 +23,13 @@ class Activity {
   final String venue;
   final int joinedCount;
   final int capacity;
+  final String description;
   final ActivityStatus status;
   final bool joinRequested;
 
   Activity copyWith({
     int? joinedCount,
+    String? description,
     ActivityStatus? status,
     bool? joinRequested,
   }) => Activity(
@@ -37,6 +40,7 @@ class Activity {
     venue: venue,
     joinedCount: joinedCount ?? this.joinedCount,
     capacity: capacity,
+    description: description ?? this.description,
     status: status ?? this.status,
     joinRequested: joinRequested ?? this.joinRequested,
   );

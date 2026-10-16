@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/activity.dart';
@@ -10,6 +11,10 @@ class ActivitiesPage extends StatelessWidget {
   Future<void> _createActivity(BuildContext context) async {
     final title = TextEditingController();
     final venue = TextEditingController();
+    final schedule = TextEditingController();
+    final description = TextEditingController();
+    final capacity = TextEditingController(text: '20');
+    final formKey = GlobalKey<FormState>();
     var category = ActivityCategory.community;
     final created = await showDialog<bool>(
       context: context,
@@ -18,40 +23,99 @@ class ActivitiesPage extends StatelessWidget {
           title: const Text('Activity draft'),
           content: SizedBox(
             width: 440,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: title,
-                  maxLength: 100,
-                  decoration: const InputDecoration(labelText: 'Activity name'),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<ActivityCategory>(
-                  initialValue: category,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  items: ActivityCategory.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(_categoryLabel(value)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * .65,
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: title,
+                        maxLength: 100,
+                        decoration: const InputDecoration(
+                          labelText: 'Activity name',
                         ),
-                      )
-                      .toList(),
-                  onChanged: (value) =>
-                      setDialogState(() => category = value ?? category),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<ActivityCategory>(
+                        initialValue: category,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                        ),
+                        items: ActivityCategory.values
+                            .map(
+                              (value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(_categoryLabel(value)),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) =>
+                            setDialogState(() => category = value ?? category),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: schedule,
+                        maxLength: 80,
+                        decoration: const InputDecoration(
+                          labelText: 'Schedule',
+                          hintText: 'e.g. Nov 08 · 8:00 AM',
+                        ),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: venue,
+                        maxLength: 120,
+                        decoration: const InputDecoration(labelText: 'Venue'),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: description,
+                        maxLength: 500,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                          alignLabelWithHint: true,
+                        ),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: capacity,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: const InputDecoration(
+                          labelText: 'Volunteer capacity',
+                        ),
+                        validator: (value) {
+                          final parsed = int.tryParse(value ?? '');
+                          if (parsed == null || parsed < 1) {
+                            return 'Enter a whole number greater than zero.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Saved only in this session as a draft. Publishing and participation are not connected.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF748078),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: venue,
-                  maxLength: 100,
-                  decoration: const InputDecoration(labelText: 'Venue'),
-                ),
-                const Text(
-                  'Saved only in this session. Publishing and participation are not connected.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF748078)),
-                ),
-              ],
+              ),
             ),
           ),
           actions: [
@@ -61,8 +125,7 @@ class ActivitiesPage extends StatelessWidget {
             ),
             FilledButton(
               onPressed: () {
-                if (title.text.trim().isNotEmpty &&
-                    venue.text.trim().isNotEmpty) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.pop(context, true);
                 }
               },
@@ -76,11 +139,17 @@ class ActivitiesPage extends StatelessWidget {
       context.read<ActivitiesViewModel>().createDraft(
         title: title.text,
         category: category,
+        scheduleLabel: schedule.text,
         venue: venue.text,
+        description: description.text,
+        capacity: int.parse(capacity.text),
       );
     }
     title.dispose();
     venue.dispose();
+    schedule.dispose();
+    description.dispose();
+    capacity.dispose();
   }
 
   @override
@@ -144,12 +213,63 @@ class ActivitiesPage extends StatelessWidget {
         for (final activity in viewModel.visibleActivities)
           _ActivityCard(
             activity: activity,
+            onDetails: () => _showDetails(context, activity),
             onJoin: () => viewModel.toggleJoinRequest(activity.id),
           ),
       ],
     ),
   );
+
+  Future<void> _showDetails(
+    BuildContext context,
+    Activity activity,
+  ) => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(activity.title),
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                activity.description.isEmpty
+                    ? 'No description was provided for this sample activity.'
+                    : activity.description,
+                style: const TextStyle(height: 1.45),
+              ),
+              const SizedBox(height: 16),
+              _ActivityDetailRow(Icons.event_outlined, activity.scheduleLabel),
+              const SizedBox(height: 8),
+              _ActivityDetailRow(Icons.place_outlined, activity.venue),
+              const SizedBox(height: 8),
+              _ActivityDetailRow(
+                Icons.groups_outlined,
+                '${activity.joinedCount} of ${activity.capacity} places shown',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Sample preview · details and join requests are not connected to a service.',
+                style: TextStyle(fontSize: 11, color: Color(0xFF748078)),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
 }
+
+String? _requiredField(String? value) =>
+    value == null || value.trim().isEmpty ? 'This field is required.' : null;
 
 String _categoryLabel(ActivityCategory category) => switch (category) {
   ActivityCategory.environment => 'Environment',
@@ -159,8 +279,13 @@ String _categoryLabel(ActivityCategory category) => switch (category) {
 };
 
 class _ActivityCard extends StatelessWidget {
-  const _ActivityCard({required this.activity, required this.onJoin});
+  const _ActivityCard({
+    required this.activity,
+    required this.onDetails,
+    required this.onJoin,
+  });
   final Activity activity;
+  final VoidCallback onDetails;
   final VoidCallback onJoin;
 
   @override
@@ -257,34 +382,58 @@ class _ActivityCard extends StatelessWidget {
               backgroundColor: const Color(0xFFE9EEE9),
             ),
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton.icon(
-                onPressed: activity.status == ActivityStatus.draft
-                    ? null
-                    : onJoin,
-                icon: Icon(
-                  activity.status == ActivityStatus.draft
-                      ? Icons.edit_note_outlined
-                      : activity.joinRequested
-                      ? Icons.check
-                      : Icons.arrow_forward,
-                  size: 16,
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: onDetails,
+                  icon: const Icon(Icons.info_outline, size: 16),
+                  label: const Text('Details'),
                 ),
-                label: Text(
-                  activity.status == ActivityStatus.draft
-                      ? 'Draft · not published'
-                      : activity.joinRequested
-                      ? 'Join request in preview'
-                      : 'Request to join',
+                const Spacer(),
+                OutlinedButton.icon(
+                  onPressed: activity.status == ActivityStatus.draft
+                      ? null
+                      : onJoin,
+                  icon: Icon(
+                    activity.status == ActivityStatus.draft
+                        ? Icons.edit_note_outlined
+                        : activity.joinRequested
+                        ? Icons.check
+                        : Icons.arrow_forward,
+                    size: 16,
+                  ),
+                  label: Text(
+                    activity.status == ActivityStatus.draft
+                        ? 'Draft · not published'
+                        : activity.joinRequested
+                        ? 'Join request in preview'
+                        : 'Request to join',
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _ActivityDetailRow extends StatelessWidget {
+  const _ActivityDetailRow(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, size: 17, color: const Color(0xFF748078)),
+      const SizedBox(width: 9),
+      Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
+    ],
+  );
 }
 
 class _SampleNotice extends StatelessWidget {

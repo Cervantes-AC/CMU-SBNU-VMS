@@ -29,7 +29,10 @@ class ActivitiesViewModel extends ChangeNotifier {
   void createDraft({
     required String title,
     required ActivityCategory category,
+    required String scheduleLabel,
     required String venue,
+    required String description,
+    required int capacity,
   }) {
     final id = 'local-${DateTime.now().microsecondsSinceEpoch}';
     _repository.saveDraft(
@@ -37,10 +40,11 @@ class ActivitiesViewModel extends ChangeNotifier {
         id: id,
         title: title.trim(),
         category: category,
-        scheduleLabel: 'Schedule to be set',
+        scheduleLabel: scheduleLabel.trim(),
         venue: venue.trim(),
+        description: description.trim(),
         joinedCount: 0,
-        capacity: 20,
+        capacity: capacity,
         status: ActivityStatus.draft,
       ),
     );

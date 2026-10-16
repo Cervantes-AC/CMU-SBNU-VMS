@@ -14,6 +14,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       id: 'sample-preparedness',
       title: 'Campus preparedness workshop',
       category: ActivityCategory.safety,
+      description:
+          'Practice campus readiness through a guided preparedness workshop and response drill.',
       scheduleLabel: 'Oct 22 · 9:00 AM',
       venue: 'University Convention Center',
       joinedCount: 24,
@@ -23,6 +25,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       id: 'sample-river-cleanup',
       title: 'Community river clean-up',
       category: ActivityCategory.environment,
+      description:
+          'Join a community clean-up focused on waste reduction and river stewardship.',
       scheduleLabel: 'Oct 26 · 6:30 AM',
       venue: 'Sawaga River access point',
       joinedCount: 18,
@@ -32,6 +36,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       id: 'sample-first-aid',
       title: 'First aid skills session',
       category: ActivityCategory.training,
+      description:
+          'Review basic first aid skills in a supervised training session.',
       scheduleLabel: 'Nov 02 · 1:00 PM',
       venue: 'College of Nursing',
       joinedCount: 12,
@@ -41,6 +47,8 @@ class PreviewActivitiesRepository implements ActivitiesRepository {
       id: 'sample-learning-day',
       title: 'Community learning day',
       category: ActivityCategory.community,
+      description:
+          'Support a community learning activity with volunteers and local partners.',
       scheduleLabel: 'Nov 08 · 8:00 AM',
       venue: 'CMU Main Campus',
       joinedCount: 31,
