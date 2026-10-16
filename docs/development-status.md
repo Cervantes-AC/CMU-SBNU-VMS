@@ -8,7 +8,7 @@
 - Application theme, SBNU logo, and public landing page following the `prototype/` palette and card styling.
 - Workspace navigation for Overview, Activities, Volunteers and Organizations, Attendance, Announcements, Emergency and Safety, Reports, and Access and Operations.
 - Responsive mobile-first layouts with an expandable navigation drawer on wider screens.
-- Synthetic sample content and local-only interactions for activity filters/drafts/details/join state, volunteer search, organization list, attendance status corrections with a session-only reason/actor/time history, announcement drafts, incident form previews, and copying an illustrative CSV to the clipboard.
+- Synthetic sample content and local-only interactions for activity filters/drafts/details/join state, volunteer search, organization list, attendance status corrections with a session-only reason/actor/time history, announcement drafts, incident previews with occurrence time, and copying an illustrative CSV to the clipboard.
 - Candidate-role and environment status reference screen, with no ability to grant roles or change account access.
 - Activities use a feature-owned preview repository and ViewModel; local drafts capture title, category, schedule, venue, description, and capacity, and sample records have a details view. The source can be replaced by an approved adapter without making the widget call Firestore.
 - Attendance uses a feature-owned preview repository and ViewModel; local status corrections require a reason and show a session-only history. QR session creation and server validation remain unavailable.
@@ -24,7 +24,7 @@
 - Firebase Auth sign-in, account approval, and recovery. The project is selected, but provider and account lifecycle decisions remain pending.
 - Firestore repositories, query contracts, Security Rules tests, or Cloud Functions.
 - QR session issuance or scan validation. These require trusted server validation, expiry, activity eligibility, replay protection, idempotency, and reviewed authorization.
-- Incident location, map provider, live incident access, or production incident review.
+- Incident location collection, provider-backed map, live reviewer list, or production review. The map-status card explains the open provider, location, and reviewer-permission decisions without displaying locations.
 - SOS delivery, responder roster, acknowledgement, escalation, or push notification. The preview reports that no alert was sent.
 - Institution-verified hotline data or phone handoff.
 - Production analytics, authorization, and report export. The preview can copy a fixed synthetic CSV sample only.

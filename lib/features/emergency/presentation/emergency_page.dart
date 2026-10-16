@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EmergencyPage extends StatefulWidget {
   const EmergencyPage({super.key});
@@ -13,6 +14,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
   Future<void> _reportIncident() async {
     final details = TextEditingController();
     String category = 'Safety concern';
+    var occurredAt = DateTime.now();
     final saved = await showDialog<_LocalIncident>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -20,51 +22,91 @@ class _EmergencyPageState extends State<EmergencyPage> {
           title: const Text('Incident report preview'),
           content: SizedBox(
             width: 440,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<String>(
-                  initialValue: category,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  items:
-                      const [
-                            'Medical concern',
-                            'Safety concern',
-                            'Facility or environment',
-                            'Transport',
-                            'Other',
-                          ]
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) =>
-                      setDialogState(() => category = value ?? category),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * .65,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      initialValue: category,
+                      decoration: const InputDecoration(labelText: 'Category'),
+                      items:
+                          const [
+                                'Medical concern',
+                                'Safety concern',
+                                'Facility or environment',
+                                'Transport',
+                                'Other',
+                              ]
+                              .map(
+                                (value) => DropdownMenuItem(
+                                  value: value,
+                                  child: Text(value),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (value) =>
+                          setDialogState(() => category = value ?? category),
+                    ),
+                    const SizedBox(height: 12),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.schedule_outlined),
+                      title: const Text('When did it happen?'),
+                      subtitle: Text(
+                        DateFormat.yMMMd().add_jm().format(occurredAt),
+                      ),
+                      trailing: const Icon(Icons.edit_calendar_outlined),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: occurredAt,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                        );
+                        if (date == null || !context.mounted) return;
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(occurredAt),
+                        );
+                        if (time == null) return;
+                        setDialogState(() {
+                          occurredAt = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            time.hour,
+                            time.minute,
+                          );
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: details,
+                      maxLength: 500,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Brief description',
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Use fictional text only. This entry stays in memory on this device and is not sent. Location is not collected in this preview.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        height: 1.4,
+                        color: Color(0xFF748078),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: details,
-                  maxLength: 500,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Brief description',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Use fictional text only. This entry stays in memory on this device and is not sent. No location is collected in this preview.',
-                  style: TextStyle(
-                    fontSize: 11,
-                    height: 1.4,
-                    color: Color(0xFF748078),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           actions: [
@@ -76,7 +118,10 @@ class _EmergencyPageState extends State<EmergencyPage> {
               onPressed: () {
                 final text = details.text.trim();
                 if (text.isNotEmpty) {
-                  Navigator.pop(context, _LocalIncident(category, text));
+                  Navigator.pop(
+                    context,
+                    _LocalIncident(category, text, occurredAt),
+                  );
                 }
               },
               child: const Text('Save local preview'),
@@ -195,6 +240,15 @@ class _EmergencyPageState extends State<EmergencyPage> {
       ),
       const SizedBox(height: 10),
       _SafetyCard(
+        icon: Icons.map_outlined,
+        title: 'Incident map and list',
+        description:
+            'No incident map, approved location policy, or authorized live records are configured.',
+        action: 'View map status',
+        onPressed: _showMapStatus,
+      ),
+      const SizedBox(height: 10),
+      _SafetyCard(
         icon: Icons.phone_in_talk_outlined,
         title: 'Hotline directory',
         description:
@@ -229,7 +283,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Text(
-              'No local drafts. Submitted reports will appear here only for this session.',
+              'No local incident drafts yet.',
               style: TextStyle(color: Color(0xFF748078), height: 1.4),
             ),
           ),
@@ -245,7 +299,7 @@ class _EmergencyPageState extends State<EmergencyPage> {
               ),
               title: Text(incident.category),
               subtitle: Text(
-                incident.description,
+                '${DateFormat.yMMMd().add_jm().format(incident.occurredAt)}\n${incident.description}',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -262,12 +316,30 @@ class _EmergencyPageState extends State<EmergencyPage> {
       ),
     ],
   );
+
+  Future<void> _showMapStatus() => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const Icon(Icons.map_outlined, color: Color(0xFF47745A), size: 36),
+      title: const Text('Incident map and list'),
+      content: const Text(
+        'A map provider, location precision policy, and reviewer access rules have not been approved. This preview does not collect location or display incident markers. Use institution procedures for current safety information.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
 }
 
 class _LocalIncident {
-  const _LocalIncident(this.category, this.description);
+  const _LocalIncident(this.category, this.description, this.occurredAt);
   final String category;
   final String description;
+  final DateTime occurredAt;
 }
 
 class _SafetyCard extends StatelessWidget {
