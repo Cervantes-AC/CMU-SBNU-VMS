@@ -57,10 +57,7 @@ class _SosResponderQueuePageState extends State<SosResponderQueuePage> {
           Text(
             'Alerts submitted by volunteers appear here for '
             'designated handlers to review.',
-            style: TextStyle(
-              fontSize: 13,
-              color: Color(0xFF68766D),
-            ),
+            style: TextStyle(fontSize: 13, color: Color(0xFF68766D)),
           ),
         ],
       ),
@@ -73,10 +70,7 @@ class _SosResponderQueuePageState extends State<SosResponderQueuePage> {
       itemCount: alerts.length,
       itemBuilder: (context, index) {
         final alert = alerts[index];
-        return _AlertCard(
-          alert: alert,
-          viewModel: viewModel,
-        );
+        return _AlertCard(alert: alert, viewModel: viewModel);
       },
     );
   }
@@ -131,8 +125,9 @@ class _AlertCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _lifecycleColor(alert.lifecycleStatus)
-                        .withValues(alpha: 0.15),
+                    color: _lifecycleColor(
+                      alert.lifecycleStatus,
+                    ).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -161,8 +156,11 @@ class _AlertCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(Icons.location_on,
-                      size: 16, color: Color(0xFF196142)),
+                  const Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: Color(0xFF196142),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(

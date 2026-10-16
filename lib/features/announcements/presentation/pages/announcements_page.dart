@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/performance/performance.dart';
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/announcement.dart';
 import '../view_models/announcements_view_model.dart';
@@ -29,8 +30,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                     icon: Icons.campaign_outlined,
                     title: 'No announcements.',
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                : ResponsiveListView(
                     itemCount: viewModel.published.length,
                     itemBuilder: (context, index) {
                       final a = viewModel.published[index];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/security/screen_security.dart';
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/sos_alert.dart';
 import '../view_models/sos_view_model.dart';
@@ -73,23 +74,26 @@ class _SosPageState extends State<SosPage> {
   Widget build(BuildContext context) {
     return Consumer<SosViewModel>(
       builder: (context, viewModel, _) {
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Emergency SOS'),
-              bottom: const TabBar(
-                tabs: [
-                  Tab(icon: Icon(Icons.add_circle), text: 'Submit Alert'),
-                  Tab(icon: Icon(Icons.queue), text: 'Responder Queue'),
+        return SecurePage(
+          enabled: true,
+          child: DefaultTabController(
+            length: 2,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Emergency SOS'),
+                bottom: const TabBar(
+                  tabs: [
+                    Tab(icon: Icon(Icons.add_circle), text: 'Submit Alert'),
+                    Tab(icon: Icon(Icons.queue), text: 'Responder Queue'),
+                  ],
+                ),
+              ),
+              body: TabBarView(
+                children: [
+                  _buildSubmitTab(context, viewModel),
+                  const SosResponderQueuePage(),
                 ],
               ),
-            ),
-            body: TabBarView(
-              children: [
-                _buildSubmitTab(context, viewModel),
-                const SosResponderQueuePage(),
-              ],
             ),
           ),
         );
@@ -97,10 +101,7 @@ class _SosPageState extends State<SosPage> {
     );
   }
 
-  Widget _buildSubmitTab(
-    BuildContext context,
-    SosViewModel viewModel,
-  ) {
+  Widget _buildSubmitTab(BuildContext context, SosViewModel viewModel) {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(22),
@@ -172,13 +173,10 @@ class _SosPageState extends State<SosPage> {
             ListTile(
               leading: Checkbox(
                 value: _shareLocation,
-                onChanged: (v) =>
-                    setState(() => _shareLocation = v ?? false),
+                onChanged: (v) => setState(() => _shareLocation = v ?? false),
               ),
               title: const Text('Share location'),
-              subtitle: const Text(
-                'Optional - helps responders find you',
-              ),
+              subtitle: const Text('Optional - helps responders find you'),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -214,9 +212,7 @@ class _SosPageState extends State<SosPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              ...viewModel.myAlerts
-                  .take(3)
-                  .map((a) => _AlertCard(alert: a)),
+              ...viewModel.myAlerts.take(3).map((a) => _AlertCard(alert: a)),
             ],
           ],
         ),

@@ -48,10 +48,7 @@ class _AttendanceQrScannerState extends State<AttendanceQrScanner> {
         children: [
           Expanded(
             flex: 3,
-            child: MobileScanner(
-              controller: _controller,
-              onDetect: _onDetect,
-            ),
+            child: MobileScanner(controller: _controller, onDetect: _onDetect),
           ),
           Expanded(
             flex: 1,
@@ -61,8 +58,7 @@ class _AttendanceQrScannerState extends State<AttendanceQrScanner> {
               child: const Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.qr_code_scanner,
-                      color: Colors.white, size: 48),
+                  Icon(Icons.qr_code_scanner, color: Colors.white, size: 48),
                   SizedBox(height: 12),
                   Text(
                     'Point the camera at a QR code',
@@ -76,10 +72,7 @@ class _AttendanceQrScannerState extends State<AttendanceQrScanner> {
                   Text(
                     'Scanning captures the token only. A trusted server '
                     'must validate it before attendance is accepted.',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
                 ],

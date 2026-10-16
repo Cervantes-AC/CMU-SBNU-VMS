@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/performance/performance.dart';
+import '../../../../core/security/screen_security.dart';
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/incident.dart';
 import '../view_models/incidents_view_model.dart';
@@ -19,45 +21,47 @@ class _IncidentsPageState extends State<IncidentsPage> {
   Widget build(BuildContext context) {
     return Consumer<IncidentsViewModel>(
       builder: (context, viewModel, _) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Incidents & Safety'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.map),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const IncidentsMapPage()),
-                ),
-                tooltip: 'View incidents on map',
-              ),
-            ],
-          ),
-          body: AppStateWrapper(
-            status: viewModel.status,
-            onRetry: viewModel.init,
-            errorMessage: viewModel.error?.message,
-            child: viewModel.myIncidents.isEmpty
-                ? const AppEmptyState(
-                    icon: Icons.report_outlined,
-                    title: 'No incident reports.',
-                    subtitle:
-                        'Submit a report if you observe a safety concern.',
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: viewModel.myIncidents.length,
-                    itemBuilder: (context, index) {
-                      final inc = viewModel.myIncidents[index];
-                      return _IncidentCard(
-                        incident: inc,
-                        onTap: () => viewModel.select(inc),
-                      );
-                    },
+        return SecurePage(
+          enabled: true,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Incidents & Safety'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.map),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const IncidentsMapPage()),
                   ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _showSubmitDialog(context, viewModel),
-            child: const Icon(Icons.add),
+                  tooltip: 'View incidents on map',
+                ),
+              ],
+            ),
+            body: AppStateWrapper(
+              status: viewModel.status,
+              onRetry: viewModel.init,
+              errorMessage: viewModel.error?.message,
+              child: viewModel.myIncidents.isEmpty
+                  ? const AppEmptyState(
+                      icon: Icons.report_outlined,
+                      title: 'No incident reports.',
+                      subtitle:
+                          'Submit a report if you observe a safety concern.',
+                    )
+                  : ResponsiveListView(
+                      itemCount: viewModel.myIncidents.length,
+                      itemBuilder: (context, index) {
+                        final inc = viewModel.myIncidents[index];
+                        return _IncidentCard(
+                          incident: inc,
+                          onTap: () => viewModel.select(inc),
+                        );
+                      },
+                    ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _showSubmitDialog(context, viewModel),
+              child: const Icon(Icons.add),
+            ),
           ),
         );
       },
