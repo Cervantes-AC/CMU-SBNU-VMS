@@ -11,6 +11,7 @@
 - Synthetic sample content and local-only interactions for activity filters/drafts/join state, volunteer search, organization list, attendance roster toggles, announcement drafts, incident form previews, and copying an illustrative CSV to the clipboard.
 - Candidate-role and environment status reference screen, with no ability to grant roles or change account access.
 - Activities use a feature-owned preview repository and ViewModel; the source can be replaced by an approved adapter without making the widget call Firestore.
+- Attendance roster status uses a feature-owned preview repository and ViewModel; QR session creation and server validation remain unavailable.
 - GoRouter handles the public landing and workspace routes.
 - User-visible disclosure where records are synthetic or local-only and where a service action is not connected.
 

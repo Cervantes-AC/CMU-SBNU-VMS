@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'features/activities/data/activities_repository.dart';
 import 'features/activities/presentation/view_models/activities_view_model.dart';
+import 'features/attendance/data/attendance_repository.dart';
+import 'features/attendance/presentation/view_models/attendance_view_model.dart';
 import 'features/landing/presentation/landing_page.dart';
 import 'features/overview/presentation/overview_page.dart';
 
@@ -33,8 +35,15 @@ class NSRCApp extends StatelessWidget {
       surface: Colors.white,
     );
 
-    return ChangeNotifierProvider(
-      create: (_) => ActivitiesViewModel(PreviewActivitiesRepository()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ActivitiesViewModel(PreviewActivitiesRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AttendanceViewModel(PreviewAttendanceRepository()),
+        ),
+      ],
       child: MaterialApp.router(
         title: 'CMU–SBNU Volunteer Management System',
         debugShowCheckedModeBanner: false,
