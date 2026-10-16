@@ -14,11 +14,14 @@
 - Attendance roster status uses a feature-owned preview repository and ViewModel; QR session creation and server validation remain unavailable.
 - GoRouter handles the public landing and workspace routes.
 - Sign-in, registration, and recovery entry pages explain the unconfigured status without accepting credentials or sending recovery requests.
+- Firebase Core initializes against the approved `cmu-sbnu-vms` project; app startup does not read or write project data.
+- Firebase Auth and Firestore emulator endpoints are configured for explicit local use with `--dart-define=USE_FIREBASE_EMULATORS=true`.
+- Start local Auth and Firestore emulators with `firebase emulators:start --only auth,firestore`, then launch Flutter with `--dart-define=USE_FIREBASE_EMULATORS=true`. Override `FIREBASE_EMULATOR_HOST` for Android emulators or a non-local emulator host.
 - User-visible disclosure where records are synthetic or local-only and where a service action is not connected.
 
 ## Deliberately not connected
 
-- Firebase Auth and account approval/recovery.
+- Firebase Auth sign-in, account approval, and recovery. The project is selected, but provider and account lifecycle decisions remain pending.
 - Firestore repositories, query contracts, Security Rules tests, or Cloud Functions.
 - QR session issuance or scan validation. These require trusted server validation, expiry, activity eligibility, replay protection, idempotency, and reviewed authorization.
 - Incident location, map provider, live incident access, or production incident review.
@@ -30,7 +33,7 @@ Firestore rules continue to deny all client access. Firebase project/environment
 
 ## Next development sequence
 
-1. Review and approve scope, supported platforms, role/action permissions, Firebase environments/region, privacy classification, and data retention.
+1. Review and approve scope, supported platforms, role/action permissions, Firebase region, privacy classification, and data retention. The existing `cmu-sbnu-vms` project is approved for development use.
 2. Add authentication/session and account approval using the approved identity lifecycle.
 3. Define feature repository contracts, Firestore queries/indexes, callable operations, and least-privilege Rules; test authorization allow and deny cases.
 4. Connect activities, organizations, volunteer profiles, participation, attendance, and announcements to an approved development environment.

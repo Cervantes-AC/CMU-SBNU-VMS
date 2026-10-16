@@ -16,11 +16,11 @@ class AuthPage extends StatelessWidget {
 
   String get _description => switch (mode) {
     AuthPageMode.signIn =>
-      'Account sign-in will be available after the identity method and development environment are approved.',
+      'The approved Firebase development project is connected. Account sign-in is waiting for an approved identity method and account lifecycle.',
     AuthPageMode.register =>
       'Registration and account approval steps are pending owner decisions.',
     AuthPageMode.recover =>
-      'Password recovery is not connected because authentication has not been configured.',
+      'Password recovery is not connected because the authentication provider and account lifecycle are not configured.',
   };
 
   @override
@@ -89,7 +89,7 @@ class AuthPage extends StatelessWidget {
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Authentication is not connected. Do not enter a password or real personal information in this preview.',
+                              'Authentication is not enabled in this preview. Do not enter a password or real personal information here.',
                               style: TextStyle(
                                 fontSize: 12,
                                 height: 1.45,
