@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../access_control/presentation/access_control_page.dart';
+import '../../activities/presentation/activities_page.dart';
+import '../../announcements/presentation/announcements_page.dart';
+import '../../attendance/presentation/attendance_page.dart';
+import '../../emergency/presentation/emergency_page.dart';
+import '../../reporting/presentation/reports_page.dart';
+import '../../volunteers/presentation/volunteers_page.dart';
+
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
 
@@ -8,22 +16,35 @@ class OverviewPage extends StatefulWidget {
 }
 
 class _OverviewPageState extends State<OverviewPage> {
-  int _selectedIndex = 0;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _activeSection = 'Overview';
 
   static const _destinations = [
+    (Icons.grid_view_rounded, 'Overview'),
     (Icons.calendar_month_outlined, 'Activities'),
     (Icons.groups_outlined, 'Volunteers'),
-    (Icons.grid_view_rounded, 'Overview'),
-    (Icons.shield_outlined, 'Safety'),
+    (Icons.fact_check_outlined, 'Attendance'),
+    (Icons.campaign_outlined, 'Announcements'),
+    (Icons.shield_outlined, 'Emergency & safety'),
+    (Icons.insights_outlined, 'Reports'),
+    (Icons.admin_panel_settings_outlined, 'Access & operations'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final title = _destinations[_selectedIndex].$2;
+    final title = _activeSection;
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         titleSpacing: 20,
+        leading: Builder(
+          builder: (context) => IconButton(
+            tooltip: 'Open workspace navigation',
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            icon: const Icon(Icons.menu),
+          ),
+        ),
         title: Row(
           children: [
             const Icon(Icons.volunteer_activism, color: Color(0xFF134F35)),
@@ -32,33 +53,104 @@ class _OverviewPageState extends State<OverviewPage> {
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Notifications preview',
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
+          const Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: _PreviewBadge(),
           ),
-          const SizedBox(width: 10),
         ],
       ),
-      body: SafeArea(
-        child: _selectedIndex == 2
-            ? const _OverviewContent()
-            : _PreviewSection(title: title),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _selectedIndex = index),
-        destinations: [
+      drawer: NavigationDrawer(
+        selectedIndex: _destinations.indexWhere(
+          (item) => item.$2 == _activeSection,
+        ),
+        onDestinationSelected: (index) {
+          setState(() => _activeSection = _destinations[index].$2);
+          _scaffoldKey.currentState?.closeDrawer();
+        },
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(28, 20, 16, 16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.volunteer_activism,
+                  color: Color(0xFF134F35),
+                  size: 32,
+                ),
+                SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SBNu',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      'VOLUNTEER WORKSPACE',
+                      style: TextStyle(fontSize: 9, letterSpacing: 0.8),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(indent: 20, endIndent: 20),
           for (final destination in _destinations)
-            NavigationDestination(
+            NavigationDrawerDestination(
               icon: Icon(destination.$1),
-              label: destination.$2,
+              label: Text(destination.$2),
             ),
         ],
       ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: IndexedStack(
+              index: _destinations.indexWhere(
+                (item) => item.$2 == _activeSection,
+              ),
+              children: const [
+                _OverviewContent(),
+                ActivitiesPage(),
+                VolunteersPage(),
+                AttendancePage(),
+                AnnouncementsPage(),
+                EmergencyPage(),
+                ReportsPage(),
+                AccessControlPage(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
+}
+
+class _PreviewBadge extends StatelessWidget {
+  const _PreviewBadge();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFBF0D7),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: const Text(
+      'SAMPLE DATA',
+      style: TextStyle(
+        color: Color(0xFF895F00),
+        fontSize: 9,
+        letterSpacing: 0.7,
+        fontWeight: FontWeight.w800,
+      ),
+    ),
+  );
 }
 
 class _OverviewContent extends StatelessWidget {
@@ -348,44 +440,6 @@ class _ActivityCard extends StatelessWidget {
               ),
             ),
             const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PreviewSection extends StatelessWidget {
-  const _PreviewSection({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.construction_outlined,
-              size: 42,
-              color: Color(0xFF47745A),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              '$title preview',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 7),
-            const Text(
-              'This workspace area is part of the design preview. Connected records and actions are not available yet.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF748078), height: 1.5),
-            ),
           ],
         ),
       ),

@@ -2,7 +2,9 @@
 
 A Flutter/Dart project for a proposed volunteer management system for Central Mindanao University's School-Based National Service Reserve Corps Unit (CMU–SBNU). The planned system is intended to help authorized users coordinate volunteer profiles and organizations, activities, participation, attendance, announcements, and operational reports. The reviewed planning baseline also proposes QR-assisted attendance, incident reporting and map/list views, an SOS workflow for designated handlers, and an institution-verified hotline directory.
 
-**Project status:** planning and application scaffolding. The specification in [`docs/CMU_SBNU_Volunteer_Management_System_Documentation.docx`](docs/CMU_SBNU_Volunteer_Management_System_Documentation.docx) is a proposed requirements and design baseline. It explicitly does not claim that features, security controls, integrations, institutional approvals, or emergency operations are complete. Roles, first-release scope, data handling, Firebase choices, and emergency procedures require owner review. See the [implementation plan](docs/implementation-plan.md) and the existing [branding](docs/branding.md) and [Git workflow](docs/git-version-control.md) notes.
+**Project status:** active interface development. The Flutter app now includes a public landing page and a responsive local preview workspace with sample screens for overview, activities, volunteers, attendance, announcements, emergency and safety, and reports. Preview interactions are in-memory only and use synthetic data. Authentication, persistence, Firestore reads/writes, QR validation, hotline calling, map data, SOS routing, and report exports are not connected. See the [development status](docs/development-status.md) for implemented scope and gates still pending.
+
+The specification in [`docs/CMU_SBNU_Volunteer_Management_System_Documentation.docx`](docs/CMU_SBNU_Volunteer_Management_System_Documentation.docx) remains a proposed requirements and design baseline. It does not establish institutional approval or production readiness. Roles, first-release scope, data handling, Firebase choices, and emergency procedures require owner review. See the [implementation plan](docs/implementation-plan.md), [architecture](docs/architecture.md), [branding](docs/branding.md), and [Git workflow](docs/git-version-control.md).
 
 ## Proposed technology
 
@@ -48,6 +50,7 @@ The proposed SOS feature is an in-app alert workflow. It does not contact public
 ## Project documentation
 
 - [Implementation plan](docs/implementation-plan.md)
+- [Development status](docs/development-status.md)
 - [Architecture decision](docs/architecture.md) — feature-first MVVM structure and Firebase trust boundaries.
 - [Specification Markdown index](docs/specification/README.md) — topic-by-topic breakdown of the supplied planning baseline.
 - [Original planning baseline](docs/CMU_SBNU_Volunteer_Management_System_Documentation.docx)
