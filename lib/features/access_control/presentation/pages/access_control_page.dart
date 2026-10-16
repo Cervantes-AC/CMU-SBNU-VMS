@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
+import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/models/permission_entry.dart';
 
-/// Access and operations page - shows proposed permission matrix (UX only).
+/// Access and operations page — premium, fully functional UX.
 class AccessControlPage extends StatefulWidget {
   const AccessControlPage({super.key});
 
@@ -81,47 +81,76 @@ class _AccessControlPageState extends State<AccessControlPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Access & Operations')),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: const Color(0xFFF3F5F0),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _PageHeader()),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(DesignTokens.lg),
+              child: Column(
                 children: [
-                  Text(
-                    'Proposed Permission Matrix',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF17231C),
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    'This matrix is UX guidance only. Real authorization is enforced at trusted backend boundaries. '
-                    'No roles can be changed from this screen.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF68766D)),
-                  ),
+                  for (final entry in _entries) ...[
+                    _MatrixRow(entry: entry),
+                    const SizedBox(height: DesignTokens.md),
+                  ],
                 ],
               ),
             ),
-            const Divider(height: 1),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _entries.length,
-                itemBuilder: (context, index) {
-                  final e = _entries[index];
-                  return _MatrixRow(entry: e);
-                },
-              ),
-            ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PageHeader extends StatelessWidget {
+  const _PageHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xl,
+        DesignTokens.lg,
+        DesignTokens.lg,
+      ),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvas,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
         ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Access & Operations',
+            style: DesignTokens.displayLarge.copyWith(
+              fontSize: 36,
+              color: DesignTokens.ink,
+            ),
+          ),
+          const SizedBox(height: DesignTokens.sm),
+          Text(
+            'Proposed permission matrix (UX guidance only).',
+            style: DesignTokens.body.copyWith(
+              fontSize: 15,
+              color: DesignTokens.muted,
+            ),
+          ),
+          const SizedBox(height: DesignTokens.sm),
+          Text(
+            'Real authorization is enforced at trusted backend boundaries. '
+            'No roles can be changed from this screen.',
+            style: DesignTokens.caption.copyWith(
+              color: DesignTokens.muted,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -134,20 +163,25 @@ class _MatrixRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+    return Container(
+      margin: const EdgeInsets.only(bottom: DesignTokens.md),
+      child: PremiumCard(
+        elevation: 1,
+        borderRadius: DesignTokens.radiusXl,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              entry.dataArea,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF17231C),
+            Padding(
+              padding: const EdgeInsets.all(DesignTokens.lg),
+              child: Text(
+                entry.dataArea,
+                style: DesignTokens.headlineSmall.copyWith(
+                  fontSize: 15,
+                  color: DesignTokens.ink,
+                ),
               ),
             ),
-            const SizedBox(height: 10),
+            PremiumDivider(),
             Row(
               children: [
                 Expanded(
@@ -196,34 +230,38 @@ class _Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF748078),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(
+    return Padding(
+      padding: const EdgeInsets.all(DesignTokens.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: DesignTokens.caption.copyWith(
+              color: DesignTokens.muted,
               fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: color,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: DesignTokens.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: DesignTokens.radiusLg,
+              border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: color,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

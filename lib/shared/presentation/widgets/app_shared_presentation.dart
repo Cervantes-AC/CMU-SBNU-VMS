@@ -1,15 +1,3 @@
-export 'app_button.dart';
-export 'app_card.dart';
-export 'app_disclosure_card.dart';
-export 'app_empty_state.dart';
-export 'app_error_state.dart';
-export 'app_form_field_error.dart';
-export 'app_input_field.dart';
-export 'app_loading_state.dart';
-export 'app_nav_drawer.dart';
-export 'app_offline_state.dart';
-export 'app_permission_denied_state.dart';
-export 'app_preview_badge.dart';
-export 'app_section_heading.dart';
-export 'app_snackbar.dart';
-export 'app_state_wrapper.dart';
+/// Re-exports the premium design system components.
+/// All shared UI now uses the high-class premium design system.
+export '../theme/design_tokens.dart';

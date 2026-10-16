@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Public landing page — fully functional entry point.
-///
-/// Displays the CMU–SBNU brand, mission, programs, and safety features.
-/// Sign-in and registration actions are connected to the auth ViewModel.
+import 'package:cmu_sbnu_vms/shared/presentation/widgets/app_shared_presentation.dart';
+
+/// Public landing page — premium, fully functional entry point.
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
 
@@ -19,13 +18,14 @@ class _LandingPageState extends State<LandingPage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: _PublicHeader()),
-            SliverToBoxAdapter(child: _HeroSection()),
-            SliverToBoxAdapter(child: _MissionSection()),
-            SliverToBoxAdapter(child: _ProgramsSection()),
-            SliverToBoxAdapter(child: _SafetySection()),
-            SliverToBoxAdapter(child: _CtaSection()),
-            SliverToBoxAdapter(child: _PublicFooter()),
+            SliverToBoxAdapter(child: const _PublicHeader()),
+            SliverToBoxAdapter(child: const _HeroSection()),
+            SliverToBoxAdapter(child: const _TrustBar()),
+            SliverToBoxAdapter(child: const _MissionSection()),
+            SliverToBoxAdapter(child: const _ProgramsSection()),
+            SliverToBoxAdapter(child: const _SafetySection()),
+            SliverToBoxAdapter(child: const _CtaSection()),
+            SliverToBoxAdapter(child: const _PublicFooter()),
           ],
         ),
       ),
@@ -33,25 +33,30 @@ class _LandingPageState extends State<LandingPage> {
   }
 }
 
-/// Public header with brand and navigation.
+/// Public header with brand and navigation actions.
 class _PublicHeader extends StatelessWidget {
   const _PublicHeader();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 16, 22, 10),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.md,
+        DesignTokens.lg,
+        DesignTokens.sm,
+      ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE5EFE7),
-              borderRadius: BorderRadius.circular(15),
+            width: 52.0,
+            height: 52.0,
+            decoration: DesignTokens.card3D(
+              color: DesignTokens.canvas,
+              shadowLevel: 1,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: DesignTokens.radiusMd,
               child: Image.asset(
                 'assets/images/sbnu_app_icon.png',
                 semanticLabel: 'SBNU logo',
@@ -59,22 +64,34 @@ class _PublicHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: DesignTokens.md),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'SBNu',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.w800,
+                    color: DesignTokens.deepForest,
+                  ),
                 ),
                 Text(
-                  'CMU VOLUNTEER CORPS',
+                  'CENTRAL MINDANAO UNIVERSITY',
                   style: TextStyle(
-                    color: Color(0xFF748078),
-                    fontSize: 10,
-                    letterSpacing: 1.1,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.w700,
+                    color: DesignTokens.gold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                Text(
+                  'VOLUNTEER MANAGEMENT SYSTEM',
+                  style: TextStyle(
+                    fontSize: 9.0,
+                    color: DesignTokens.muted,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ],
@@ -87,7 +104,6 @@ class _PublicHeader extends StatelessWidget {
   }
 }
 
-/// Sign-in / register actions in the header.
 class _AuthActions extends StatelessWidget {
   const _AuthActions();
 
@@ -96,22 +112,19 @@ class _AuthActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton(
+        PremiumButton(
+          label: 'Sign in',
           onPressed: () => context.go('/account/sign-in'),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          ),
-          child: const Text(
-            'Sign in',
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
+          variant: ButtonVariant.outline,
+          isFullWidth: false,
         ),
-        const SizedBox(width: 10),
-        AppButton(
+        const SizedBox(width: DesignTokens.sm),
+        PremiumButton(
           label: 'Join the network',
           onPressed: () => context.go('/account/register'),
+          variant: ButtonVariant.primary,
+          isFullWidth: false,
           icon: Icons.person_add,
-          isOutlined: true,
         ),
       ],
     );
@@ -125,61 +138,54 @@ class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 30, 22, 30),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xl,
+        DesignTokens.lg,
+        DesignTokens.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(width: 22, height: 2, color: const Color(0xFFD5A52F)),
-              const SizedBox(width: 9),
-              const Text(
-                'CENTRAL MINDANAO UNIVERSITY',
-                style: TextStyle(
-                  color: Color(0xFFAA7C10),
-                  fontSize: 10,
-                  letterSpacing: 1.1,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 17),
-          Text.rich(
-            TextSpan(
-              style: const TextStyle(
-                fontSize: 39,
-                height: 1.08,
-                letterSpacing: -1.7,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF15281D),
-              ),
-              children: const [
-                TextSpan(text: 'Service that moves a community forward.'),
-              ],
+          Container(
+            width: 44.0,
+            height: 4.0,
+            decoration: BoxDecoration(
+              color: DesignTokens.gold,
+              borderRadius: BorderRadius.circular(2.0),
             ),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          const SizedBox(height: DesignTokens.md),
+          Text(
+            'Service that moves a community forward.',
+            style: const TextStyle(
+              fontSize: 44.0,
+              fontWeight: FontWeight.w900,
+              color: DesignTokens.ink,
+              height: 1.05,
+              letterSpacing: -1.2,
+            ),
+          ),
+          const SizedBox(height: DesignTokens.lg),
+          Text(
             'One connected space for CMU volunteers to discover opportunities, '
             'serve with purpose, and build a safer, more resilient community.',
-            style: TextStyle(
-              color: Color(0xFF68766D),
-              fontSize: 15,
-              height: 1.6,
+            style: const TextStyle(
+              fontSize: 17.0,
+              height: 1.7,
+              color: DesignTokens.muted,
             ),
           ),
-          const SizedBox(height: 28),
-          _HeroActions(),
-          const SizedBox(height: 32),
-          _TrustBar(),
+          const SizedBox(height: DesignTokens.xxl),
+          const _HeroActions(),
+          const SizedBox(height: DesignTokens.xxl),
+          const _TrustBar(),
         ],
       ),
     );
   }
 }
 
-/// Primary action buttons in the hero.
 class _HeroActions extends StatelessWidget {
   const _HeroActions();
 
@@ -188,368 +194,442 @@ class _HeroActions extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: AppButton(
-            label: 'Become a volunteer',
-            onPressed: () => context.go('/account/register'),
-            icon: Icons.person_add,
-          ),
+        PremiumButton(
+          label: 'Become a volunteer',
+          onPressed: () => context.go('/account/register'),
+          icon: Icons.person_add,
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: AppButton(
-            label: 'Explore programs',
-            onPressed: () => context.go('/workspace'),
-            icon: Icons.event_available,
-            isOutlined: true,
-          ),
+        const SizedBox(height: DesignTokens.md),
+        PremiumButton(
+          label: 'Explore programs',
+          onPressed: () => context.go('/activities'),
+          variant: ButtonVariant.outline,
+          icon: Icons.event_available,
         ),
       ],
     );
   }
 }
 
-/// Trust indicators: active volunteers, service hours, engagement.
 class _TrustBar extends StatelessWidget {
   const _TrustBar();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _TrustItem(
-            label: 'Active volunteers',
-            value: '1,248',
-            subtitle: 'Serving across CMU',
+    return GlassCard(
+      elevation: 1,
+      borderRadius: DesignTokens.radiusXl,
+      padding: const EdgeInsets.all(DesignTokens.lg),
+      color: Colors.white,
+      opacity: 0.9,
+      blur: 24.0,
+      child: Row(
+        children: [
+          Expanded(
+            child: _TrustItem(
+              icon: Icons.people_alt_rounded,
+              label: 'Active volunteers',
+              value: '1,248',
+              subtitle: 'Serving across CMU',
+              accent: DesignTokens.forest,
+            ),
           ),
-        ),
-        Expanded(
-          child: _TrustItem(
-            label: 'Service hours',
-            value: '38K+',
-            subtitle: 'Since 2022',
+          Container(width: 1.0, height: 40.0, color: DesignTokens.line),
+          Expanded(
+            child: _TrustItem(
+              icon: Icons.access_time_rounded,
+              label: 'Service hours',
+              value: '38K+',
+              subtitle: 'Since 2022',
+              accent: DesignTokens.gold,
+            ),
           ),
-        ),
-        Expanded(
-          child: _TrustItem(
-            label: 'Volunteer engagement',
-            value: '87%',
-            subtitle: 'Participation rate',
+          Container(width: 1.0, height: 40.0, color: DesignTokens.line),
+          Expanded(
+            child: _TrustItem(
+              icon: Icons.trending_up_rounded,
+              label: 'Engagement rate',
+              value: '87%',
+              subtitle: 'Participation',
+              accent: DesignTokens.success,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
 class _TrustItem extends StatelessWidget {
   const _TrustItem({
+    required this.icon,
     required this.label,
     required this.value,
     required this.subtitle,
+    required this.accent,
   });
 
+  final IconData icon;
   final String label;
   final String value;
   final String subtitle;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F5F0),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE1E6DF)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF134F35),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36.0,
+          height: 36.0,
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.12),
+            borderRadius: DesignTokens.radiusMd,
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF17231C),
-            ),
+          child: Icon(icon, color: accent, size: 18.0),
+        ),
+        const SizedBox(height: DesignTokens.md),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.w800,
+            color: DesignTokens.ink,
           ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: const TextStyle(fontSize: 11, color: Color(0xFF748078)),
+        ),
+        const SizedBox(height: DesignTokens.xs / 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.w700,
+            color: DesignTokens.ink,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: DesignTokens.xs / 2),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 10.0,
+            fontWeight: FontWeight.w600,
+            color: DesignTokens.muted,
+            letterSpacing: 0.4,
+          ),
+        ),
+      ],
     );
   }
 }
 
-/// Mission / purpose section.
+/// Mission / purpose section with 3D cards.
 class _MissionSection extends StatelessWidget {
   const _MissionSection();
 
   @override
   Widget build(BuildContext context) {
     const items = [
-      (
-        Icons.explore_outlined,
-        'Discover your purpose',
-        'Find service opportunities aligned with your skills, interests, and community priorities.',
+      _MissionItem(
+        icon: Icons.explore_rounded,
+        title: 'Discover your purpose',
+        subtitle:
+            'Find service opportunities aligned with your skills, interests, and community priorities.',
+        accent: DesignTokens.forest,
       ),
-      (
-        Icons.groups_outlined,
-        'Serve together',
-        'Collaborate across colleges and units through organized, high-impact volunteer programs.',
+      _MissionItem(
+        icon: Icons.groups_rounded,
+        title: 'Serve together',
+        subtitle:
+            'Collaborate across colleges and units through organized, high-impact volunteer programs.',
+        accent: DesignTokens.gold,
       ),
-      (
-        Icons.insights_outlined,
-        'See your impact',
-        'Track attendance, service hours, milestones, and the difference your contribution creates.',
+      _MissionItem(
+        icon: Icons.insights_rounded,
+        title: 'See your impact',
+        subtitle:
+            'Track attendance, service hours, milestones, and the difference your contribution creates.',
+        accent: DesignTokens.success,
       ),
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 28, 22, 20),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xxl,
+        DesignTokens.lg,
+        DesignTokens.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'WHY SBNu',
-            style: TextStyle(
-              color: Color(0xFFAA7C10),
-              fontSize: 10,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w800,
-            ),
+          PremiumSectionHeading(
+            title: 'Why SBNu',
+            subtitle: 'A stronger culture of service starts here.',
+            accentColor: DesignTokens.forest,
           ),
-          const SizedBox(height: 7),
-          Text(
-            'A stronger culture of service starts here.',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.6,
-            ),
+          const SizedBox(height: DesignTokens.lg),
+          Row(
+            children: [
+              Expanded(child: _MissionCard(item: items[0])),
+              const SizedBox(width: DesignTokens.md),
+              Expanded(child: _MissionCard(item: items[1])),
+              const SizedBox(width: DesignTokens.md),
+              Expanded(child: _MissionCard(item: items[2])),
+            ],
           ),
-          const SizedBox(height: 14),
-          for (final item in items)
-            Card(
-              margin: const EdgeInsets.only(bottom: 10),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 6,
-                ),
-                leading: CircleAvatar(
-                  backgroundColor: const Color(0xFFE5EFE7),
-                  foregroundColor: const Color(0xFF134F35),
-                  child: Icon(item.$1),
-                ),
-                title: Text(
-                  item.$2,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-                subtitle: Text(item.$3),
-              ),
-            ),
         ],
       ),
     );
   }
 }
 
-/// Programs section showing service areas.
+class _MissionItem {
+  const _MissionItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+}
+
+class _MissionCard extends StatelessWidget {
+  const _MissionCard({required this.item});
+
+  final _MissionItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return PremiumCard(
+      elevation: 2,
+      borderRadius: DesignTokens.radiusXl,
+      padding: const EdgeInsets.all(DesignTokens.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44.0,
+            height: 44.0,
+            decoration: BoxDecoration(
+              color: item.accent.withValues(alpha: 0.12),
+              borderRadius: DesignTokens.radiusLg,
+            ),
+            child: Icon(item.icon, color: item.accent, size: 22.0),
+          ),
+          const SizedBox(height: DesignTokens.lg),
+          Text(
+            item.title,
+            style: const TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w800,
+              color: DesignTokens.ink,
+            ),
+          ),
+          const SizedBox(height: DesignTokens.sm),
+          Text(
+            item.subtitle,
+            style: const TextStyle(
+              fontSize: 13.0,
+              height: 1.6,
+              color: DesignTokens.muted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Programs section showing service areas with premium cards.
 class _ProgramsSection extends StatelessWidget {
   const _ProgramsSection();
 
   @override
   Widget build(BuildContext context) {
     const items = [
-      (
-        'Environment',
-        const Color(0xFF196142),
-        '12 active programs',
-        'Restore what sustains us.',
-        'Watershed, campus greening, and community clean-up initiatives.',
-        Icons.eco_outlined,
+      _ProgramItem(
+        title: 'Environment',
+        accent: DesignTokens.forest,
+        count: '12 active programs',
+        heading: 'Restore what sustains us.',
+        description:
+            'Watershed, campus greening, and community clean-up initiatives.',
+        icon: Icons.eco_rounded,
       ),
-      (
-        'Safety',
-        const Color(0xFF196142),
-        '8 active programs',
-        'Build a culture of readiness.',
-        'Training, preparedness drills, and resilient community support.',
-        Icons.shield_outlined,
+      _ProgramItem(
+        title: 'Safety',
+        accent: DesignTokens.error,
+        count: '8 active programs',
+        heading: 'Build a culture of readiness.',
+        description:
+            'Training, preparedness drills, and resilient community support.',
+        icon: Icons.shield_rounded,
       ),
-      (
-        'Community',
-        const Color(0xFFD5A52F),
-        '17 active programs',
-        'Extend care beyond campus.',
-        'Education, outreach, relief, and civic engagement programs.',
-        Icons.people_outlined,
+      _ProgramItem(
+        title: 'Community',
+        accent: DesignTokens.gold,
+        count: '17 active programs',
+        heading: 'Extend care beyond campus.',
+        description:
+            'Education, outreach, relief, and civic engagement programs.',
+        icon: Icons.people_rounded,
       ),
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 28, 22, 20),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xxl,
+        DesignTokens.lg,
+        DesignTokens.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'PROGRAMS',
-                style: TextStyle(
-                  color: Color(0xFFAA7C10),
-                  fontSize: 10,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w800,
-                ),
+              PremiumSectionHeading(
+                title: 'Programs',
+                subtitle: 'There is a place for every kind of service.',
+                accentColor: DesignTokens.forest,
               ),
-              AppButton(
+              PremiumButton(
                 label: 'View all opportunities',
                 onPressed: () => context.go('/activities'),
+                variant: ButtonVariant.outline,
+                isFullWidth: false,
                 icon: Icons.event_available,
-                isOutlined: true,
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            'There is a place for every kind of service.',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.6,
-            ),
-          ),
-          const SizedBox(height: 16),
-          for (final item in items)
-            _ProgramCard(
-              title: item.$1,
-              tint: item.$2,
-              programCount: item.$3,
-              heading: item.$4,
-              description: item.$5,
-              icon: item.$6,
-              onTap: () => context.go('/activities'),
-            ),
+          const SizedBox(height: DesignTokens.lg),
+          for (final item in items) ...[
+            _ProgramCard(item: item),
+            const SizedBox(height: DesignTokens.md),
+          ],
         ],
       ),
     );
   }
 }
 
-class _ProgramCard extends StatelessWidget {
-  const _ProgramCard({
+class _ProgramItem {
+  const _ProgramItem({
     required this.title,
-    required this.tint,
-    required this.programCount,
+    required this.accent,
+    required this.count,
     required this.heading,
     required this.description,
     required this.icon,
-    required this.onTap,
   });
 
   final String title;
-  final Color tint;
-  final String programCount;
+  final Color accent;
+  final String count;
   final String heading;
   final String description;
   final IconData icon;
-  final VoidCallback onTap;
+}
+
+class _ProgramCard extends StatelessWidget {
+  const _ProgramCard({required this.item});
+
+  final _ProgramItem item;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return PremiumCard(
+      elevation: 2,
+      borderRadius: DesignTokens.radiusXl,
+      padding: const EdgeInsets.all(DesignTokens.lg),
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: tint.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+        onTap: () => context.go('/activities'),
+        borderRadius: DesignTokens.radiusXl,
+        child: Row(
+          children: [
+            Container(
+              width: 52.0,
+              height: 52.0,
+              decoration: BoxDecoration(
+                color: item.accent.withValues(alpha: 0.12),
+                borderRadius: DesignTokens.radiusLg,
+                boxShadow: DesignTokens.shadowSoft(
+                  color: item.accent.withValues(alpha: 0.2),
+                  blur: 12.0,
+                  offset: const Offset(0.0, 4.0),
                 ),
-                child: Icon(icon, color: tint, size: 22),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: tint,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
+              child: Icon(item.icon, color: item.accent, size: 26.0),
+            ),
+            const SizedBox(width: DesignTokens.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          programCount,
+                        decoration: BoxDecoration(
+                          color: item.accent,
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                        child: Text(
+                          item.title,
                           style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF748078),
-                            fontWeight: FontWeight.w700,
+                            fontSize: 10.0,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      heading,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF17231C),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: Color(0xFF68766D),
+                      const SizedBox(width: DesignTokens.sm),
+                      Text(
+                        item.count,
+                        style: const TextStyle(
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.w700,
+                          color: DesignTokens.muted,
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: DesignTokens.md),
+                  Text(
+                    item.heading,
+                    style: const TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w800,
+                      color: DesignTokens.ink,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: DesignTokens.sm),
+                  Text(
+                    item.description,
+                    style: const TextStyle(
+                      fontSize: 13.0,
+                      height: 1.6,
+                      color: DesignTokens.muted,
+                    ),
+                  ),
+                ],
               ),
-              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
-            ],
-          ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              size: 20.0,
+              color: DesignTokens.muted,
+            ),
+          ],
         ),
       ),
     );
@@ -564,26 +644,43 @@ class _SafetySection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 28, 22, 20),
-      color: const Color(0xFFF3F5F0),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xxl,
+        DesignTokens.lg,
+        DesignTokens.xxl,
+      ),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvas,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(40.0),
+          topRight: Radius.circular(40.0),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 52.0,
+                height: 52.0,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8EEE8),
-                  borderRadius: BorderRadius.circular(12),
+                  color: DesignTokens.error.withValues(alpha: 0.12),
+                  borderRadius: DesignTokens.radiusLg,
+                  boxShadow: DesignTokens.shadowSoft(
+                    color: DesignTokens.error.withValues(alpha: 0.2),
+                    blur: 16.0,
+                    offset: const Offset(0.0, 4.0),
+                  ),
                 ),
                 child: const Icon(
-                  Icons.shield_outlined,
-                  color: Color(0xFF134F35),
+                  Icons.shield_rounded,
+                  color: DesignTokens.error,
+                  size: 26.0,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: DesignTokens.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,28 +688,29 @@ class _SafetySection extends StatelessWidget {
                     const Text(
                       'POWERED BY ODRRM READINESS',
                       style: TextStyle(
-                        color: Color(0xFFAA7C10),
-                        fontSize: 10,
-                        letterSpacing: 1.1,
+                        fontSize: 10.0,
                         fontWeight: FontWeight.w800,
+                        color: DesignTokens.error,
+                        letterSpacing: 1.5,
                       ),
                     ),
+                    const SizedBox(height: DesignTokens.xs / 2),
                     Text(
                       'Service, with safety at the center.',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.6,
-                          ),
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w800,
+                        color: DesignTokens.ink,
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    const Text(
+                    const SizedBox(height: DesignTokens.sm),
+                    Text(
                       'Access verified emergency contacts, submit safety reports, '
                       'receive campus advisories, and connect with designated responders.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 1.5,
-                        color: Color(0xFF68766D),
+                      style: const TextStyle(
+                        fontSize: 13.0,
+                        height: 1.6,
+                        color: DesignTokens.muted,
                       ),
                     ),
                   ],
@@ -620,10 +718,10 @@ class _SafetySection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: DesignTokens.xl),
           SizedBox(
             width: double.infinity,
-            child: AppButton(
+            child: PremiumButton(
               label: 'Access the safety center',
               onPressed: () => context.go('/emergency'),
               icon: Icons.shield,
@@ -643,55 +741,60 @@ class _CtaSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 28, 22, 20),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xxl,
+        DesignTokens.lg,
+        DesignTokens.xxl,
+      ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0C402B), Color(0xFF176043)],
+        gradient: DesignTokens.forestGradient,
+        borderRadius: DesignTokens.radiusXl,
+        boxShadow: DesignTokens.shadowStrong(
+          color: DesignTokens.deepForest.withValues(alpha: 0.4),
+          blur: 32.0,
+          offset: const Offset(0.0, 16.0),
         ),
-        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.eco_outlined, size: 110, color: Color(0x33FFFFFF)),
-            ],
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: DesignTokens.md),
           const Text(
             'START SERVING TODAY',
             style: TextStyle(
-              color: Color(0xFFE1B747),
-              fontSize: 9,
-              letterSpacing: 1.1,
-              fontWeight: FontWeight.w700,
+              fontSize: 10.0,
+              fontWeight: FontWeight.w800,
+              color: DesignTokens.goldLight,
+              letterSpacing: 1.8,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: DesignTokens.md),
           const Text(
             'Your time can change someone\'s tomorrow.',
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              height: 1.2,
+              fontSize: 32.0,
               fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.2,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: DesignTokens.sm),
           const Text(
             'Join the CMU SBNu volunteer network and turn your willingness '
             'to help into measurable impact.',
-            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 22),
-          SizedBox(
-            width: double.infinity,
-            child: AppButton(
-              label: 'Create your volunteer account',
-              onPressed: () => context.go('/account/register'),
-              icon: Icons.person_add,
+            style: TextStyle(
+              fontSize: 14.0,
+              height: 1.6,
+              color: Colors.white70,
             ),
+          ),
+          const SizedBox(height: DesignTokens.xl),
+          PremiumButton(
+            label: 'Create your volunteer account',
+            onPressed: () => context.go('/account/register'),
+            icon: Icons.person_add,
+            variant: ButtonVariant.secondary,
           ),
         ],
       ),
@@ -707,23 +810,28 @@ class _PublicFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 32),
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.lg,
+        DesignTokens.xxl,
+        DesignTokens.lg,
+        DesignTokens.xxl,
+      ),
       decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFE0E5DF))),
+        border: Border(top: BorderSide(color: DesignTokens.line)),
       ),
       child: Column(
         children: [
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5EFE7),
-                  borderRadius: BorderRadius.circular(12),
+                width: 44.0,
+                height: 44.0,
+                decoration: DesignTokens.card3D(
+                  color: DesignTokens.canvas,
+                  shadowLevel: 1,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: DesignTokens.radiusMd,
                   child: Image.asset(
                     'assets/images/sbnu_app_icon.png',
                     semanticLabel: 'SBNU logo',
@@ -731,110 +839,41 @@ class _PublicFooter extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: DesignTokens.md),
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'SBNu',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w800,
+                      color: DesignTokens.ink,
+                    ),
                   ),
                   Text(
                     'CMU VOLUNTEER CORPS',
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 9.0,
                       letterSpacing: 0.8,
-                      color: Color(0xFF748078),
+                      color: DesignTokens.muted,
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: DesignTokens.lg),
           const Text(
             'Service • Bayanihan • Nationalism • Unity',
             style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF89948C),
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
+              fontSize: 11.0,
+              fontWeight: FontWeight.w700,
+              color: DesignTokens.muted,
+              letterSpacing: 2.0,
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// A styled primary action button consistent with the SBNU brand.
-class AppButton extends StatelessWidget {
-  const AppButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-    this.icon,
-    this.isLoading = false,
-    this.isOutlined = false,
-    this.isDestructive = false,
-  });
-
-  final String label;
-  final VoidCallback onPressed;
-  final IconData? icon;
-  final bool isLoading;
-  final bool isOutlined;
-  final bool isDestructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final effectiveOnPressed = isLoading ? null : onPressed;
-
-    if (isOutlined) {
-      return OutlinedButton.icon(
-        onPressed: effectiveOnPressed,
-        icon: icon != null ? Icon(icon, size: 18) : null,
-        label: isLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Text(label),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: isDestructive
-              ? Theme.of(context).colorScheme.error
-              : Theme.of(context).colorScheme.primary,
-          side: BorderSide(
-            color: isDestructive
-                ? Theme.of(context).colorScheme.error
-                : Theme.of(context).colorScheme.primary,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-    }
-
-    return FilledButton.icon(
-      onPressed: effectiveOnPressed,
-      icon: icon != null ? Icon(icon, size: 18) : null,
-      label: isLoading
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : Text(label),
-      style: FilledButton.styleFrom(
-        backgroundColor: isDestructive
-            ? Theme.of(context).colorScheme.error
-            : null,
-        foregroundColor: isDestructive ? Colors.white : null,
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
