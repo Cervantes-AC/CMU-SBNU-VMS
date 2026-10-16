@@ -36,4 +36,22 @@ class EmergencyViewModel extends ChangeNotifier {
     _repository.deleteLocalIncidentDraft(id);
     notifyListeners();
   }
+
+  void updateLocalIncidentDraft({
+    required String id,
+    required String category,
+    required String description,
+    required DateTime occurredAt,
+  }) {
+    final index = localIncidentDrafts.indexWhere((draft) => draft.id == id);
+    if (index < 0) return;
+    _repository.updateLocalIncidentDraft(
+      localIncidentDrafts[index].copyWith(
+        category: category,
+        description: description.trim(),
+        occurredAt: occurredAt,
+      ),
+    );
+    notifyListeners();
+  }
 }

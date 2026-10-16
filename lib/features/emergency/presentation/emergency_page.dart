@@ -14,15 +14,22 @@ class EmergencyPage extends StatefulWidget {
 }
 
 class _EmergencyPageState extends State<EmergencyPage> {
-  Future<void> _reportIncident(EmergencyViewModel viewModel) async {
-    final details = TextEditingController();
-    String category = 'Safety concern';
-    var occurredAt = DateTime.now();
+  Future<void> _reportIncident(
+    EmergencyViewModel viewModel, {
+    IncidentDraft? existing,
+  }) async {
+    final details = TextEditingController(text: existing?.description);
+    String category = existing?.category ?? 'Safety concern';
+    var occurredAt = existing?.occurredAt ?? DateTime.now();
     final saved = await showDialog<_LocalIncident>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Incident report preview'),
+          title: Text(
+            existing == null
+                ? 'Incident report preview'
+                : 'Edit local incident draft',
+          ),
           content: SizedBox(
             width: 440,
             child: ConstrainedBox(
@@ -127,7 +134,9 @@ class _EmergencyPageState extends State<EmergencyPage> {
                   );
                 }
               },
-              child: const Text('Save local preview'),
+              child: Text(
+                existing == null ? 'Save local preview' : 'Save draft changes',
+              ),
             ),
           ],
         ),
@@ -135,11 +144,20 @@ class _EmergencyPageState extends State<EmergencyPage> {
     );
     details.dispose();
     if (saved != null && mounted) {
-      viewModel.saveLocalIncidentDraft(
-        category: saved.category,
-        description: saved.description,
-        occurredAt: saved.occurredAt,
-      );
+      if (existing == null) {
+        viewModel.saveLocalIncidentDraft(
+          category: saved.category,
+          description: saved.description,
+          occurredAt: saved.occurredAt,
+        );
+      } else {
+        viewModel.updateLocalIncidentDraft(
+          id: existing.id,
+          category: saved.category,
+          description: saved.description,
+          occurredAt: saved.occurredAt,
+        );
+      }
     }
   }
 
@@ -344,10 +362,26 @@ class _EmergencyPageState extends State<EmergencyPage> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-                trailing: IconButton(
-                  tooltip: 'Delete local incident draft',
-                  onPressed: () => _discardIncident(viewModel, incident),
-                  icon: const Icon(Icons.delete_outline),
+                trailing: PopupMenuButton<_IncidentDraftAction>(
+                  tooltip: 'Local incident draft actions',
+                  onSelected: (action) {
+                    switch (action) {
+                      case _IncidentDraftAction.edit:
+                        _reportIncident(viewModel, existing: incident);
+                      case _IncidentDraftAction.delete:
+                        _discardIncident(viewModel, incident);
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: _IncidentDraftAction.edit,
+                      child: Text('Edit draft'),
+                    ),
+                    PopupMenuItem(
+                      value: _IncidentDraftAction.delete,
+                      child: Text('Delete draft'),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -526,6 +560,8 @@ class _LocalIncident {
   final String description;
   final DateTime occurredAt;
 }
+
+enum _IncidentDraftAction { edit, delete }
 
 class _SafetyCard extends StatelessWidget {
   const _SafetyCard({

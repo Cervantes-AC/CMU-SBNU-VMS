@@ -5,6 +5,7 @@ abstract interface class EmergencyRepository {
   List<IncidentDraft> get localIncidentDrafts;
   List<IncidentPreviewRecord> get sampleIncidentRecords;
   void saveLocalIncidentDraft(IncidentDraft draft);
+  void updateLocalIncidentDraft(IncidentDraft draft);
   void deleteLocalIncidentDraft(String id);
 }
 
@@ -45,6 +46,16 @@ class PreviewEmergencyRepository implements EmergencyRepository {
   void saveLocalIncidentDraft(IncidentDraft draft) {
     if (!draft.id.startsWith('local-')) return;
     _localIncidentDrafts.insert(0, draft);
+  }
+
+  @override
+  void updateLocalIncidentDraft(IncidentDraft draft) {
+    if (!draft.id.startsWith('local-')) return;
+    final index = _localIncidentDrafts.indexWhere(
+      (item) => item.id == draft.id,
+    );
+    if (index < 0) return;
+    _localIncidentDrafts[index] = draft;
   }
 
   @override
