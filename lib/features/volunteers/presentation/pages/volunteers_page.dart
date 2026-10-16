@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cmu_sbnu_vms/features/organizations/presentation/pages/organizations_page.dart';
-import 'package:cmu_sbnu_vms/features/volunteers/data/models/volunteer_preview.dart';
-import 'package:cmu_sbnu_vms/features/volunteers/presentation/view_models/volunteers_view_model.dart';
+import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
+import '../../data/volunteers_repository.dart';
+import '../../data/models/volunteer.dart';
+import '../view_models/volunteers_view_model.dart';
 
+/// Volunteers page - roster and profiles.
 class VolunteersPage extends StatefulWidget {
   const VolunteersPage({super.key});
 
@@ -13,201 +15,128 @@ class VolunteersPage extends StatefulWidget {
 }
 
 class _VolunteersPageState extends State<VolunteersPage> {
-  bool _showOrganizations = false;
-
-  Future<void> _showVolunteerDetails(
-    VolunteerPreview volunteer,
-  ) => showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(volunteer.name),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _DetailRow(Icons.account_balance_outlined, volunteer.college),
-          const SizedBox(height: 10),
-          _DetailRow(Icons.schedule_outlined, volunteer.serviceHoursLabel),
-          const SizedBox(height: 14),
-          const Text(
-            'Fictional preview profile. Account status, contact details, membership records, and attendance history are not connected.',
-            style: TextStyle(
-              fontSize: 11,
-              height: 1.4,
-              color: Color(0xFF748078),
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
-        ),
-      ],
-    ),
-  );
-
   @override
-  Widget build(BuildContext context) => Consumer<VolunteersViewModel>(
-    builder: (context, viewModel, _) => ListView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-      children: [
-        Text(
-          'People directory',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: const Color(0xFFAA7C10),
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Volunteers and organizations',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Browse a synthetic volunteer directory or illustrative organization list. Contact details and membership records are not included.',
-          style: TextStyle(color: Color(0xFF748078), height: 1.4),
-        ),
-        const SizedBox(height: 16),
-        SegmentedButton<bool>(
-          segments: const [
-            ButtonSegment(
-              value: false,
-              label: Text('Volunteers'),
-              icon: Icon(Icons.groups_outlined),
-            ),
-            ButtonSegment(
-              value: true,
-              label: Text('Organizations'),
-              icon: Icon(Icons.account_tree_outlined),
-            ),
-          ],
-          selected: {_showOrganizations},
-          onSelectionChanged: (selection) =>
-              setState(() => _showOrganizations = selection.first),
-        ),
-        const SizedBox(height: 14),
-        if (_showOrganizations) ...[
-          const OrganizationsPage(),
-        ] else ...[
-          TextField(
-            onChanged: viewModel.setQuery,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
-              hintText: 'Search volunteers',
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(13),
-                borderSide: const BorderSide(color: Color(0xFFE1E6DF)),
+  Widget build(BuildContext context) {
+    return Consumer<VolunteersViewModel>(
+      builder: (context, viewModel, _) {
+        final colleges = viewModel.colleges;
+        final filtered = viewModel.filteredVolunteers;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Volunteers'),
+            actions: [
+              DropdownButton<String>(
+                value: viewModel.collegeFilter,
+                items: colleges
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) viewModel.setCollegeFilter(value);
+                },
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(13),
-                borderSide: const BorderSide(color: Color(0xFFE1E6DF)),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          DropdownButtonFormField<String>(
-            initialValue: viewModel.college,
-            decoration: const InputDecoration(
-              labelText: 'College or unit',
-              border: OutlineInputBorder(),
-            ),
-            items: [
-              const DropdownMenuItem(
-                value: 'All colleges',
-                child: Text('All colleges'),
-              ),
-              for (final college in viewModel.colleges)
-                DropdownMenuItem(value: college, child: Text(college)),
             ],
-            onChanged: (value) {
-              if (value != null) viewModel.setCollege(value);
-            },
           ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFBF0D7),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              'Synthetic directory · This preview contains fictional sample profiles.',
-              style: TextStyle(fontSize: 11, color: Color(0xFF6E581F)),
-            ),
+          body: AppStateWrapper(
+            status: viewModel.status,
+            onRetry: viewModel.init,
+            errorMessage: viewModel.error?.message,
+            child: filtered.isEmpty
+                ? const AppEmptyState(
+                    icon: Icons.groups_outlined,
+                    title: 'No volunteers found.',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final v = filtered[index];
+                      return _VolunteerCard(profile: v, onTap: () => viewModel.select(v));
+                    },
+                  ),
           ),
-          const SizedBox(height: 12),
-          if (viewModel.filteredVolunteers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(28),
-              child: Text(
-                'No sample volunteers match your search.',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          for (final volunteer in viewModel.filteredVolunteers)
-            Card(
-              margin: const EdgeInsets.only(bottom: 9),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 4,
-                ),
-                leading: CircleAvatar(
-                  backgroundColor: Color(volunteer.accentColorValue),
-                  child: Text(
-                    volunteer.initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  volunteer.name,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-                subtitle: Text(
-                  volunteer.college,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: Text(
-                  volunteer.serviceHoursLabel,
-                  style: const TextStyle(
-                    color: Color(0xFF315E43),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11,
-                  ),
-                ),
-                onTap: () => _showVolunteerDetails(volunteer),
-              ),
-            ),
-        ],
-      ],
-    ),
-  );
+        );
+      },
+    );
+  }
 }
 
-class _DetailRow extends StatelessWidget {
-  const _DetailRow(this.icon, this.label);
+class _VolunteerCard extends StatelessWidget {
+  const _VolunteerCard({required this.profile, required this.onTap});
 
-  final IconData icon;
-  final String label;
+  final VolunteerProfile profile;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Icon(icon, size: 18, color: const Color(0xFF47745A)),
-      const SizedBox(width: 9),
-      Expanded(child: Text(label)),
-    ],
-  );
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5EFE7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.person_outlined, color: Color(0xFF134F35)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.fullName,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF17231C),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      profile.email,
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF68766D)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${profile.college ?? '-'} · ${profile.course ?? '-'}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF748078)),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: profile.isActive
+                            ? const Color(0xFFE5EFE7)
+                            : const Color(0xFFF5E5E5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        profile.status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: profile.isActive
+                              ? const Color(0xFF196142)
+                              : const Color(0xFFB63D34),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Color(0xFFADB5AF)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
