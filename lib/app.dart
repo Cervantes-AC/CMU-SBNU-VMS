@@ -10,6 +10,8 @@ import 'features/announcements/data/announcements_repository.dart';
 import 'features/announcements/presentation/view_models/announcements_view_model.dart';
 import 'features/emergency/data/emergency_repository.dart';
 import 'features/emergency/presentation/view_models/emergency_view_model.dart';
+import 'features/volunteers/data/volunteers_repository.dart';
+import 'features/volunteers/presentation/view_models/volunteers_view_model.dart';
 import 'features/auth/presentation/auth_page.dart';
 import 'features/landing/presentation/landing_page.dart';
 import 'features/overview/presentation/overview_page.dart';
@@ -67,6 +69,9 @@ class NSRCApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => EmergencyViewModel(PreviewEmergencyRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => VolunteersViewModel(PreviewVolunteersRepository()),
         ),
       ],
       child: MaterialApp.router(

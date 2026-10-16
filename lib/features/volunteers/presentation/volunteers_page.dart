@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../data/models/volunteer_preview.dart';
+import 'view_models/volunteers_view_model.dart';
 
 class VolunteersPage extends StatefulWidget {
   const VolunteersPage({super.key});
@@ -8,66 +12,21 @@ class VolunteersPage extends StatefulWidget {
 }
 
 class _VolunteersPageState extends State<VolunteersPage> {
-  String _query = '';
-  String _college = 'All colleges';
   bool _showOrganizations = false;
 
-  static const _volunteers = [
-    ('MA', 'Mika Alvarez', 'College of Forestry', '32 hrs', Color(0xFF155E3B)),
-    ('JR', 'Jon Reyes', 'College of Engineering', '28 hrs', Color(0xFFB88318)),
-    ('CL', 'Cathy Lim', 'College of Nursing', '24 hrs', Color(0xFF315E70)),
-    (
-      'AS',
-      'Aira Santos',
-      'College of Arts & Sciences',
-      '21 hrs',
-      Color(0xFF765341),
-    ),
-    (
-      'DN',
-      'Daniel Navarro',
-      'College of Agriculture',
-      '18 hrs',
-      Color(0xFF566231),
-    ),
-  ];
-
-  static const _organizations = [
-    (
-      'College of Agriculture',
-      'Environment and community programs',
-      Icons.eco_outlined,
-    ),
-    (
-      'College of Engineering',
-      'Preparedness and technical support',
-      Icons.engineering_outlined,
-    ),
-    (
-      'College of Forestry',
-      'Watershed and campus initiatives',
-      Icons.forest_outlined,
-    ),
-    (
-      'College of Nursing',
-      'First aid and health preparedness',
-      Icons.medical_services_outlined,
-    ),
-  ];
-
   Future<void> _showVolunteerDetails(
-    (String, String, String, String, Color) volunteer,
+    VolunteerPreview volunteer,
   ) => showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text(volunteer.$2),
+      title: Text(volunteer.name),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DetailRow(Icons.account_balance_outlined, volunteer.$3),
+          _DetailRow(Icons.account_balance_outlined, volunteer.college),
           const SizedBox(height: 10),
-          _DetailRow(Icons.schedule_outlined, volunteer.$4),
+          _DetailRow(Icons.schedule_outlined, volunteer.serviceHoursLabel),
           const SizedBox(height: 14),
           const Text(
             'Fictional preview profile. Account status, contact details, membership records, and attendance history are not connected.',
@@ -89,14 +48,17 @@ class _VolunteersPageState extends State<VolunteersPage> {
   );
 
   Future<void> _showOrganizationDetails(
-    (String, String, IconData) organization,
+    OrganizationPreview organization,
   ) => showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
-      icon: Icon(organization.$3, color: const Color(0xFF196142)),
-      title: Text(organization.$1),
+      icon: Icon(
+        _organizationIcon(organization.kind),
+        color: const Color(0xFF196142),
+      ),
+      title: Text(organization.name),
       content: Text(
-        '${organization.$2}. This entry is illustrative; the approved unit hierarchy and coordinator assignments are not configured.',
+        '${organization.description}. This entry is illustrative; the approved unit hierarchy and coordinator assignments are not configured.',
       ),
       actions: [
         TextButton(
@@ -108,19 +70,8 @@ class _VolunteersPageState extends State<VolunteersPage> {
   );
 
   @override
-  Widget build(BuildContext context) {
-    final colleges =
-        _volunteers.map((volunteer) => volunteer.$3).toSet().toList()..sort();
-    final filtered = _volunteers
-        .where(
-          (volunteer) =>
-              '${volunteer.$2} ${volunteer.$3}'.toLowerCase().contains(
-                _query.toLowerCase(),
-              ) &&
-              (_college == 'All colleges' || volunteer.$3 == _college),
-        )
-        .toList();
-    return ListView(
+  Widget build(BuildContext context) => Consumer<VolunteersViewModel>(
+    builder: (context, viewModel, _) => ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       children: [
         Text(
@@ -179,27 +130,27 @@ class _VolunteersPageState extends State<VolunteersPage> {
             ),
           ),
           const SizedBox(height: 12),
-          for (final organization in _organizations)
+          for (final organization in viewModel.organizations)
             Card(
               margin: const EdgeInsets.only(bottom: 9),
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: const Color(0xFFE5EFE7),
                   foregroundColor: const Color(0xFF196142),
-                  child: Icon(organization.$3),
+                  child: Icon(_organizationIcon(organization.kind)),
                 ),
                 title: Text(
-                  organization.$1,
+                  organization.name,
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
-                subtitle: Text(organization.$2),
+                subtitle: Text(organization.description),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showOrganizationDetails(organization),
               ),
             ),
         ] else ...[
           TextField(
-            onChanged: (value) => setState(() => _query = value),
+            onChanged: viewModel.setQuery,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
               hintText: 'Search volunteers',
@@ -217,7 +168,7 @@ class _VolunteersPageState extends State<VolunteersPage> {
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<String>(
-            initialValue: _college,
+            initialValue: viewModel.college,
             decoration: const InputDecoration(
               labelText: 'College or unit',
               border: OutlineInputBorder(),
@@ -227,11 +178,11 @@ class _VolunteersPageState extends State<VolunteersPage> {
                 value: 'All colleges',
                 child: Text('All colleges'),
               ),
-              for (final college in colleges)
+              for (final college in viewModel.colleges)
                 DropdownMenuItem(value: college, child: Text(college)),
             ],
             onChanged: (value) {
-              if (value != null) setState(() => _college = value);
+              if (value != null) viewModel.setCollege(value);
             },
           ),
           const SizedBox(height: 14),
@@ -247,7 +198,7 @@ class _VolunteersPageState extends State<VolunteersPage> {
             ),
           ),
           const SizedBox(height: 12),
-          if (filtered.isEmpty)
+          if (viewModel.filteredVolunteers.isEmpty)
             const Padding(
               padding: EdgeInsets.all(28),
               child: Text(
@@ -255,7 +206,7 @@ class _VolunteersPageState extends State<VolunteersPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-          for (final volunteer in filtered)
+          for (final volunteer in viewModel.filteredVolunteers)
             Card(
               margin: const EdgeInsets.only(bottom: 9),
               child: ListTile(
@@ -264,9 +215,9 @@ class _VolunteersPageState extends State<VolunteersPage> {
                   vertical: 4,
                 ),
                 leading: CircleAvatar(
-                  backgroundColor: volunteer.$5,
+                  backgroundColor: Color(volunteer.accentColorValue),
                   child: Text(
-                    volunteer.$1,
+                    volunteer.initials,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -274,16 +225,16 @@ class _VolunteersPageState extends State<VolunteersPage> {
                   ),
                 ),
                 title: Text(
-                  volunteer.$2,
+                  volunteer.name,
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 subtitle: Text(
-                  volunteer.$3,
+                  volunteer.college,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 trailing: Text(
-                  volunteer.$4,
+                  volunteer.serviceHoursLabel,
                   style: const TextStyle(
                     color: Color(0xFF315E43),
                     fontWeight: FontWeight.w700,
@@ -295,9 +246,16 @@ class _VolunteersPageState extends State<VolunteersPage> {
             ),
         ],
       ],
-    );
-  }
+    ),
+  );
 }
+
+IconData _organizationIcon(OrganizationKind kind) => switch (kind) {
+  OrganizationKind.agriculture => Icons.eco_outlined,
+  OrganizationKind.engineering => Icons.engineering_outlined,
+  OrganizationKind.forestry => Icons.forest_outlined,
+  OrganizationKind.nursing => Icons.medical_services_outlined,
+};
 
 class _DetailRow extends StatelessWidget {
   const _DetailRow(this.icon, this.label);
