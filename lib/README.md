@@ -1,6 +1,6 @@
 ﻿# Flutter client structure
 
-The client follows a **modular monolith** organized around CMU–SBNU workflows. Its boundary rules and rationale are in [the project architecture decision](../docs/architecture.md). The landing page and local preview workspace are implemented; the preview uses synthetic data and does not imply institutional approval or a connected backend.
+The client is being developed as a **working modular monolith** organized around CMU–SBNU workflows. Its requirements, boundary rules, target layout, and delivery status are in the [specification](../docs/specification/README.md), [architecture decision](../docs/architecture.md), [structure redesign](../docs/structure-redesign.md), and [development checklist](../docs/development-checklist.md). Some existing screens still use local synthetic data; those are incomplete development slices and must not be treated as production functionality.
 
 ```text
 lib/
@@ -8,10 +8,10 @@ lib/
 ├── app.dart
 ├── firebase_options.dart
 ├── app/
-│   ├── bootstrap/
-│   ├── dependencies/
-│   ├── routing/
-│   └── theme/
+│   ├── bootstrap/app_bootstrap.dart
+│   ├── dependencies/app_providers.dart
+│   ├── routing/app_router.dart
+│   └── theme/app_theme.dart
 ├── core/
 │   ├── errors/
 │   ├── logging/
@@ -34,7 +34,7 @@ lib/
     └── audit/                    # Restricted audit review
 ```
 
-Keep each feature folder small until its first implementation. A feature usually grows to `presentation/` (pages, ViewModels, widgets) and `data/` (repository, external data sources, and DTOs when needed). Add `application/` or `domain/` only when a feature has complex lifecycle rules, reusable policy, or cross-repository orchestration. Likely candidates are attendance/QR, incidents, SOS, and access control.
+Create feature subfolders when real code needs them. A simple feature can use `presentation/` (pages, ViewModels, widgets) and `data/` (repository, external data sources, and DTOs when needed). Add `application/` or `domain/` only for complex lifecycle rules, reusable policy, or cross-repository orchestration. Likely candidates are attendance/QR, incidents, SOS, and access control. Avoid empty scaffolding and migrate in small compiling steps.
 
 ## Where shared code goes
 
@@ -45,4 +45,4 @@ Keep each feature folder small until its first implementation. A feature usually
 - Do not create a generic `FirebaseService` or `AppService`. Keep one-feature integrations local, such as QR scanning in attendance and phone handoff in hotlines.
 - Firestore Rules and trusted backend operations enforce access; route guards and UI visibility only guide navigation.
 
-Use the existing Provider and GoRouter dependencies. The app uses GoRouter for landing/workspace routes and Provider with feature-owned ViewModels/repositories for activity, attendance, announcements, incident previews, volunteer profiles, organizations, reporting, and audit previews. SOS and hotline previews live in their own features; other preview sections still hold presentation state locally and should move behind feature-owned view models/repositories as they gain behavior. Do not add another state-management or routing package without a demonstrated need. See [architecture.md](../docs/architecture.md) for the Firebase trust boundary, module dependencies, and implementation order.
+Use the existing Provider and GoRouter dependencies. The app uses GoRouter for landing/workspace routes and Provider for feature ViewModels. Replace synthetic preview repositories with working, approved integrations as implementation proceeds; keep demo data explicit and clearly labeled. Do not add another state-management or routing package without a demonstrated need. See [architecture.md](../docs/architecture.md) for the Firebase trust boundary and [development-checklist.md](../docs/development-checklist.md) for outstanding work.

@@ -1,6 +1,14 @@
 # CMU–SBNU VMS Agent Guidance
 
-This file applies to the Flutter application and repository-wide work. A more specific `AGENTS.md` applies within its directory. In particular, `prototype/AGENTS.md` governs the prototype only; treat `prototype/` as the visual and interaction reference for the Flutter client.
+This file applies to the Flutter application and repository-wide work. A more specific `AGENTS.md` applies within its directory. In particular, `prototype/AGENTS.md` governs the prototype only; treat `prototype/` as the visual and interaction reference for Flutter UI/UX.
+
+## Product outcome
+
+- The goal is a usable, end-to-end Flutter/Dart application, not a permanent prototype or a collection of preview screens. Use `docs/` as the requirements and delivery guide, and match the flows, layout, and visual language in `prototype/` while implementing them as native Flutter UI.
+- Replace local synthetic preview implementations with working feature repositories and approved development Firebase/backend integrations as each feature is built. Keep synthetic data only in clearly labeled demo/sample paths and automated checks. Do not call a feature done while its primary user flow is preview-only.
+- Implement in reviewable slices: working authentication/session and authorization foundation, then the approved core management workflows, then gated emergency workflows and release operations. For every slice, connect UI, state, validation, persistence/API, access control, failure/retry states, and its documented acceptance criteria.
+- A functional release still respects institutional approval gates. Where an operational, privacy, security, or data decision is unresolved, keep that specific capability safely unavailable and visible as such; do not fake a successful action to make the app appear complete. Ordinary approved features should continue toward real functionality rather than staying mock-only.
+- Maintain `docs/development-checklist.md` as the live implementation checklist and `docs/structure-redesign.md` as the target `lib/` layout and migration map. Update both as work lands; link implemented items to the relevant requirement IDs and verification evidence.
 
 ## Authority and project status
 
@@ -15,6 +23,8 @@ This file applies to the Flutter application and repository-wide work. A more sp
 - Keep UI widgets focused on rendering and user actions. ViewModels own screen state and commands; repositories own feature data access and mapping; data sources adapt external APIs. Do not put Firestore paths, serialization, or authorization policy in widgets/ViewModels.
 - Preserve feature ownership: `auth`, `access_control`, `organizations`, `volunteers`, `activities`, `attendance`, `announcements`, `incidents`, `sos`, `hotlines`, `reporting`, and `audit`. Share across features through documented public contracts; avoid dependency cycles and imports of another feature’s internals. Shared/core code must not depend on features.
 - Use the established Provider/ChangeNotifier and GoRouter approach where it fits the existing code. Follow local naming, formatting, and design conventions. Use `prototype/` for visual direction, adapting it to the Flutter architecture and accessibility needs.
+- Use `lib/app/` for bootstrap, dependency composition, routing, and theme; use `lib/core/` only for genuinely cross-cutting primitives; use `lib/shared/presentation/` only for reusable UI without feature policy. Put business UI, state, models, repositories, and data sources in the owning `lib/features/<feature>/` folder. Do not leave empty scaffold folders, duplicate feature logic, or let `lib/app.dart` become a container for routes, themes, and every feature dependency.
+- Before adding a new folder or layer, make it serve real code in the current slice. Prefer the simplest layout that supports ownership and testing; add domain/application layers for complex policy and workflows, not as empty boilerplate. Migrate existing files in small steps and keep imports/build working at each step.
 - Preserve explicit loading, empty, unavailable, error, and offline states. Provide a usable list alternative wherever a map is planned; do not make location permission a prerequisite for hotline access or location-optional workflows.
 
 ## Security, privacy, and safety boundaries
