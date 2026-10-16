@@ -9,6 +9,7 @@ class VolunteersPage extends StatefulWidget {
 
 class _VolunteersPageState extends State<VolunteersPage> {
   String _query = '';
+  String _college = 'All colleges';
   bool _showOrganizations = false;
 
   static const _volunteers = [
@@ -54,13 +55,69 @@ class _VolunteersPageState extends State<VolunteersPage> {
     ),
   ];
 
+  Future<void> _showVolunteerDetails(
+    (String, String, String, String, Color) volunteer,
+  ) => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(volunteer.$2),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _DetailRow(Icons.account_balance_outlined, volunteer.$3),
+          const SizedBox(height: 10),
+          _DetailRow(Icons.schedule_outlined, volunteer.$4),
+          const SizedBox(height: 14),
+          const Text(
+            'Fictional preview profile. Account status, contact details, membership records, and attendance history are not connected.',
+            style: TextStyle(
+              fontSize: 11,
+              height: 1.4,
+              color: Color(0xFF748078),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+
+  Future<void> _showOrganizationDetails(
+    (String, String, IconData) organization,
+  ) => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: Icon(organization.$3, color: const Color(0xFF196142)),
+      title: Text(organization.$1),
+      content: Text(
+        '${organization.$2}. This entry is illustrative; the approved unit hierarchy and coordinator assignments are not configured.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
+    final colleges =
+        _volunteers.map((volunteer) => volunteer.$3).toSet().toList()..sort();
     final filtered = _volunteers
         .where(
-          (volunteer) => '${volunteer.$2} ${volunteer.$3}'
-              .toLowerCase()
-              .contains(_query.toLowerCase()),
+          (volunteer) =>
+              '${volunteer.$2} ${volunteer.$3}'.toLowerCase().contains(
+                _query.toLowerCase(),
+              ) &&
+              (_college == 'All colleges' || volunteer.$3 == _college),
         )
         .toList();
     return ListView(
@@ -137,6 +194,7 @@ class _VolunteersPageState extends State<VolunteersPage> {
                 ),
                 subtitle: Text(organization.$2),
                 trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showOrganizationDetails(organization),
               ),
             ),
         ] else ...[
@@ -156,6 +214,25 @@ class _VolunteersPageState extends State<VolunteersPage> {
                 borderSide: const BorderSide(color: Color(0xFFE1E6DF)),
               ),
             ),
+          ),
+          const SizedBox(height: 14),
+          DropdownButtonFormField<String>(
+            initialValue: _college,
+            decoration: const InputDecoration(
+              labelText: 'College or unit',
+              border: OutlineInputBorder(),
+            ),
+            items: [
+              const DropdownMenuItem(
+                value: 'All colleges',
+                child: Text('All colleges'),
+              ),
+              for (final college in colleges)
+                DropdownMenuItem(value: college, child: Text(college)),
+            ],
+            onChanged: (value) {
+              if (value != null) setState(() => _college = value);
+            },
           ),
           const SizedBox(height: 14),
           Container(
@@ -213,10 +290,27 @@ class _VolunteersPageState extends State<VolunteersPage> {
                     fontSize: 11,
                   ),
                 ),
+                onTap: () => _showVolunteerDetails(volunteer),
               ),
             ),
         ],
       ],
     );
   }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(icon, size: 18, color: const Color(0xFF47745A)),
+      const SizedBox(width: 9),
+      Expanded(child: Text(label)),
+    ],
+  );
 }
