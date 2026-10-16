@@ -1,70 +1,188 @@
-import 'models/announcement.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
-abstract interface class AnnouncementsRepository {
-  List<Announcement> get announcements;
-  void saveDraft(Announcement announcement);
-  void updateDraft(Announcement announcement);
-  void setDraftArchived(String announcementId, bool archived);
+import '../../../../core/errors/app_failure.dart';
+import '../../../../core/logging/app_logger.dart';
+import '../../../../core/types/app_types.dart';
+import '../data/models/announcement.dart';
+
+/// Repository contract for announcements.
+abstract class AnnouncementsRepository {
+  Stream<List<Announcement>> get announcements;
+  Stream<List<Announcement>> getPublishedAnnouncements(String audience);
+  Future<AppResult<Announcement>> createAnnouncement(Announcement announcement);
+  Future<AppResult<Announcement>> updateAnnouncement(Announcement announcement);
+  Future<AppResult<void>> archiveAnnouncement(String id);
+  Future<AppResult<void>> deleteAnnouncement(String id);
 }
 
-/// In-memory sample source. It never publishes or delivers messages.
+/// Preview implementation for development.
 class PreviewAnnouncementsRepository implements AnnouncementsRepository {
+  PreviewAnnouncementsRepository();
+
   final List<Announcement> _announcements = [
-    const Announcement(
-      id: 'sample-orientation',
-      title: 'Volunteer orientation schedule',
-      message:
-          'Welcome session dates and preparation notes for new volunteers.',
-      audience: 'Unit members',
-      dateLabel: 'Sample · Oct 14',
-      kind: AnnouncementKind.general,
+    Announcement(
+      id: 'ann_001',
+      title: 'Welcome to SBNu Volunteer Network',
+      body: 'Welcome to the volunteer management system. Explore activities and log your service hours.',
+      audienceRule: 'all',
+      status: AnnouncementStatus.published,
+      authorUid: 'staff_001',
+      publishAt: DateTime(2026, 10, 1, 9, 0),
+      priority: 'normal',
     ),
-    const Announcement(
-      id: 'sample-workshop',
-      title: 'Preparedness workshop registration',
-      message:
-          'A sample training notice for the upcoming campus preparedness workshop.',
-      audience: 'Activity participants',
-      dateLabel: 'Sample · Oct 12',
-      kind: AnnouncementKind.activity,
-    ),
-    const Announcement(
-      id: 'sample-reflection',
-      title: 'Service reflection submissions',
-      message:
-          'Reminder to review your learning notes after a completed activity.',
-      audience: 'All volunteers',
-      dateLabel: 'Sample · Oct 08',
-      kind: AnnouncementKind.reminder,
+    Announcement(
+      id: 'ann_002',
+      title: 'Tree Planting This Saturday',
+      body: 'Join us for community tree planting at the Botanical Garden. Sign up now!',
+      audienceRule: 'all',
+      status: AnnouncementStatus.published,
+      authorUid: 'staff_002',
+      publishAt: DateTime(2026, 11, 3, 8, 0),
+      priority: 'high',
     ),
   ];
 
   @override
-  List<Announcement> get announcements => List.unmodifiable(_announcements);
+  Stream<List<Announcement>> get announcements => Stream.value(_announcements);
 
   @override
-  void saveDraft(Announcement announcement) {
-    if (!announcement.isDraft || announcement.isArchived) return;
-    _announcements.insert(0, announcement);
+  Stream<List<Announcement>> getPublishedAnnouncements(String audience) =>
+      Stream.value(_announcements.where(
+        (a) => a.isPublished && (a.audienceRule == 'all' || a.audienceRule == audience),
+      ).toList());
+
+  @override
+  Future<AppResult<Announcement>> createAnnouncement(Announcement announcement) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _announcements.add(announcement);
+    return AppResult.data(announcement);
   }
 
   @override
-  void updateDraft(Announcement announcement) {
-    final index = _announcements.indexWhere(
-      (item) => item.id == announcement.id,
-    );
-    if (index < 0 || !_announcements[index].isDraft) return;
-    _announcements[index] = announcement;
+  Future<AppResult<Announcement>> updateAnnouncement(Announcement announcement) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final idx = _announcements.indexWhere((a) => a.id == announcement.id);
+    if (idx >= 0) {
+      _announcements[idx] = announcement;
+      return AppResult.data(announcement);
+    }
+    return AppResult.error(const NotFoundFailure(message: 'Announcement not found.'));
   }
 
   @override
-  void setDraftArchived(String announcementId, bool archived) {
-    final index = _announcements.indexWhere(
-      (item) => item.id == announcementId,
-    );
-    if (index < 0 || !_announcements[index].isDraft) return;
-    _announcements[index] = _announcements[index].copyWith(
-      isArchived: archived,
-    );
+  Future<AppResult<void>> archiveAnnouncement(String id) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final idx = _announcements.indexWhere((a) => a.id == id);
+    if (idx >= 0) {
+      _announcements[idx] = _announcements[idx].copyWith(status: AnnouncementStatus.archived);
+      return const AppResult.data(null);
+    }
+    return AppResult.error(const NotFoundFailure(message: 'Announcement not found.'));
   }
+
+  @override
+  Future<AppResult<void>> deleteAnnouncement(String id) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _announcements.removeWhere((a) => a.id == id);
+    return const AppResult.data(null);
+  }
+}
+
+/// Firestore-backed implementation.
+class FirestoreAnnouncementsRepository implements AnnouncementsRepository {
+  FirestoreAnnouncementsRepository({
+    FirebaseFirestore? firestore,
+    required AppLogger logger,
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _logger = logger;
+
+  final FirebaseFirestore _firestore;
+  final AppLogger _logger;
+
+  CollectionReference<Map<String, dynamic>> get _anns =>
+      _firestore.collection('announcements');
+
+  @override
+  Stream<List<Announcement>> get announcements =>
+      _anns.snapshots().map((s) => s.docs.map((d) => Announcement.fromFirestore(d)).toList());
+
+  @override
+  Stream<List<Announcement>> getPublishedAnnouncements(String audience) =>
+      _anns
+          .where('status', isEqualTo: 'published')
+          .snapshots()
+          .map((s) => s.docs
+              .map((d) => Announcement.fromFirestore(d))
+              .where((a) => a.audienceRule == 'all' || a.audienceRule == audience)
+              .toList());
+
+  @override
+  Future<AppResult<Announcement>> createAnnouncement(Announcement announcement) async {
+    try {
+      await _anns.doc(announcement.id).set(announcement.toFirestore());
+      _logger.info('announcement.create', fields: {'announcementId': announcement.id});
+      return AppResult.data(announcement);
+    } on AppFailure catch (e) {
+      return AppResult.error(e);
+    } catch (e, s) {
+      _logger.error('announcement.create_error', error: e, stackTrace: s);
+      return AppResult.error(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<AppResult<Announcement>> updateAnnouncement(Announcement announcement) async {
+    try {
+      await _anns.doc(announcement.id).update(announcement.toFirestore());
+      return AppResult.data(announcement);
+    } on AppFailure catch (e) {
+      return AppResult.error(e);
+    } catch (e, s) {
+      _logger.error('announcement.update_error', error: e, stackTrace: s);
+      return AppResult.error(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<AppResult<void>> archiveAnnouncement(String id) async {
+    try {
+      await _anns.doc(id).update({'status': 'archived', 'updatedAt': FieldValue.serverTimestamp()});
+      return const AppResult.data(null);
+    } on AppFailure catch (e) {
+      return AppResult.error(e);
+    } catch (e, s) {
+      _logger.error('announcement.archive_error', error: e, stackTrace: s);
+      return AppResult.error(UnknownFailure());
+    }
+  }
+
+  @override
+  Future<AppResult<void>> deleteAnnouncement(String id) async {
+    try {
+      await _anns.doc(id).delete();
+      return const AppResult.data(null);
+    } on AppFailure catch (e) {
+      return AppResult.error(e);
+    } catch (e, s) {
+      _logger.error('announcement.delete_error', error: e, stackTrace: s);
+      return AppResult.error(UnknownFailure());
+    }
+  }
+}
+
+AnnouncementsRepository createAnnouncementsRepository({
+  bool useFirestore = false,
+  FirebaseFirestore? firestore,
+  required AppLogger logger,
+}) {
+  if (useFirestore && firestore != null) {
+    return FirestoreAnnouncementsRepository(firestore: firestore, logger: logger);
+  }
+  return PreviewAnnouncementsRepository();
+}
+
+AnnouncementsRepository announcementsRepositoryOf(BuildContext context) {
+  return Provider.of<AnnouncementsRepository>(context, listen: false);
 }
