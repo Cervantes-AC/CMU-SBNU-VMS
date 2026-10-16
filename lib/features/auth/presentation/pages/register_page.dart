@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
+import '../view_models/auth_view_model.dart';
 
-/// Registration page for new volunteer accounts.
+/// Registration page for new volunteer accounts — fully functional.
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -17,6 +20,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _displayNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -35,11 +40,21 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     setState(() => _isSubmitting = true);
 
-    // Note: Registration flows through the auth ViewModel/repository.
-    // This page collects input and delegates to the ViewModel.
+    final viewModel = context.read<AuthViewModel>();
+    await viewModel.register(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      displayName: _displayNameController.text.trim(),
+    );
+
     if (mounted) {
       setState(() => _isSubmitting = false);
-      showAppSnackbar(context, 'Registration submitted for review.');
+      if (viewModel.error != null) {
+        showAppSnackbar(context, viewModel.error!.message, isError: true);
+      } else if (viewModel.isAuthenticated) {
+        showAppSnackbar(context, 'Account created. Awaiting approval.');
+        context.go('/workspace');
+      }
     }
   }
 
@@ -130,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           label: 'Password',
                           hint: '••••••••',
                           icon: Icons.lock_outline,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a password';
@@ -140,6 +155,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             }
                             return null;
                           },
+                          suffixIcon: _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          onSuffixTap: () {
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
+                          },
                         ),
                         const SizedBox(height: 16),
                         AppInputField(
@@ -147,12 +170,21 @@ class _RegisterPageState extends State<RegisterPage> {
                           label: 'Confirm password',
                           hint: '••••••••',
                           icon: Icons.lock_outline,
-                          obscureText: true,
+                          obscureText: _obscureConfirmPassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please confirm your password';
                             }
                             return null;
+                          },
+                          suffixIcon: _obscureConfirmPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          onSuffixTap: () {
+                            setState(
+                              () => _obscureConfirmPassword =
+                                  !_obscureConfirmPassword,
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
@@ -170,9 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         SizedBox(
                           width: double.infinity,
                           child: TextButton(
-                            onPressed: () {
-                              // Navigate to sign in
-                            },
+                            onPressed: () => context.go('/account/sign-in'),
                             child: const Text(
                               'Already have an account? Sign in',
                             ),

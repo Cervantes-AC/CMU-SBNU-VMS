@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
 import '../../data/auth_repository.dart';
 import '../view_models/auth_view_model.dart';
 
-/// Sign-in page with email and password.
+/// Sign-in page with email and password — fully functional.
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
@@ -18,6 +19,7 @@ class _SignInPageState extends State<SignInPage> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -42,6 +44,7 @@ class _SignInPageState extends State<SignInPage> {
         showAppSnackbar(context, viewModel.error!.message, isError: true);
       } else if (viewModel.isAuthenticated) {
         showAppSnackbar(context, 'Welcome back!');
+        context.go('/workspace');
       }
     }
   }
@@ -120,21 +123,27 @@ class _SignInPageState extends State<SignInPage> {
                           label: 'Password',
                           hint: '••••••••',
                           icon: Icons.lock_outline,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
                             }
                             return null;
                           },
+                          suffixIcon: _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          onSuffixTap: () {
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
+                          },
                         ),
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () {
-                              // Navigate to password recovery
-                            },
+                            onPressed: () => context.go('/account/recover'),
                             child: const Text('Forgot password?'),
                           ),
                         ),
@@ -153,9 +162,7 @@ class _SignInPageState extends State<SignInPage> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
-                            onPressed: () {
-                              // Navigate to registration
-                            },
+                            onPressed: () => context.go('/account/register'),
                             child: const Text('Create an account'),
                           ),
                         ),

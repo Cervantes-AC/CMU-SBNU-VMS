@@ -8,6 +8,8 @@ class AppInputField extends StatelessWidget {
     required this.label,
     this.hint,
     this.icon,
+    this.suffixIcon,
+    this.onSuffixTap,
     this.keyboardType,
     this.obscureText = false,
     this.validator,
@@ -22,6 +24,8 @@ class AppInputField extends StatelessWidget {
   final String label;
   final String? hint;
   final IconData? icon;
+  final IconData? suffixIcon;
+  final VoidCallback? onSuffixTap;
   final TextInputType? keyboardType;
   final bool obscureText;
   final String? Function(String?)? validator;
@@ -61,6 +65,16 @@ class AppInputField extends StatelessWidget {
                 : null,
             prefixText: prefixText,
             suffixText: suffixText,
+            suffixIcon: suffixIcon != null
+                ? GestureDetector(
+                    onTap: onSuffixTap,
+                    child: Icon(
+                      suffixIcon,
+                      size: 20,
+                      color: const Color(0xFF748078),
+                    ),
+                  )
+                : null,
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(

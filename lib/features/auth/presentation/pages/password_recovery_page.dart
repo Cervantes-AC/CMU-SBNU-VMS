@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../shared/presentation/widgets/app_shared_presentation.dart';
+import '../view_models/auth_view_model.dart';
 
-/// Password recovery page.
+/// Password recovery page — fully functional.
 class PasswordRecoveryPage extends StatefulWidget {
   const PasswordRecoveryPage({super.key});
 
@@ -25,13 +28,20 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
 
-    // Note: Password reset flows through the auth ViewModel/repository.
+    final viewModel = context.read<AuthViewModel>();
+    await viewModel.sendPasswordReset(email: _emailController.text.trim());
+
     if (mounted) {
       setState(() => _isSubmitting = false);
-      showAppSnackbar(
-        context,
-        'If an account exists, a reset link has been sent.',
-      );
+      if (viewModel.error != null) {
+        showAppSnackbar(context, viewModel.error!.message, isError: true);
+      } else {
+        showAppSnackbar(
+          context,
+          'If an account exists, a reset link has been sent.',
+        );
+        context.go('/account/sign-in');
+      }
     }
   }
 
@@ -111,6 +121,14 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                             onPressed: _handleReset,
                             isLoading: _isSubmitting,
                             icon: Icons.email,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            onPressed: () => context.go('/account/sign-in'),
+                            child: const Text('Back to sign in'),
                           ),
                         ),
                       ],
