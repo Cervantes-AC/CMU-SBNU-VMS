@@ -16,7 +16,7 @@ class AuthPage extends StatelessWidget {
 
   String get _description => switch (mode) {
     AuthPageMode.signIn =>
-      'The approved Firebase development project is connected. Account sign-in is waiting for an approved identity method and account lifecycle.',
+      'The approved Firebase development project is configured for this build. Account sign-in is waiting for an approved identity method and account lifecycle.',
     AuthPageMode.register =>
       'Registration and account approval steps are pending owner decisions.',
     AuthPageMode.recover =>

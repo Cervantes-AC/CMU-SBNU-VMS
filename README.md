@@ -23,7 +23,14 @@ flutter pub get
 flutter run
 ```
 
-Use a development Firebase project and synthetic data only. Firebase app options are generated in `lib/firebase_options.dart`; configure the intended development project using the team's approved FlutterFire workflow. Do not add service-account credentials, production secrets, or real volunteer/incident data to the client or source control. Never ship server credentials in a Flutter app.
+The selected development project is `cmu-sbnu-vms`, and the Flutter client options are in `lib/firebase_options.dart`. Firebase Core initializes from those options, but the current app performs no Auth or Firestore reads/writes. Use synthetic data only. To prototype Auth and Firestore locally, start the emulators and run the app with the explicit emulator flag:
+
+```sh
+firebase emulators:start --only auth,firestore
+flutter run --dart-define=USE_FIREBASE_EMULATORS=true
+```
+
+For an Android emulator, set `--dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2` as well. Do not add service-account credentials, production secrets, or real volunteer/incident data to the client or source control. Never ship server credentials in a Flutter app.
 
 ## Repository map
 
