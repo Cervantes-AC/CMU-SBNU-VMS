@@ -16,6 +16,8 @@ import 'features/organizations/data/organizations_repository.dart';
 import 'features/organizations/presentation/view_models/organizations_view_model.dart';
 import 'features/reporting/data/reports_repository.dart';
 import 'features/reporting/presentation/view_models/reports_view_model.dart';
+import 'features/audit/data/audit_preview_repository.dart';
+import 'features/audit/presentation/view_models/audit_preview_view_model.dart';
 import 'features/auth/presentation/auth_page.dart';
 import 'features/landing/presentation/landing_page.dart';
 import 'features/overview/presentation/overview_page.dart';
@@ -83,6 +85,9 @@ class NSRCApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ReportsViewModel(PreviewReportsRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AuditPreviewViewModel(SampleAuditPreviewRepository()),
         ),
       ],
       child: MaterialApp.router(

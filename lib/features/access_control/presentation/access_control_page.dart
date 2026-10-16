@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../audit/presentation/audit_preview_dialog.dart';
+
 class AccessControlPage extends StatelessWidget {
   const AccessControlPage({super.key});
 
@@ -259,6 +261,12 @@ class AccessControlPage extends StatelessWidget {
       const _StatusRow(
         label: 'Support and recovery owner',
         value: 'To be confirmed',
+      ),
+      const SizedBox(height: 8),
+      OutlinedButton.icon(
+        onPressed: () => AuditPreviewDialog.show(context),
+        icon: const Icon(Icons.history),
+        label: const Text('Preview synthetic audit events'),
       ),
       const SizedBox(height: 14),
       const Text(
