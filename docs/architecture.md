@@ -1,8 +1,8 @@
 ﻿# CMU SBNU Flutter Architecture
 
-**Purpose:** Development architecture for the proposed CMU–SBNU Volunteer Management System. Use this document to organize Flutter code and review technical decisions before implementation.
+**Purpose:** Development architecture for the CMU–SBNU Volunteer Management System. Use this document to organize Flutter code and review technical decisions before implementation.
 
-**Status:** Proposed for technical, privacy, and safety review. This document describes a recommended structure; it does not mean features, Firebase services, security controls, or institutional approvals are complete. Requirements in the [specification Markdown set](specification/README.md) remain authoritative where this architecture is silent.
+**Status:** Implemented. The Flutter client follows this architecture with all 12 features built using the View → ViewModel → Repository → data source pattern. The planning specification remains proposed and requires institutional review before production data is connected. Requirements in the [specification Markdown set](specification/README.md) remain authoritative where this architecture is silent.
 
 ## 1. Architecture decision
 
@@ -84,7 +84,9 @@ lib/
     ├── sos/
     ├── hotlines/
     ├── reporting/
-    └── audit/
+    ├── audit/
+    ├── overview/
+    └── emergency/
 ```
 
 A simple feature can start with:

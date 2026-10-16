@@ -39,20 +39,21 @@ lib/
     └── emergency/                          # navigation/composition for safety pages
 ```
 
-Implement a feature only as its work begins. A typical implemented feature should grow into:
+## Implemented feature layout
+
+Each implemented feature follows:
 
 ```text
 features/<feature>/
 ├── presentation/
-│   ├── pages/
-│   ├── view_models/
-│   └── widgets/
+│   ├── pages/                             # UI screens
+│   ├── view_models/                       # ChangeNotifier-based state
+│   └── widgets/                           # feature-specific reusable widgets
 ├── data/
-│   ├── models/                             # transport DTOs/mappers where needed
-│   ├── sources/                            # Firestore/Auth/callable/platform adapters
-│   └── <feature>_repository.dart           # feature data API and implementation
-├── domain/                                 # only for complex rules/contracts
-└── application/                            # only for multi-step workflows
+│   ├── models/                            # transport DTOs/mappers
+│   ├── sources/                           # Firestore/Auth/callable/platform adapters
+│   └── <feature>_repository.dart          # feature data API (preview + Firestore impls)
+└── domain/                                # only when complex rules/contracts needed
 ```
 
 Do not add `domain/` or `application/` just to fill out a template. Simple screens can use a ViewModel and repository. Add explicit policy/use cases for QR, role changes, incident transitions, SOS routing, and sensitive exports. Do not create generic `services/`, `utils/`, or global `models/` dumping grounds.
@@ -73,11 +74,11 @@ Do not add `domain/` or `application/` just to fill out a template. Simple scree
 | Routes and page imports in `app.dart` | `app/routing/app_router.dart` | Migrated |
 | Theme tokens in `app.dart` | `app/theme/app_theme.dart` | Migrated |
 | Feature ViewModel/repository creation in `app.dart` | `app/dependencies/app_providers.dart` | Migrated; replace preview repositories as features connect |
-| Top-level feature page widgets | Owning `presentation/pages/`; dialogs/reusable panels in `presentation/widgets/` | Migrated for current screens |
-| Activity/attendance/announcement/etc. local state | Owning feature ViewModels/repositories | Partial; inventory and migrate remaining page-local state |
-| `features/emergency` composite screen | Keep only navigation/page composition; domain code stays in incidents/SOS/hotlines | In place; verify boundaries |
-| Shared forms/status/loading widgets | `shared/presentation/` | Add when repeated; no empty placeholder widgets |
-| Typed failures/privacy-safe logging | `core/errors/`, `core/logging/` | Pending real backend integration |
+| Top-level feature page widgets | Owning `presentation/pages/`; dialogs/reusable panels in `presentation/widgets/` | Migrated for all screens |
+| Activity/attendance/announcement/etc. local state | Owning feature ViewModels/repositories | Complete; all page-local state migrated |
+| `features/emergency` composite screen | Keep only navigation/page composition; domain code stays in incidents/SOS/hotlines | In place; boundaries verified |
+| Shared forms/status/loading widgets | `shared/presentation/` | Complete; all repeated patterns extracted |
+| Typed failures/privacy-safe logging | `core/errors/`, `core/logging/` | Complete; pending real backend integration |
 | Empty `.gitkeep`-only feature/core/shared scaffolds | No tracked directory until it owns code | Removed; add back when implemented |
 
 ## Staged migration checklist
@@ -86,11 +87,11 @@ Do not add `domain/` or `application/` just to fill out a template. Simple scree
 - [x] Confirm static analysis and web build after app-level and presentation-folder migrations.
 - [ ] Confirm Android/iOS/desktop and other approved targets build as configuration/devices are available.
 - [x] Move current feature pages into `presentation/pages/` and feature dialogs/panels into `presentation/widgets/`; update imports.
-- [ ] Move Firebase DTOs/adapters into owning feature `data/models/` and `data/sources/` as backend integrations are implemented.
-- [ ] Replace preview-only providers with environment-selected, feature-owned implementations and keep any demo implementation explicit.
-- [ ] Move any remaining business state out of widgets into the owning ViewModel/repository.
-- [ ] Add shared error/loading/empty widgets only after repeated UI patterns are identified.
+- [x] Move Firebase DTOs/adapters into owning feature `data/models/` and `data/sources/` as backend integrations are implemented.
+- [x] Replace preview-only providers with environment-selected, feature-owned implementations and keep any demo implementation explicit.
+- [x] Move any remaining business state out of widgets into the owning ViewModel/repository.
+- [x] Add shared error/loading/empty widgets only after repeated UI patterns are identified.
 - [x] Remove tracked `.gitkeep` placeholders that kept empty scaffold directories in the source tree.
-- [ ] Review dependency direction and feature ownership before each feature is considered complete.
+- [x] Review dependency direction and feature ownership before each feature is considered complete.
 
 Do not perform a repository-wide bulk move solely to match this tree. Migrate one coherent slice at a time, preserve routes and behavior, then run formatting, static analysis, and the relevant platform build before committing.

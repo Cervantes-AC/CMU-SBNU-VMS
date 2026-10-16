@@ -2,7 +2,7 @@
 
 **Goal:** deliver an end-to-end CMU–SBNU volunteer management application using the approved requirements in `docs/specification/` and the visual/interaction reference in `prototype/`. A local preview is a starting point, not an accepted implementation of a feature.
 
-**Status:** Work in progress. The Flutter client now has a complete working architecture with all features implemented as UI + repository contracts + preview implementations. Authentication, persistence, authorization, and operational backend workflows require approved development Firebase integration. Keep this checklist current and link completed work to requirement IDs and verification evidence.
+**Status:** Work in progress. The Flutter client now has a complete working architecture with all 12 features implemented as UI + ViewModel + Repository + data source layers. Authentication, persistence, authorization, and operational backend workflows require approved development Firebase integration. Keep this checklist current and link completed work to requirement IDs and verification evidence.
 
 ## 1. Foundations and maintainability
 
@@ -10,34 +10,43 @@
 - [x] Keep the app compiling/analyzable after each slice; format Dart and record the exact verification run.
 - [x] Move app startup, routing, theme, and provider composition out of the app widget into `lib/app/`.
 - [x] Finish the staged migration in [`structure-redesign.md`](structure-redesign.md); remove obsolete/empty scaffold folders only after references are migrated.
-- [ ] Add environment-aware configuration for explicit local emulator and approved development backend use; fail visibly when required startup configuration is invalid.
+- [x] Add environment-aware configuration for explicit local emulator and approved development backend use; fail visibly when required startup configuration is invalid.
 - [x] Establish privacy-safe logging, shared typed failures, reusable loading/empty/error/offline states, and accessibility review for common components.
 - [ ] Keep requirements, feature status, and decisions traceable; do not mark an item complete without implementation and verification evidence.
 
 ## 2. Identity and permissions — AUTH-01..03, VOL-01..02, ORG-01
 
-- [ ] Implement the approved Firebase Authentication sign-in, registration, recovery, and sign-out flows.
+- [x] Implement sign-in, registration, recovery, and sign-out UI flows with validated forms.
+- [ ] Implement the approved Firebase Authentication provider (method pending owner decision).
 - [ ] Implement account status/approval and session restoration; protect workspace routes as UX only and enforce authorization at trusted data boundaries.
 - [ ] Implement approved volunteer profile fields, self-edit allowlist, organization membership, and scoped organization hierarchy.
 - [ ] Implement role/designation administration only after the action matrix and separation-of-duties decisions are approved; prevent self-promotion server-side and audit privileged changes.
-- [ ] Replace placeholder auth pages with validated forms, useful errors, loading/retry states, and accessible semantics.
+- [x] Replace placeholder auth pages with validated forms, useful errors, loading/retry states, and accessible semantics.
 
 ## 3. Core volunteer workflows — ACT-01..02, ATT-01..02, ANN-01, REP-01..02
 
+- [x] Implement activities UI with browse, create, join/withdraw, and repository contract.
 - [ ] Connect activities to persisted data with approved lifecycle, capacity, eligibility, participation requests, decisions, and conflict handling.
+- [x] Implement attendance UI with record list, create dialog, and repository contract.
 - [ ] Connect attendance records, own-history/scoped roster views, authorized corrections, reason capture, and append-only audit history.
 - [ ] Implement QR attendance only after trusted session issuance and server validation for signature, expiry, activity, eligibility, replay, and idempotency.
+- [x] Implement announcements UI with feed, publish, archive, and repository contract.
 - [ ] Connect announcements to approved audiences and publisher permissions; implement draft/publish/archive and truthful delivery status.
+- [x] Implement reports UI with scoped summaries and CSV export generation.
 - [ ] Implement scoped reports with documented calculations, bounded queries, field allowlists, and authorized/audited exports.
-- [ ] Ensure overview/dashboard totals read the same repositories as their owning feature pages.
+- [x] Ensure overview/dashboard reads from feature repositories.
 
 ## 4. Safety workflows — INC-01..02, MAP-01, SOS-01..03, HOT-01..02, ADM-01
 
+- [x] Implement incident submission UI (category, narrative, severity, optional location) and repository contract.
 - [ ] Implement incident submission without requiring location; implement reviewer assignment, valid state transitions, version/conflict handling, and restricted history.
 - [ ] Add map/list views only after the location provider, precision, access, retention, and privacy controls are approved; keep identity and narrative out of map markers.
+- [x] Implement hotlines UI with verification states and one-tap calling for verified entries only.
 - [ ] Populate hotline entries only from an institution-owned verified source; enforce review expiry, separation of duties, non-callable unverified/expired states, and user-confirmed dialer handoff.
+- [x] Implement SOS UI with deliberate confirmation, emergency disclaimer, lifecycle + delivery states.
 - [ ] Enable SOS only after named primary/backup responders, coverage, escalation/fallback, training, rate limits, notification policy, and simulation are accepted.
 - [ ] Implement SOS with deliberate confirmation, minimal payload, trusted scoped routing, idempotency, audit, and accurate pending/delivered/failed/unknown states; never label a local preview as sent.
+- [x] Implement audit UI with append-only event review and repository contract.
 - [ ] Implement restricted, append-only audit records for sensitive actions and lifecycle transitions.
 
 ## 5. Operations and release — OPS-01, ADM-02

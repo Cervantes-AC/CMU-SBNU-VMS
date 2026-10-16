@@ -1,7 +1,7 @@
 # Development Status
 
 **Last updated:** 2026-10-17
-**Status:** Working Flutter application with complete feature architecture. The planning specification remains proposed and requires institutional review.
+**Status:** Working Flutter application with complete feature architecture. All 12 features are implemented with UI + ViewModel + Repository + data source layers. The planning specification remains proposed and requires institutional review before production data is connected.
 
 ## Implemented in the Flutter client
 
@@ -18,39 +18,45 @@
 - `AuthRepository` contract + `FirebaseAuthRepository` implementation backed by Firebase Auth
 - `AuthViewModel` with sign-in/register/reset/sign-out state, loading/error states
 - Auth state stream and `currentUser` accessor
-- Route guards for `/account/*` pages; workspace routes accessible
+- Routes: `/account/sign-in`, `/account/register`, `/account/recover`
 
 ### Access Control (complete UI)
 - Access & operations page with proposed permission matrix (Volunteer / Officer / Admin / Server)
 - Matrix is UX guidance only; real authorization is enforced at trusted backend boundaries
+- Route: `/access-control` (via workspace), `/organizations`
 
 ### Organizations (complete UI + preview repository)
 - Organization directory with name, status, coordinator list
 - Create organization dialog
 - `OrganizationsRepository` contract + preview + Firestore implementations
+- Route: `/organizations`
 
 ### Volunteers (complete UI + preview repository)
-- Volunteer roster with college filter and search
+- Volunteer roster with college filter
 - Volunteer profile detail (full name, email, college, course, student ID, status)
 - `VolunteersRepository` contract + preview + Firestore implementations
+- Route: `/volunteers`
 
 ### Activities (complete UI + preview repository)
 - Activity browse with published status filter
-- Activity detail, create dialog (title, description, venue)
+- Activity create dialog (title, description, venue)
 - Join/withdraw participation
 - `ActivitiesRepository` contract + preview + Firestore implementations
+- Route: `/activities`
 
 ### Attendance (complete UI + preview repository)
 - Attendance record list (activity, UID, status, source)
 - Record attendance dialog (activity ID, volunteer UID, status)
 - `AttendanceRepository` contract + preview + Firestore implementations
 - Personal attendance via collection-group query
+- Route: `/attendance`
 
 ### Announcements (complete UI + preview repository)
 - Announcement feed with status and priority badges
 - Create/publish dialog (title, message, audience)
 - Archive/delete operations
 - `AnnouncementsRepository` contract + preview + Firestore implementations
+- Route: `/announcements`
 
 ### Incidents (complete UI + preview repository)
 - Incident submission (category, narrative, severity, optional location)
@@ -58,6 +64,7 @@
 - Status transitions (submitted → under review → action in progress → resolved, etc.)
 - Append-only history events
 - `IncidentsRepository` contract + preview + Firestore implementations
+- Route: `/incidents`
 
 ### SOS (complete UI + preview repository, clearly labeled)
 - SOS alert creation with deliberate confirmation and emergency disclaimer
@@ -66,6 +73,7 @@
 - Location sharing is optional
 - Clearly labeled as NOT contacting public emergency services
 - `SosRepository` contract + preview + Firestore implementations
+- Route: `/sos`
 
 ### Hotlines (complete UI + preview repository)
 - Hotline directory with label, number, coverage, hours
@@ -73,20 +81,28 @@
 - One-tap calling only for verified active entries (url_launcher)
 - Unverified/expired entries visibly non-callable
 - `HotlinesRepository` contract + preview + Firestore implementations
+- Route: `/hotlines`
 
 ### Reporting (complete UI + preview repository)
 - Scoped report summaries (active volunteers, activities, service hours, attendance rate)
 - CSV export generation
 - `ReportsRepository` contract + preview + Firestore implementations
+- Route: `/reports`
 
 ### Audit (complete UI + preview repository)
 - Append-only audit event review (actor, action, record type, outcome, timestamp)
 - `AuditRepository` contract + preview + Firestore implementations
+- Route: `/audit`
 
 ### Overview / Dashboard (complete)
 - Dashboard with activity and service hour metrics
 - Navigation drawer with all workspace sections
 - Section content delegates to feature pages
+- Route: `/workspace`
+
+### Emergency & Safety (complete UI composition)
+- Tabbed composition: SOS / Incidents / Hotlines
+- Route: `/emergency`
 
 ### Navigation (complete)
 - GoRouter with routes: `/`, `/account/sign-in`, `/account/register`, `/account/recover`, `/workspace`, `/activities`, `/volunteers`, `/attendance`, `/announcements`, `/emergency`, `/reports`, `/sos`, `/incidents`, `/hotlines`, `/audit`, `/organizations`
